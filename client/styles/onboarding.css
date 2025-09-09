@@ -1,0 +1,54 @@
+.main-container {
+    height: 100vh;
+    width: 90%;
+    margin: 0 auto;
+
+    & main {
+        max-width: 100%;
+        height: 100%;
+        justify-content: flex-end;
+
+        & .headline {
+            font-size: 3rem;
+            font-weight: 500;
+        }
+    
+        & .vector_illustration {
+            height: 45%;
+            background-color: var(--accent);
+
+            & img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        & .auth_btn {
+            width: 100%;
+            height: 20%;
+            
+            & button {
+                width: 100%;
+                border-radius: 15px;
+                height: 40%;;
+                background: var(--accent);
+                transition: .2s ease-in-out;
+            }
+
+            & button:hover {
+                background: var(--secondary);
+            }
+            
+        }
+    }
+    
+    
+}
+
+.nav-dots {
+    width: 100%;
+    position: absolute;
+    bottom: 15%;
+    gap: 3%;
+}
