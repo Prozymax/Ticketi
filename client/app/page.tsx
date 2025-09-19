@@ -1,7 +1,59 @@
-import Image from "next/image";
+"use client";
+import "@/styles/splash.css";
+import "@/styles/mobileview/splash.css";
+import {useRouter} from "next/navigation";
+import {useEffect, useState} from "react";
 
-export default function Home() {
+export default function LandingPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUserStatus = () => {
+      try {
+        // Import the utility (dynamic import for client-side only)
+        import("./utils/userStorage").then(({UserStorage}) => {
+          // If user is already logged in and has a valid token, go to events
+          if (UserStorage.isLoggedIn() && UserStorage.getUserToken()) {
+            router.push("/events");
+            return;
+          }
+
+          // If user has visited before but not logged in, go to login
+          if (UserStorage.hasVisited()) {
+            router.push("/login");
+            return;
+          }
+
+          // First time visitor, go to onboarding
+          router.push("/onboarding/authenticate");
+        });
+      } catch (error) {
+        console.error("Error checking user status:", error);
+        // Fallback to onboarding if there's an error
+        router.push("/onboarding/authenticate");
+      }
+    };
+
+    // Show splash for 2 seconds then redirect
+    const timer = setTimeout(() => {
+      checkUserStatus();
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [router]);
+
   return (
-    <h1>Ticketi</h1>
+    <main className="flex flex-col items-center main">
+      <div className="logo-container">
+        <p className="logo_text">Ticket<span className="color-span">i</span></p>
+      </div>
+      {isLoading && (
+        <div className="loading-indicator">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+    </main>
   );
 }

@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #1F0349;
+  --splash-background: #1F0349;
+  --background: #000000;
   --foreground: #FFFFFF;
   --secondary: #F62585;
   --accent: #7D5B9C;
+  --accent-mid: rgba(76, 53, 98, 0.629);
+  --username-display: #e2d7ec;
   --accent-bold: #472083;
   --font-fredoka: var(--font-fredoka);
   --font-nunito: var(--font-nunito);
@@ -13,7 +16,8 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* --background: #0a0a0a; */ /* dark mode background */
-    --background: #1F0348;
+    --splash-background: #1F0348;
+    --background: #000000;
     --foreground: #ededed;
   }
 }

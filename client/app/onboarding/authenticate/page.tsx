@@ -61,7 +61,10 @@ export default function OnboardingCarousel() {
       >
         {slides.map((data, idx) => (
           <div key={idx} className="w-full flex-shrink-0">
-            <OnboardingSlide data={data} />
+            <OnboardingSlide 
+              data={data} 
+              isLastSlide={idx === slides.length - 1}
+            />
           </div>
         ))}
       </div>

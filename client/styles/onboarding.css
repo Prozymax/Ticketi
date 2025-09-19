@@ -1,3 +1,7 @@
+body {
+    background: var(--splash-background)
+}
+
 .main-container {
     height: 100vh;
     width: 90%;
@@ -15,31 +19,68 @@
     
         & .vector_illustration {
             height: 45%;
-            background-color: var(--accent);
 
             & img {
                 width: 100%;
-                height: 100%;
-                object-fit: cover;
             }
         }
 
         & .auth_btn {
             width: 100%;
             height: 20%;
+            flex-direction: column;
+            gap: 10px;
             
             & button {
                 width: 100%;
                 border-radius: 15px;
-                height: 40%;;
+                height: 40%;
                 background: var(--accent);
                 transition: .2s ease-in-out;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-weight: 500;
+                color: white;
+                border: none;
+                cursor: pointer;
             }
 
-            & button:hover {
+            & button:hover:not(.disabled):not(.loading) {
                 background: var(--secondary);
             }
-            
+
+            & button.loading {
+                background: var(--accent-mid);
+                cursor: not-allowed;
+            }
+
+            & button.disabled {
+                background: rgba(182, 148, 246, 0.5);
+                cursor: not-allowed;
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            & .loading-spinner {
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-top: 2px solid white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            & .auth-error {
+                background: rgba(255, 0, 0, 0.1);
+                border: 1px solid rgba(255, 0, 0, 0.3);
+                border-radius: 8px;
+                padding: 8px 12px;
+                color: #ff6b6b;
+                font-size: 14px;
+                text-align: center;
+                width: 100%;
+            }
         }
     }
     
@@ -51,4 +92,9 @@
     position: absolute;
     bottom: 15%;
     gap: 3%;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

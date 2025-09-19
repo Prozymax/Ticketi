@@ -1,0 +1,276 @@
+/* Mobile-specific styles for profile page */
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 0 20px;
+  }
+  
+  .profile-header {
+    padding: 20px 0 24px;
+  }
+  
+  .profile-title {
+    font-size: 20px;
+  }
+  
+  .user-info-section {
+    padding: 24px 0;
+  }
+  
+  .user-profile {
+    gap: 12px;
+  }
+  
+  .profile-avatar {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .username {
+    font-size: 18px;
+  }
+  
+  .verification-badge {
+    font-size: 13px;
+  }
+  
+  .followers-count {
+    font-size: 16px;
+  }
+  
+  .followers-label {
+    font-size: 13px;
+  }
+  
+  .section-title {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .menu-item {
+    padding: 14px 0;
+  }
+  
+  .menu-item:hover {
+    margin: 0 -20px;
+    padding: 14px 20px;
+  }
+  
+  .menu-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
+  }
+  
+  .menu-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .menu-text {
+    font-size: 15px;
+  }
+  
+  .menu-arrow svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .leave-app-button {
+    padding: 14px 16px;
+  }
+  
+  .leave-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
+  }
+  
+  .leave-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .leave-text {
+    font-size: 15px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .profile-container {
+    padding: 0 16px;
+  }
+  
+  .profile-header {
+    padding: 16px 0 20px;
+  }
+  
+  .profile-title {
+    font-size: 18px;
+  }
+  
+  .user-info-section {
+    padding: 20px 0;
+  }
+  
+  .user-profile {
+    gap: 10px;
+  }
+  
+  .profile-avatar {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .username {
+    font-size: 16px;
+  }
+  
+  .verification-badge {
+    font-size: 12px;
+  }
+  
+  .followers-count {
+    font-size: 14px;
+  }
+  
+  .section-title {
+    font-size: 13px;
+  }
+  
+  .menu-item {
+    padding: 12px 0;
+  }
+  
+  .menu-item:hover {
+    margin: 0 -16px;
+    padding: 12px 16px;
+  }
+  
+  .menu-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+  }
+  
+  .menu-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .menu-text {
+    font-size: 14px;
+  }
+  
+  .leave-app-button {
+    padding: 12px 14px;
+  }
+  
+  .leave-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+  }
+  
+  .leave-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .leave-text {
+    font-size: 14px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  .profile-header {
+    padding: 12px 0 16px;
+  }
+  
+  .user-info-section {
+    padding: 16px 0;
+  }
+  
+  .profile-section {
+    margin-bottom: 24px;
+  }
+  
+  .section-title {
+    margin-bottom: 12px;
+  }
+  
+  .menu-item {
+    padding: 10px 0;
+  }
+  
+  .leave-app-section {
+    margin-top: 24px;
+    padding-bottom: 24px;
+  }
+}
+
+/* Touch-friendly adjustments */
+@media (pointer: coarse) {
+  .menu-item {
+    min-height: 48px;
+    padding: 12px 0;
+  }
+  
+  .leave-app-button {
+    min-height: 48px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .profile-avatar {
+    border-width: 1px;
+  }
+  
+  .verification-badge svg {
+    border-radius: 50%;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .profile-section {
+    animation: none;
+  }
+  
+  .leave-app-section {
+    animation: none;
+  }
+  
+  .menu-item {
+    transition: none;
+  }
+  
+  .leave-app-button {
+    transition: none;
+  }
+}
+
+/* Better contrast for low vision users */
+@media (prefers-contrast: high) {
+  .profile-title,
+  .username,
+  .menu-text {
+    color: #ffffff;
+  }
+  
+  .section-title,
+  .followers-label {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .menu-item {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .leave-app-button {
+    border-color: rgba(220, 38, 38, 0.6);
+    background: rgba(220, 38, 38, 0.2);
+  }
+}

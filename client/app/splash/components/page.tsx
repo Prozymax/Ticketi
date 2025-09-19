@@ -15,7 +15,7 @@ export default function TermsAndPrivacyPage({ content } : { content: LegalConten
         <h1 className="header">{content?.title}</h1>
         <p
           className="text-content"
-          dangerouslySetInnerHTML={{__html: content?.content}}
+          dangerouslySetInnerHTML={{__html: typeof content?.content === 'string' ? content.content : ""}}
         ></p>
         <p className="agreement flex items-center justify-center gap-3">
           {content?.param == "terms" && (
@@ -30,7 +30,7 @@ export default function TermsAndPrivacyPage({ content } : { content: LegalConten
         <p className="submit_next flex items-center justify-center">
           {content?.param === "terms" ? (
             <>
-              <Link href={"/onboarding"}>
+              <Link href={"/onboarding/authenticate"}>
                 <button type="button" title="next_btn">Next</button>
               </Link>
             </>

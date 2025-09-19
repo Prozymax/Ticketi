@@ -1,0 +1,157 @@
+/* Mobile-specific styles */
+@media (max-width: 980px) {
+  .header {
+    padding: 16px 0;
+  }
+  
+  .content {
+    padding: 20px 20px 24px;
+  }
+  
+  .profile-section {
+    margin-bottom: 40px;
+  }
+  
+  .avatar {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .verified-badge {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .verified-badge svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .username-display {
+    font-size: 13px;
+    padding: 6px 14px;
+  }
+  
+  .title-section {
+    margin-bottom: 40px;
+  }
+  
+  .title {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+  
+  .description {
+    font-size: 15px;
+    max-width: 95%;
+  }
+  
+  .input-section {
+    margin-bottom: 32px;
+  }
+  
+  .username-input {
+    padding: 14px 18px;
+    font-size: 15px;
+  }
+  
+  .continue-button {
+    padding: 14px;
+    font-size: 15px;
+    margin-bottom: 32px;
+  }
+  
+  .footer-links {
+    font-size: 12px;
+    padding: 0 10px;
+
+    & p {
+        width: 70%;
+    }
+  }
+
+  .mint-link {
+    font-size: 10px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .header {
+    padding: 12px 16px;
+  }
+  
+  .content {
+    padding: 16px 16px 20px;
+  }
+  
+  .title {
+    font-size: 22px;
+  }
+  
+  .description {
+    font-size: 14px;
+    max-width: 260px;
+  }
+  
+  .username-input {
+    padding: 12px 16px;
+  }
+  
+  .continue-button {
+    padding: 12px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  .content {
+    padding: 10px 20px 20px;
+  }
+  
+  .profile-section {
+    margin-bottom: 20px;
+  }
+  
+  .title-section {
+    margin-bottom: 20px;
+  }
+  
+  .title {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .description {
+    font-size: 14px;
+  }
+  
+  .input-section {
+    margin-bottom: 20px;
+  }
+  
+  .continue-button {
+    margin-bottom: 20px;
+  }
+}
+
+/* Touch-friendly adjustments */
+@media (pointer: coarse) {
+  .back-button {
+    padding: 12px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .username-input {
+    min-height: 48px;
+  }
+  
+  .continue-button {
+    min-height: 48px;
+  }
+  
+  .mint-link {
+    display: inline-block;
+  }
+}

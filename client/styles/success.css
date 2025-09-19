@@ -1,0 +1,307 @@
+/* Success Page Styles */
+.success-container {
+  min-height: 100vh;
+  background: var(--splash-background);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Logo Section */
+.success-logo {
+  margin-bottom: 60px;
+}
+
+.logo-text {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}
+
+.logo-accent {
+  color: var(--accent);
+}
+
+/* Congratulations Section */
+.congratulations-section {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.celebration-icons {
+  position: relative;
+  margin-bottom: 20px;
+  height: 60px;
+}
+
+.celebration-icon {
+  font-size: 32px;
+  position: absolute;
+  animation: bounce 2s infinite;
+}
+
+.celebration-icon.left {
+  left: -40px;
+  top: 0;
+  animation-delay: 0.2s;
+}
+
+.celebration-icon.right {
+  right: -40px;
+  top: 0;
+  animation-delay: 0.4s;
+}
+
+.confetti {
+  position: absolute;
+  font-size: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.confetti:nth-child(3) }  }
+e: 14px;
+-siz
+    fontx; 16png: 12pxddi {
+    paton  .share-butn,
+buttoomplete-
+  
+  .c14px;
+  }font-size: e {
+    -valu.detail  }
+  
+  
+13px;size: 
+    font-ail-label {det
+  
+  . 16px;
+  }padding:card {
+    details-  .event-}
+  
+20px;
+  : 24px 16px ddinger {
+    pantain-coess) {
+  .succpxth: 360widia (max- */
+@medscreensa small xtr}
+
+/* E0px;
+  }
+ight: -3  r {
+  icon.rightlebration-  
+  .ce0px;
+  }
+ft: -3    le.left {
+ation-icon .celebr 
+ ;
+  }
+ e: 28pxsiz{
+    font--icon elebration
+  .c  ;
+  }
+-size: 15px
+    font;x 20pxg: 14p
+    paddintton {share-bubutton,
+  ..complete- 
+  
+ 
+  }12px;    gap: uttons {
+ction-b
+  
+  .a  } 18px;
+font-size:alue {
+     .price-v
+ }
+  x;
+  : 17pizent-s   fost-name {
+ ho
+  .
+   };
+ : 15pxnt-size{
+    fotail-value   .de}
+  
+16px;
+  us: r-radi
+    bordeing: 20px;{
+    paddrd s-caevent-detail
+  .
+  
+  }ize: 15px;t-s    fonbtitle {
+suations-.congratul 
+  x;
+  }
+ 2pont-size: 2 f   title {
+s-ionngratulat  
+  .co  }
+ 28px;
+font-size:t {
+    
+  .logo-tex  }
+  px 24px;
+ 20g: 32px
+    paddinainer {ntcoss-
+  .succe480px) {dth: max-wi@media (
+ve */esponsi R
+/* Mobile
+}
+  }.8;
+y: 0
+    opaciteg);e(180dotatteY(-20px) rm: transla  transfor{
+  
+  50% : 1;
+  } opacity);
+   0degate(eY(0px) rotrm: translat transfo {
+   %, 100%
+  0s float {
+
+@keyframe  }
+}(-5px);
+ translateY  transform:  60% {
+  }
+10px);
+  anslateY(-sform: tr{
+    tran  }
+  40% lateY(0);
+form: transns{
+    tra 100% %,%, 80, 50%, 20% 0
+ s bounce {rame@keyf */
+ Animations0);
+}
+
+/*Y(translateorm: sfve {
+  trann:actiare-buttotive,
+.shbutton:acplete-
+}
+
+.comeY(-2px);nslatm: tra
+  transforsecondary);--nd: var(grou  backon:hover {
+-butt}
+
+.shareone;
+er: n
+  bordlor: white;
+  cot);var(--accenckground: tton {
+  bashare-bu}
+
+.x);
+ateY(-2pslform: tranans 0.3);
+  tr 255, 255,a(255,round: rgbckgover {
+  baete-button:h
+
+.compl, 0.3);
+}55, 255, 255a(2olid rgb 1px s;
+  border:ite: wh);
+  color5, 0.2 255, 25255,gba(und: r{
+  backgroton mplete-but}
+
+.co
+: center;ify-content justter;
+  cenign-items:
+  allex;play: f: 0;
+  disargins ease;
+  m.3l 0 aln:  transitioer;
+r: pointrso
+  cur;: centet-align00;
+  tex: 6t-weight fon6px;
+  1 font-size:2px;
+ adius: 1er-rx;
+  bord 24p16pxpadding: 
+  : 1; flex
+ button {re-
+.shate-button,
+
+.completo;
+} auin-top: marg: 400px;
+ 
+  max-width 100%;;
+  width: 16pxp:  ga
+x;isplay: fle{
+  dn-buttons 
+.actio */tons Action But
+/*}
+ht: 500;
+font-weig 1.4;
+  ine-height:  lpx;
+-size: 15{
+  fontion-text ocat
+.l00;
+}
+-weight: 7800;
+  fontor: #FFB;
+  col-size: 20pxfontue {
+  .price-val
+00;
+}
+-weight: 7ont
+  f 18px;ont-size:
+  fme {ost-na
+}
+
+.h3; 1.ight:
+  line-het: 600;t-weighon;
+  f: white
+  colorx; 16pt-size: {
+  fonail-value
+
+.det;
+}-weight: 400
+  font;: 4pxn-bottom;
+  margi, 255, 0.7)255rgba(255, : px;
+  coloront-size: 14 {
+  f-labelail
+}
+
+.detn-bottom: 0;  margist-child {
+laction:seail-.det}
+
+20px;
+gin-bottom:  {
+  martail-section
+}
+
+.de;ottom: 32px-bin;
+  marg: blur(10px)lterbackdrop-fi0px;
+  : 40dth
+  max-wih: 100%;  widtng: 24px;
+paddi  
+s: 20px;adiuer-r.1);
+  bord, 05, 255, 255lid rgba(25rder: 1px sod);
+  bocent-mid: var(--acroun  backgard {
+-ct-details
+.even Card */Detailsnt 
+/* Eve
+4;
+}-height: 1.
+  linegin: 0;.8);
+  mar 0 255, 255,r: rgba(255,px;
+  colont-size: 16itle {
+  foons-subtatiratul
+.cong;
+}
+color: white   12px 0;
+ 0 0gin:
+  mart: 700;  font-weigh24px;
+: ont-sizeitle {
+  fns-tulatiocongrat
+}
+
+.5s;ay: 1.tion-del
+  anima-50%); translateX(ransform:20px;
+  ttop: -t: 50%;
+  -3 {
+  leftticonfe 1s;
+}
+
+.n-delay:animatio 20px;
+   top:60px;
+  -
+  right:onfetti-2 {
+}
+
+.c: 0.5s;mation-delay  aniop: -10px;
+px;
+  t  left: -60{
