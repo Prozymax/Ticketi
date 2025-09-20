@@ -1,6 +1,6 @@
 "use client"
 import "@/styles/onboarding.css";
-import { usePiNetwork } from "@/app/hooks/usePiNetwork";
+// import { usePiNetwork } from "@/app/hooks/usePiNetwork";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -16,8 +16,9 @@ interface OnboardingSlideProps {
 }
 
 export default function OnboardingSlide({ data, isLastSlide = false }: OnboardingSlideProps) {
-  const { authenticate, isLoading, error, isSDKReady } = usePiNetwork();
+  // const { authenticate, isLoading, error, isSDKReady } = usePiNetwork();
   const router = useRouter();
+  const isLoading = false, isSDKReady = true, error = false;
   const [authError, setAuthError] = useState<string | null>(null);
 
   const handlePiAuthentication = async () => {
@@ -28,9 +29,9 @@ export default function OnboardingSlide({ data, isLastSlide = false }: Onboardin
       // await authenticate();
       
       // Set first visit cache and user data
-      const { UserStorage } = await import('../../../utils/userStorage');
-      UserStorage.setHasVisited();
-      UserStorage.setOnboardingCompleted();
+      // const { UserStorage } = await import('../../../utils/userStorage');
+      // UserStorage.setHasVisited();
+      // UserStorage.setOnboardingCompleted();
       
       // Navigate to edit-username page
       router.push('/onboarding/edit-username');

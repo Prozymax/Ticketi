@@ -209,14 +209,6 @@ p.create-event {
     gap: 12px;
   }
 
-  .event-title {
-    font-size: 28px;
-  }
-
-  .event-price {
-    align-self: flex-end;
-  }
-
   .detail-item {
     font-size: 13px;
     gap: 10px;
@@ -231,19 +223,6 @@ p.create-event {
 @media (max-width: 480px) {
   .event-content {
     padding: 16px;
-  }
-
-  .event-title {
-    font-size: 20px;
-  }
-
-  .event-price {
-    padding: 0;
-  }
-
-  .pi-symbol,
-  .price-amount {
-    font-size: 20px;
   }
 
   .detail-item {
