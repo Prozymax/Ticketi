@@ -1,7 +1,7 @@
 "use client";
 import {useState} from "react";
 import {slides} from "@/onboarding_data";
-import '@/styles/onboarding.css'
+import "@/styles/onboarding.css";
 import OnboardingSlide from "./components/page";
 
 export default function OnboardingCarousel() {
@@ -61,8 +61,8 @@ export default function OnboardingCarousel() {
       >
         {slides.map((data, idx) => (
           <div key={idx} className="w-full flex-shrink-0">
-            <OnboardingSlide 
-              data={data} 
+            <OnboardingSlide
+              data={data}
               isLastSlide={idx === slides.length - 1}
             />
           </div>
@@ -82,7 +82,6 @@ export default function OnboardingCarousel() {
           />
         ))}
       </div>
-
     </div>
   );
 }

@@ -43,8 +43,8 @@ export default function OnboardingSlide({ data, isLastSlide = false }: Onboardin
   };
 
   return (
-    <div className="main-container flex flex-col items-center justify-center">
-      <main className="flex flex-col items-center justify-center">
+    <div className="main-container">
+      <main>
         <h1 className="headline" dangerouslySetInnerHTML={{ __html: data?.title }}>
          </h1>
         <p className="description">
@@ -55,38 +55,38 @@ export default function OnboardingSlide({ data, isLastSlide = false }: Onboardin
                 <img src={data.image} alt="vector_illustration"/>
             }
         </div>
-
-        {/* Only show auth button on the last slide */}
-        {isLastSlide && (
-          <div className="auth_btn flex items-center text-center justify-center">
-            <button 
-              type="button" 
-              title="Authenticate with Pi Network"
-              onClick={handlePiAuthentication}
-              disabled={isLoading || !isSDKReady}
-              className={`pi-auth-button ${isLoading ? 'loading' : ''} ${!isSDKReady ? 'disabled' : ''}`}
-            >
-              {isLoading ? (
-                <>
-                  <div className="loading-spinner"></div>
-                  Authenticating...
-                </>
-              ) : !isSDKReady ? (
-                'Loading Pi SDK...'
-              ) : (
-                'Authenticate with Pi Network'
-              )}
-            </button>
-            
-            {/* Error message */}
-            {(error || authError) && (
-              <div className="auth-error">
-                {error || authError}
-              </div>
-            )}
-          </div>
-        )}
       </main>
+
+      {/* Only show auth button on the last slide */}
+      {isLastSlide && (
+        <div className="auth_btn">
+          <button 
+            type="button" 
+            title="Authenticate with Pi Network"
+            onClick={handlePiAuthentication}
+            disabled={isLoading || !isSDKReady}
+            className={`pi-auth-button ${isLoading ? 'loading' : ''} ${!isSDKReady ? 'disabled' : ''}`}
+          >
+            {isLoading ? (
+              <>
+                <div className="loading-spinner"></div>
+                Authenticating...
+              </>
+            ) : !isSDKReady ? (
+              'Loading Pi SDK...'
+            ) : (
+              'Authenticate with Pi Network'
+            )}
+          </button>
+          
+          {/* Error message */}
+          {(error || authError) && (
+            <div className="auth-error">
+              {error || authError}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
