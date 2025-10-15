@@ -34,8 +34,9 @@ export default function LoginPage() {
         return;
       }
 
-      // If not authenticated, check for stored username
-      const storedUsername = localStorage.getItem("pi_username");
+      // If not authenticated, check for stored username (client-side only)
+      if (typeof window !== 'undefined') {
+        const storedUsername = localStorage.getItem("pi_username");
       if (storedUsername) {
         console.log("Found stored username:", storedUsername);
         setUsername(storedUsername);
@@ -73,6 +74,10 @@ export default function LoginPage() {
         // No stored username, show input
         setShowUsernameInput(true);
       }
+      } else {
+        // Server-side rendering, show input
+        setShowUsernameInput(true);
+      }
     };
 
     loadStoredUsername();
@@ -80,7 +85,7 @@ export default function LoginPage() {
 
   // Store username when user data becomes available after authentication
   useEffect(() => {
-    if (user?.username && !localStorage.getItem("pi_username")) {
+    if (typeof window !== 'undefined' && user?.username && !localStorage.getItem("pi_username")) {
       localStorage.setItem("pi_username", user.username);
       console.log(
         "Username stored in localStorage after login:",

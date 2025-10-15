@@ -8,7 +8,7 @@ class CookieService {
         this.cookieOptions = {
             httpOnly: true, // Prevent XSS attacks
             secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-            sameSite: 'none', // Allow cross-site cookies
+            sameSite: 'lax', // Allow cross-site cookies
             maxAge: 24 * 60 * 60 * 1000, // 24 hours
             path: '/',
             // domain: process.env.COOKIE_DOMAIN || undefined // Set explicitly if needed

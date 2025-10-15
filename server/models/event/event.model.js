@@ -13,14 +13,19 @@ const Event = sequelize.define('Event', {
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: false
-    },
-    image: {
-        type: DataTypes.STRING,
         allowNull: true
     },
+    organizerId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        reference: {
+            model: 'users',
+            key: 'id'
+        },
+        field: 'organizer_id'
+    },
     location: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: false
     },
     startDate: {
@@ -33,33 +38,45 @@ const Event = sequelize.define('Event', {
         allowNull: false,
         field: 'end_date'
     },
-    startTime: {
-        type: DataTypes.STRING,
+    regularTickets: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        field: 'start_time'
+        defaultValue: 0,
+        field: 'regular_tickets'
     },
-    endTime: {
-        type: DataTypes.STRING,
+    ticketPrice: {
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
-        field: 'end_time'
+        defaultValue: 0.00,
+        field: 'ticket_price'
     },
-    status: {
-        type: DataTypes.ENUM('draft', 'published', 'cancelled', 'completed'),
-        defaultValue: 'draft'
+    eventImage: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'event_image'
     },
-    isActive: {
+    isPublished: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true,
-        field: 'is_active'
+        defaultValue: false,
+        field: 'is_published'
     },
-    createdBy: {
+    organizerId: {
         type: DataTypes.UUID,
         allowNull: false,
-        field: 'created_by',
+        field: 'organizer_id',
         references: {
             model: 'users',
             key: 'id'
         }
+    },
+    ticketsSold: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        field: 'tickets_sold'
+    },
+    status: {
+        type: DataTypes.ENUM('draft', 'published', 'cancelled', 'completed'),
+        defaultValue: 'draft'
     }
 }, {
     tableName: 'events',

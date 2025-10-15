@@ -4,12 +4,14 @@ const EventController = require('../../controllers/event.controller');
 const TicketController = require('../../controllers/ticket.controller');
 const PurchaseController = require('../../controllers/purchase.controller');
 const { authenticateToken, optionalAuth } = require('../../middleware/auth.middleware');
+const { uploadSingle } = require('../../middleware/upload.middleware');
 
 // Event routes
-router.post('/', EventController.createEvent);
-router.get('/', optionalAuth, EventController.getAllEvents);
-router.get('/:eventId', optionalAuth, EventController.getEventById);
-router.put('/:eventId', authenticateToken, EventController.updateEvent);
+router.post('/', authenticateToken, uploadSingle('eventImage'), EventController.createEvent);
+router.get('/', EventController.getAllEvents);
+router.get('/my', authenticateToken, EventController.getMyEvents);
+router.get('/:eventId', EventController.getEventById);
+router.put('/:eventId', authenticateToken, uploadSingle('eventImage'), EventController.updateEvent);
 router.delete('/:eventId', authenticateToken, EventController.deleteEvent);
 router.post('/:eventId/publish', authenticateToken, EventController.publishEvent);
 

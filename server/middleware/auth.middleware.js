@@ -11,6 +11,7 @@ const authenticateToken = async (req, res, next) => {
     try {
         // Try to get Pi access token from cookie first, then from Authorization header
         let userToken = cookieService.getAuthToken(req);
+        console.log(userToken)
 
         if (!userToken) {
             return res.status(401).json({

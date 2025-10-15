@@ -9,23 +9,46 @@ import '@/styles/mobileview/edit-username.css';
 export default function EditUsernamePage() {
   const [username, setUsername] = useState('pioneer');
   const [isLoading, setIsLoading] = useState(true);
-  c
+  const router = useRouter();
+
+  // Load username from localStorage on client side only
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("pi_username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+    setIsLoading(false);
+  }, []);
 
   const handleContinue = () => {
-    // Handle username update logic here
+    // Save username to localStorage
+    localStorage.setItem("pi_username", username);
     console.log('Username updated:', username);
-    router.push('/onboarding/finalizing-profile')
+    router.push('/onboarding/finalizing-profile');
   };
 
   const handleBack = () => {
     router.back();
   };
 
+  // Show loading state while checking localStorage
+  if (isLoading) {
+    return (
+      <div className="edit-username-container">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="edit-username-container">
       {/* Header with back button and progress indicator */}
       <div className="header">
         <button
+          type="button"
           title="back-button"
           className="back-button"
           onClick={handleBack}
@@ -53,16 +76,16 @@ export default function EditUsernamePage() {
           {/* Profile section */}
           <div className="profile-section">
             <div className="avatar-container">
-              <img
-                width="90"
-                height="90"
+              <Image
+                width={90}
+                height={90}
                 src="/Avatar.png"
                 alt="user-male-circle--v2"
               />
               <div className="verified-badge">
-                <img
-                  width="80"
-                  height="80"
+                <Image
+                  width={80}
+                  height={80}
                   src="https://img.icons8.com/fluency/48/instagram-verification-badge.png"
                   alt="instagram-verification-badge"
                 />
@@ -92,7 +115,7 @@ export default function EditUsernamePage() {
           </div>
 
           {/* Continue button */}
-          <button className="continue-button" onClick={handleContinue}>
+          <button type="button" className="continue-button" onClick={handleContinue}>
             Continue
           </button>
 

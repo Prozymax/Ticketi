@@ -1,156 +1,76 @@
-const EventService = require('../services/event.service');
-const { logger } = require('../utils/logger');
+const eventService = require('../services/event.service');
 const { ApiResponse } = require('../utils/response.utils');
 
 class EventController {
-    /**
-     * Create a new event
-     */
-    static async createEvent(req, res) {
-        try {
-            const userId = req.user?.id || '96d8a4f2-b2f4-467b-9852-f5b36b3af2b0';
-            const eventData = req.body;
+  createEvent = async (req, res) => {
+    return ApiResponse.success(res, { message: 'Event created' }, 'Success', 201);
+  }
 
-            if (!userId) {
-                return ApiResponse.unauthorized(res, 'User authentication required');
-            }
+  getAllEvents = async (req, res) => {
+    const { page, limit } = req.query;
+    let pageNumber = page || 1, limitNumber = limit || 10;
+    const eventsResponse = await eventService.getPublishedEvents(pageNumber, limitNumber);
 
-            const result = await EventService.createEvent(eventData, userId);
+    if (!eventsResponse || !eventsResponse || eventsResponse.error) {
+      return ApiResponse.error(res, eventsResponse.error || 'Error getting events', 500);
+    }
+    return ApiResponse.success(res, eventsResponse.events, 'Success', 200);
+  }
 
-            if (!result.success) {
-                return ApiResponse.error(res, result.error, 400);
-            }
+  getEventById = async (req, res) => {
+    const { id } = req.params;
+    const eventResponse = await eventService.getEventById(id);
 
-            return ApiResponse.success(res, result.event, 'Event created successfully', 201);
-        } catch (error) {
-            logger.error('Error in createEvent controller:', error);
-            return ApiResponse.serverError(res, 'Failed to create event');
-        }
+    if (!eventResponse || !eventResponse || eventResponse.error) {
+      return ApiResponse.error(res, eventResponse.error || 'Error getting event', 500);
+    }
+    return ApiResponse.success(res, eventResponse.event, 'Success', 200);
+  }
+
+  updateEvent = async (req, res) => {
+    try {
+      const { eventId, organizerId, updateData } = request.body;
+      const updatedEvent = await eventService.updateEvent(eventId, updateData, organizerId)
+
+      if (!updatedEvent || updatedEvent.error) {
+        return ApiResponse.error(res, 'Error updating event', 500);
+      }
+      return ApiResponse.success(res, updatedEvent.event, 'Success', 200);
+    }
+    catch(error) {
+      console.error(error);
+      return ApiResponse.error(res, 'Error updating event', 500);
+    }
     }
 
-    /**
-     * Get all events with pagination
-     */
-    static async getAllEvents(req, res) {
-        try {
-            const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
-            const filters = {
-                status: req.query.status,
-                search: req.query.search
-            };
+  deleteEvent = async (req, res) => {
+    const { eventId, organizerId } = req.params;
+    const eventResponse = await eventService.deleteEvent(eventId, organizerId);
 
-            const result = await EventService.getAllEvents(page, limit, filters);
-
-            if (!result.success) {
-                return ApiResponse.error(res, result.error, 400);
-            }
-
-            return ApiResponse.success(res, {
-                events: result.events,
-                pagination: result.pagination
-            }, 'Events retrieved successfully');
-        } catch (error) {
-            logger.error('Error in getAllEvents controller:', error);
-            return ApiResponse.serverError(res, 'Failed to retrieve events');
-        }
+    if (!eventResponse || !eventResponse || eventResponse.error) {
+      return ApiResponse.error(res, eventResponse.error || 'Error deleting event', 500);
     }
+    return ApiResponse.success(res, eventResponse.event, 'Success', 200);
+  }
 
-    /**
-     * Get event by ID
-     */
-    static async getEventById(req, res) {
-        try {
-            const { eventId } = req.params;
+  publishEvent = async (req, res) => {
+    const { eventId, organizerId } = req.params;
+    const eventResponse = await eventService.publishEvent(eventId, organizerId);
 
-            const result = await EventService.getEventById(eventId);
-
-            if (!result.success) {
-                return ApiResponse.notFound(res, result.error);
-            }
-
-            return ApiResponse.success(res, result.event, 'Event retrieved successfully');
-        } catch (error) {
-            logger.error('Error in getEventById controller:', error);
-            return ApiResponse.serverError(res, 'Failed to retrieve event');
-        }
+    if (!eventResponse || !eventResponse || eventResponse.error) {
+      return ApiResponse.error(res, eventResponse.error || 'Error publishing event', 500);
     }
+    return ApiResponse.success(res, eventResponse.event, 'Success', 200);
+  }
 
-    /**
-     * Update event
-     */
-    static async updateEvent(req, res) {
-        try {
-            const { eventId } = req.params;
-            const updateData = req.body;
-            const userId = req.user?.id;
-
-            if (!userId) {
-                return ApiResponse.unauthorized(res, 'User authentication required');
-            }
-
-            const result = await EventService.updateEvent(eventId, updateData, userId);
-
-            if (!result.success) {
-                return ApiResponse.error(res, result.error, 400);
-            }
-
-            return ApiResponse.success(res, result.event, 'Event updated successfully');
-        } catch (error) {
-            logger.error('Error in updateEvent controller:', error);
-            return ApiResponse.serverError(res, 'Failed to update event');
-        }
+  getMyEvents = async (req, res) => {
+    const { id } = req.user;
+    const eventsResponse = await eventService.getMyEvents(id);
+    if (!eventsResponse || !eventsResponse || eventsResponse.error) {
+      return ApiResponse.error(res, eventsResponse.error || 'Error getting events', 500);
     }
-
-    /**
-     * Delete event
-     */
-    static async deleteEvent(req, res) {
-        try {
-            const { eventId } = req.params;
-            const userId = req.user?.id;
-
-            if (!userId) {
-                return ApiResponse.unauthorized(res, 'User authentication required');
-            }
-
-            const result = await EventService.deleteEvent(eventId, userId);
-
-            if (!result.success) {
-                return ApiResponse.error(res, result.error, 400);
-            }
-
-            return ApiResponse.success(res, null, result.message);
-        } catch (error) {
-            logger.error('Error in deleteEvent controller:', error);
-            return ApiResponse.serverError(res, 'Failed to delete event');
-        }
-    }
-
-    /**
-     * Publish event
-     */
-    static async publishEvent(req, res) {
-        try {
-            const { eventId } = req.params;
-            const userId = req.user?.id;
-
-            if (!userId) {
-                return ApiResponse.unauthorized(res, 'User authentication required');
-            }
-
-            const result = await EventService.publishEvent(eventId, userId);
-
-            if (!result.success) {
-                return ApiResponse.error(res, result.error, 400);
-            }
-
-            return ApiResponse.success(res, result.event, 'Event published successfully');
-        } catch (error) {
-            logger.error('Error in publishEvent controller:', error);
-            return ApiResponse.serverError(res, 'Failed to publish event');
-        }
-    }
+    return ApiResponse.success(res, eventsResponse.events, 'Success', 200);
+  }
 }
 
-module.exports = EventController;
+module.exports = new EventController();

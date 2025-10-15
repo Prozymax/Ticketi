@@ -105,10 +105,10 @@ const BottomNavigation = () => {
     return pathname.startsWith(path);
   };
 
-  // Only show navigation on specific pages
+  // Only show navigation on specific pages (exclude home/splash page)
   const showNavigation = ['/events', '/event-hub', '/profile'].some(route => 
     pathname.startsWith(route)
-  ) || pathname === '/';
+  );
 
   if (!showNavigation) {
     return null;
