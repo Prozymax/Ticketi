@@ -2,6 +2,10 @@ body {
     background: var(--splash-background)
 }
 
+.nav-bottom {
+    display: none;
+}
+
 main {
     height: 100vh;
     width: 100%;

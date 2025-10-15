@@ -1,26 +1,25 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { usePiNetwork } from '@/app/hooks/usePiNetwork';
-import '@/styles/payment.css';
-import '@/styles/create-event.css';
+import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {useEventCreation} from "@/app/contexts/EventCreationContext";
+import {eventAPI, CreateEventRequest} from "@/app/utils/api";
+import {usePiNetwork} from "@/app/hooks/usePiNetwork";
+import "@/styles/payment.css";
+import "@/styles/create-event.css";
 
 export default function PaymentPage() {
   const router = useRouter();
-//   const { createPayment, isLoading, error } = usePiNetwork();
-    const isLoading = false;
+  const {state, reset} = useEventCreation();
+  const {eventData} = state;
+  const {createPayment, isLoading: piLoading, error: piError} = usePiNetwork();
+  const [isLoading, setIsLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
-  // Mock event data - in real app, this would come from state/props
-  const eventData = {
-    title: 'Token2049 Singapore',
-    ticketType: 'Regular',
-    ticketCount: 100,
-    eventCreationFee: 0.5,
-    blockchainFee: 0.1,
-    total: 0.6
-  };
+  // Calculate fees
+  const eventCreationFee = process.env.NEXT_PUBLIC_EVENT_CREATION_FEE || 0.5;
+  const blockchainFee = process.env.NEXT_PUBLIC_BLOCKCHAIN_FEE || 0.1;
+  const total = Number(eventCreationFee) + Number(blockchainFee);
 
   const handleBack = () => {
     router.back();
@@ -28,27 +27,82 @@ export default function PaymentPage() {
 
   const handleConfirmPayment = async () => {
     try {
+      setIsLoading(true);
       setPaymentError(null);
-      
+
+      // First create the event in the database
+      const createEventData: CreateEventRequest = {
+        title: eventData.title,
+        description: eventData.description,
+        location: eventData.location,
+        startDate: eventData.startDate,
+        endDate: eventData.endDate,
+        startTime: eventData.startTime,
+        endTime: eventData.endTime,
+        ticketTypes: [
+          {
+            ticketType: "Regular",
+            price: parseFloat(eventData.ticketPrice.replace("π", "")),
+            totalQuantity: eventData.regularTickets,
+            availableQuantity: eventData.regularTickets,
+          },
+        ],
+      };
+
+      const eventResult = await eventAPI.createEvent(createEventData);
+
+      if (!eventResult.success) {
+        throw new Error(eventResult.error || "Failed to create event");
+      }
+
       // Create Pi Network payment
-    //   const paymentId = await createPayment(
-    //     eventData.total,
-    //     `Event creation payment for ${eventData.title}`,
-    //     {
-    //       eventTitle: eventData.title,
-    //       ticketType: eventData.ticketType,
-    //       ticketCount: eventData.ticketCount
-    //     }
-    //   );
-      
-      console.log('Payment created');
-      
-      // Navigate to success page or back to events
-      router.push('/create-event/success');
-      
-    } catch (error) {
-      console.error('Payment failed:', error);
-      setPaymentError('Payment failed. Please try again.');
+      const paymentId = await createPayment(
+        total,
+        `Event creation payment for ${eventData.title}`,
+        {
+          eventId: eventResult.data.id,
+          eventTitle: eventData.title,
+          ticketType: "Regular",
+          ticketCount: eventData.regularTickets,
+          paymentType: "event_creation",
+        }
+      );
+
+      console.log("Payment created successfully:", paymentId);
+      console.log("Event created successfully:", eventResult.data);
+
+      const eventUpdate = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/events/${eventResult.data.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({status: "published"}),
+        }
+      );
+
+      if (!eventUpdate.ok) {
+        throw new Error("Failed to update event status");
+      }
+
+      // Reset the form state
+      reset();
+
+      // Navigate to success page
+      router.push("/create-event/success");
+    } catch (error: unknown) {
+      console.error("Payment/Event creation failed:", error);
+      if (error instanceof Error) {
+        setPaymentError(error.message || "Payment failed. Please try again.");
+        if (
+          error.message == 'Cannot create a payment without "payments" scope'
+        ) {
+          router.push("/login");
+        }
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -79,7 +133,7 @@ export default function PaymentPage() {
       {/* Payment Section */}
       <div className="payment-section">
         <h2 className="payment-title">Make payment</h2>
-        
+
         {/* Payment Card */}
         <div className="payment-card">
           {/* Event Title */}
@@ -89,15 +143,17 @@ export default function PaymentPage() {
 
           {/* Amount Display */}
           <div className="amount-section">
-            <div className="main-amount">0.60π</div>
-            <div className="usd-equivalent">≈ 0.010USDT</div>
+            <div className="main-amount">{total.toFixed(2)}π</div>
+            <div className="usd-equivalent">
+              ≈ {(total * 0.267).toFixed(3)}USDT
+            </div>
           </div>
 
           {/* Event Details */}
           <div className="event-details">
             <div className="detail-row">
-              <span className="detail-label">Ticket . {eventData.ticketType}</span>
-              <span className="detail-value">{eventData.ticketCount}</span>
+              <span className="detail-label">Ticket . Regular</span>
+              <span className="detail-value">{eventData.regularTickets}</span>
             </div>
             <div className="detail-row">
               <span className="detail-label">Event Title</span>
@@ -109,40 +165,42 @@ export default function PaymentPage() {
           <div className="cost-breakdown">
             <div className="breakdown-row">
               <span className="breakdown-label">For event creation</span>
-              <span className="breakdown-value">{eventData.eventCreationFee}π</span>
+              <span className="breakdown-value">{eventCreationFee}π</span>
             </div>
             <div className="breakdown-row">
               <span className="breakdown-label">Blockchain fee</span>
-              <span className="breakdown-value">{eventData.blockchainFee}π</span>
+              <span className="breakdown-value">{blockchainFee}π</span>
             </div>
             <div className="breakdown-row total-row">
               <span className="breakdown-label">Total</span>
-              <span className="breakdown-value">{eventData.total}π</span>
+              <span className="breakdown-value">{total}π</span>
             </div>
           </div>
 
           {/* Confirm Payment Button */}
           <div className="payment-button-section">
-            <p 
-              className={`confirm-payment-button ${isLoading ? 'loading' : ''}`}
-              onClick={!isLoading ? handleConfirmPayment : undefined}
+            <p
+              className={`confirm-payment-button ${
+                isLoading || piLoading ? "loading" : ""
+              }`}
+              onClick={
+                !(isLoading || piLoading) ? handleConfirmPayment : undefined
+              }
             >
-              {isLoading ? (
+              {isLoading || piLoading ? (
                 <>
                   <div className="loading-spinner"></div>
                   Processing...
                 </>
               ) : (
-                'Confirm to Pay'
+                "Confirm to Pay"
               )}
             </p>
-            
+
             {/* Error message */}
-            {/* {(error || paymentError) && (
-              <div className="payment-error">
-                {error || paymentError}
-              </div>
-            )} */}
+            {(paymentError || piError) && (
+              <div className="payment-error">{paymentError || piError}</div>
+            )}
           </div>
         </div>
       </div>

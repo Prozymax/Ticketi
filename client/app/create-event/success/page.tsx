@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useEventCreation } from '@/app/contexts/EventCreationContext';
+import { UserStorage } from '@/app/utils/userStorage';
 import '@/styles/create-event.css'
 import '@/styles/mobileview/create-event.css'
 
@@ -16,25 +18,29 @@ interface EventData {
 
 export default function SuccessPage() {
   const router = useRouter();
+  const { state } = useEventCreation();
   const [eventData, setEventData] = useState<EventData | null>(null);
 
   useEffect(() => {
-    // Get event data from localStorage or state management
-    const storedEventData = localStorage.getItem('eventData');
-    if (storedEventData) {
-      setEventData(JSON.parse(storedEventData));
-    } else {
-      // Fallback data for demo purposes
+    // Get user data
+    const userData = UserStorage.getUserData();
+    const username = userData?.username || 'Event Creator';
+    
+    // Use actual event data from context
+    if (state.eventData.title) {
       setEventData({
-        eventHost: 'Woodylightyearx',
-        price: '10π',
-        eventTitle: 'Token2049 Singapore',
-        tickets: '100 Regular Tickets',
-        location: 'Marina Bay Sands (10 Bayfront Avenue, Singapore, 018956, SG',
+        eventHost: username,
+        price: state.eventData.ticketPrice,
+        eventTitle: state.eventData.title,
+        tickets: `${state.eventData.regularTickets} Regular Tickets`,
+        location: state.eventData.location,
         creatorFee: '0.5π'
       });
+    } else {
+      // Fallback if no event data
+      router.push('/');
     }
-  }, []);
+  }, [state.eventData, router]);
 
   const handleComplete = () => {
     // Clear event data and navigate to home

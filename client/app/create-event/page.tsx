@@ -1,14 +1,22 @@
 "use client";
 
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
+import {useEventCreation} from "@/app/contexts/EventCreationContext";
 import "@/styles/create-event.css";
 import "@/styles/mobileview/create-event.css";
 
 export default function CreateEventPage() {
-  const [eventTitle, setEventTitle] = useState("");
-  const [eventDescription, setEventDescription] = useState("");
+  const {state, updateBasicInfo, setStep} = useEventCreation();
+  const [eventTitle, setEventTitle] = useState(state.eventData.title);
+  const [eventDescription, setEventDescription] = useState(
+    state.eventData.description
+  );
   const router = useRouter();
+
+  useEffect(() => {
+    setStep(1);
+  }, [setStep]); // Remove setStep from dependencies to prevent infinite loop
 
   const handleBack = () => {
     router.back();
@@ -16,7 +24,7 @@ export default function CreateEventPage() {
 
   const handleNext = () => {
     if (eventTitle.trim() && eventDescription.trim()) {
-      // Navigate to schedule step of event creation
+      updateBasicInfo(eventTitle, eventDescription);
       router.push("/create-event/schedule");
     }
   };

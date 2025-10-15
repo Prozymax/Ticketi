@@ -1,21 +1,27 @@
 "use client";
 
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
+import { useEventCreation } from "@/app/contexts/EventCreationContext";
 import "@/styles/create-event.css";
 import "@/styles/mobileview/create-event.css";
 
 export default function TicketsPage() {
+  const { state, updateTickets, setStep } = useEventCreation();
   const router = useRouter();
-  const [regularTickets, setRegularTickets] = useState(0);
-  const [ticketPrice, setTicketPrice] = useState("0.0π");
+  const [regularTickets, setRegularTickets] = useState(state.eventData.regularTickets);
+  const [ticketPrice, setTicketPrice] = useState(state.eventData.ticketPrice);
+
+  useEffect(() => {
+    setStep(3);
+  }, []); // Remove setStep from dependencies to prevent infinite loop
 
   const handleBack = () => {
     router.back();
   };
 
   const handleNext = () => {
-    // Navigate to summary step of event creation
+    updateTickets(regularTickets, ticketPrice);
     router.push("/create-event/summary");
   };
 

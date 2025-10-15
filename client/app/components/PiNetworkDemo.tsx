@@ -11,6 +11,7 @@ export const PiNetworkDemo: React.FC = () => {
     error,
     authenticate,
     createPayment,
+    createPaymentWithBackend,
     shareContent,
     isSDKReady,
   } = usePiNetwork();
@@ -32,6 +33,27 @@ export const PiNetworkDemo: React.FC = () => {
       );
       console.log("Payment created:", paymentId);
       alert(`Payment created successfully! ID: ${paymentId}`);
+    } catch (err) {
+      console.error("Payment error:", err);
+      alert(
+        "Payment failed: " +
+          (err instanceof Error ? err.message : "Unknown error")
+      );
+    }
+  };
+
+  const handleCreatePaymentWithBackend = async () => {
+    try {
+      const result = await createPaymentWithBackend(
+        "ticket_123", // ticketId
+        2, // quantity
+        "event_123", // eventId
+        2.0, // amount (2π for 2 tickets)
+        "Ticket purchase for demo event",
+        { ticketType: "regular", demo: true }
+      );
+      console.log("Payment created with backend integration:", result);
+      alert(`Payment created successfully!\nPi Payment ID: ${result.paymentId}\nBackend Payment ID: ${result.backendPaymentId}`);
     } catch (err) {
       console.error("Payment error:", err);
       alert(
@@ -131,23 +153,49 @@ export const PiNetworkDemo: React.FC = () => {
               borderRadius: "8px",
             }}
           >
-            <h3>Payment</h3>
-            <p>Create a test payment for 1π</p>
-            <button
-              onClick={handleCreatePayment}
-              disabled={isLoading}
-              style={{
-                padding: "12px 24px",
-                backgroundColor: "#10b981",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: isLoading ? "not-allowed" : "pointer",
-                opacity: isLoading ? 0.6 : 1,
-              }}
-            >
-              {isLoading ? "Creating Payment..." : "Pay 1π for Ticket"}
-            </button>
+            <h3>Payment Options</h3>
+            
+            <div style={{ marginBottom: "16px" }}>
+              <p>Simple Pi Network payment (1π)</p>
+              <button
+                onClick={handleCreatePayment}
+                disabled={isLoading}
+                style={{
+                  padding: "12px 24px",
+                  backgroundColor: "#10b981",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                  opacity: isLoading ? 0.6 : 1,
+                  marginRight: "12px",
+                }}
+              >
+                {isLoading ? "Creating Payment..." : "Pay 1π (Simple)"}
+              </button>
+            </div>
+
+            <div>
+              <p>Full backend integration payment (2π for 2 tickets)</p>
+              <button
+                onClick={handleCreatePaymentWithBackend}
+                disabled={isLoading}
+                style={{
+                  padding: "12px 24px",
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: isLoading ? "not-allowed" : "pointer",
+                  opacity: isLoading ? 0.6 : 1,
+                }}
+              >
+                {isLoading ? "Creating Payment..." : "Pay 2π (With Backend)"}
+              </button>
+              <p style={{ fontSize: "12px", color: "#666", marginTop: "8px" }}>
+                This creates a payment record on the backend first, then initiates Pi Network payment with automatic approval/completion callbacks.
+              </p>
+            </div>
           </div>
 
           <div

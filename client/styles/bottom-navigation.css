@@ -1,0 +1,44 @@
+/* Bottom Navigation Styles */
+.bottom-navigation {
+  /* Ensure it only shows on specific pages */
+  display: flex;
+  justify-content: center;
+  padding-block: .5rem;
+}
+
+/* Hide bottom navigation on pages that shouldn't have it */
+.hide-bottom-nav .bottom-navigation {
+  display: none !important;
+}
+
+/* Ensure proper spacing for pages with bottom navigation */
+body:has(.bottom-navigation) {
+  padding-bottom: 5rem;
+}
+
+/* Specific page adjustments */
+.create-event-container,
+.event-details-container,
+.onboarding-container {
+  padding-bottom: 1rem !important;
+}
+
+.create-event-container ~ .bottom-navigation,
+.home-main ~ .bottom-navigation,
+.event-details-container ~ .bottom-navigation,
+.onboarding-container ~ .bottom-navigation {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body:has(.bottom-navigation) {
+    padding-bottom: 4.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body:has(.bottom-navigation) {
+    padding-bottom: 4rem;
+  }
+}

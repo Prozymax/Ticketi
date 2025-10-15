@@ -1,28 +1,19 @@
 "use client";
 
-import {useState} from "react";
+import {useEffect} from "react";
 import {useRouter} from "next/navigation";
+import { useEventCreation } from "@/app/contexts/EventCreationContext";
 import "@/styles/create-event.css";
 import "@/styles/mobileview/create-event.css";
 
 export default function SummaryPage() {
+  const { state, setStep } = useEventCreation();
   const router = useRouter();
+  const { eventData } = state;
 
-  // Mock data - in a real app, this would come from state management or props
-  const [eventData] = useState({
-    tickets: {
-      regular: 28,
-      price: "10π",
-    },
-    title: "Token2049 Singapore",
-    description:
-      'A music festival in Sydney, Australia, is set to feature local artists in a series of live performances. The festival, called "Music in the Park," will showcase the work of up-and-coming musicians in the area.',
-    location: "Marina Bay Sands (10 Bayfront Avenue, Singapore, 018956, SG)",
-    startDate: "Sept 12, 2025",
-    startTime: "00:00GMT",
-    endDate: "Sept 12, 2025",
-    endTime: "00:00GMT",
-  });
+  useEffect(() => {
+    setStep(4);
+  }, []); // Remove setStep from dependencies to prevent infinite loop
 
   const handleBack = () => {
     router.back();
@@ -92,12 +83,12 @@ export default function SummaryPage() {
               <div className="summary-content">
                 <h3 className="summary-label">Ticket</h3>
                 <p className="summary-main-text">
-                  {eventData.tickets.regular} Regular Tickets
+                  {eventData.regularTickets} Regular Tickets
                 </p>
                 <div className="summary-sub-info">
                   <span className="summary-sub-label">Price</span>
                   <span className="summary-sub-value">
-                    {eventData.tickets.price}
+                    {eventData.ticketPrice}
                   </span>
                 </div>
               </div>

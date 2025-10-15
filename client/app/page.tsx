@@ -45,7 +45,7 @@ export default function LandingPage() {
   }, [router]);
 
   return (
-    <main className="flex flex-col items-center main">
+    <main className="flex flex-col items-center main home-main">
       <div className="logo-container">
         <p className="logo_text">Ticket<span className="color-span">i</span></p>
       </div>

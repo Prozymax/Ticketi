@@ -1,15 +1,93 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { usePiNetwork } from '../hooks/usePiNetwork';
-import '@/styles/login.css';
-import '@/styles/mobileview/login.css';
+import {useRouter} from "next/navigation";
+import {useState, useEffect} from "react";
+import {usePiNetwork} from "../hooks/usePiNetwork";
+import {apiService} from "../lib/api";
+import Image from "next/image";
+import "@/styles/login.css";
+import "@/styles/mobileview/login.css";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { authenticate, isLoading, error, isSDKReady } = usePiNetwork();
+  const {authenticate, isLoading, error, isSDKReady, user} = usePiNetwork();
   const [authError, setAuthError] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>("");
+  const [isCheckingUser, setIsCheckingUser] = useState<boolean>(false);
+  const [showUsernameInput, setShowUsernameInput] = useState<boolean>(true);
+  const [userVerificationStatus, setUserVerificationStatus] = useState<{
+    isVerified: boolean;
+    username: string;
+  } | null>(null);
+
+  // Load stored username and check verification status on mount
+  useEffect(() => {
+    const loadStoredUsername = async () => {
+      // First check if user is already authenticated
+      if (user) {
+        setUserVerificationStatus({
+          isVerified: user.isVerified,
+          username: user.username,
+        });
+        setUsername(user.username);
+        setShowUsernameInput(false);
+        return;
+      }
+
+      // If not authenticated, check for stored username
+      const storedUsername = localStorage.getItem("pi_username");
+      if (storedUsername) {
+        console.log("Found stored username:", storedUsername);
+        setUsername(storedUsername);
+
+        // Automatically verify the stored username
+        try {
+          setIsCheckingUser(true);
+          const response = await apiService.confirmUserVerification(
+            storedUsername
+          );
+
+          if (!response.error && response.verified) {
+            // User exists and is verified
+            setUserVerificationStatus({
+              isVerified: response.user.is_verified,
+              username: response.user.username,
+            });
+            setShowUsernameInput(false);
+            console.log("Stored username verified successfully");
+          } else {
+            // User doesn't exist or is not verified - show input for manual entry
+            console.log("Stored username not verified, showing input");
+            setShowUsernameInput(true);
+            setUserVerificationStatus(null);
+          }
+        } catch (error) {
+          console.error("Failed to verify stored username:", error);
+          // On error, show input for manual entry
+          setShowUsernameInput(true);
+          setUserVerificationStatus(null);
+        } finally {
+          setIsCheckingUser(false);
+        }
+      } else {
+        // No stored username, show input
+        setShowUsernameInput(true);
+      }
+    };
+
+    loadStoredUsername();
+  }, [user]);
+
+  // Store username when user data becomes available after authentication
+  useEffect(() => {
+    if (user?.username && !localStorage.getItem("pi_username")) {
+      localStorage.setItem("pi_username", user.username);
+      console.log(
+        "Username stored in localStorage after login:",
+        user.username
+      );
+    }
+  }, [user]);
 
   const handleBack = () => {
     router.back();
@@ -18,20 +96,32 @@ export default function LoginPage() {
   const handlePiNetworkAuth = async () => {
     try {
       setAuthError(null);
-      
+
       // Authenticate with Pi Network
-      await authenticate();
-      
+      const authResult = await authenticate();
+
       // Store user data and token (this is already handled in the usePiNetwork hook)
-      const { UserStorage } = await import('../utils/userStorage');
+      const {UserStorage} = await import("../utils/userStorage");
       UserStorage.setHasVisited();
-      
+
+      // Ensure username is stored after successful authentication
+      // The usePiNetwork hook already stores it, but let's be explicit
+      if (authResult && authResult?.username) {
+        localStorage.setItem("pi_username", authResult.username);
+        console.log(
+          "Username stored in localStorage after login auth:",
+          authResult?.username
+        );
+        router.push("/events");
+      }
+
       // Redirect to events page
-      router.push('/events');
-      
     } catch (error) {
-      console.error('Authentication failed:', error);
-      setAuthError('Authentication failed. Please try again.');
+      console.error("Authentication failed:", error);
+      setAuthError("Authentication failed. Please try again.");
+
+      // If authentication fails, redirect to onboarding
+      router.push("/onboarding/authenticate");
     }
   };
 
@@ -61,33 +151,35 @@ export default function LoginPage() {
         {/* Profile section */}
         <div className="profile-section">
           <div className="avatar-container">
-            <img 
-              src="/Avatar.png" 
-              alt="Profile avatar" 
-              className="avatar"
-            />
-            {/* <div className="verified-badge">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path 
-                  d="M9 12L11 14L15 10" 
-                  stroke="white" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div> */}
+            <img src="/Avatar.png" alt="Profile avatar" className="avatar" />
+            {user?.isVerified && (
+              <div className="verified-badge">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M9 12L11 14L15 10"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            )}
           </div>
-          
-          <h1 className="welcome-title">Welcome Back!</h1>
-          <div className="username-display">woodylightyearx</div>
+
+          <h1 className="welcome-title">
+            {user ? `Welcome Back, ${user.username}!` : "Welcome Back!"}
+          </h1>
+          {user && <div className="username-display">{user.username}</div>}
         </div>
 
         {/* Authentication section */}
         <div className="auth-section">
           <div className="auth-card">
-            <button 
-              className={`pi-auth-button ${isLoading ? 'loading' : ''} ${!isSDKReady ? 'disabled' : ''}`}
+            <button
+              className={`pi-auth-button ${isLoading ? "loading" : ""} ${
+                !isSDKReady ? "disabled" : ""
+              }`}
               onClick={handlePiNetworkAuth}
               disabled={isLoading || !isSDKReady}
             >
@@ -97,17 +189,15 @@ export default function LoginPage() {
                   Authenticating...
                 </>
               ) : !isSDKReady ? (
-                'Loading Pi SDK...'
+                "Loading Pi SDK..."
               ) : (
-                'Authenticate with Pi Network'
+                "Authenticate with Pi Network"
               )}
             </button>
-            
+
             {/* Error message */}
             {(error || authError) && (
-              <div className="auth-error">
-                {error || authError}
-              </div>
+              <div className="auth-error">{error || authError}</div>
             )}
           </div>
         </div>

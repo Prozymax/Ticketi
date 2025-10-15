@@ -68,6 +68,7 @@ p.near_user {
 /* Event Header */
 .event-header {
   display: flex;
+  background: none;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
@@ -184,7 +185,7 @@ p.create-event {
   width: fit-content;
   padding: .8rem;
   position: fixed;
-  bottom: 5%;
+  bottom: 12%;
   border-radius: 0 5px 5px 15px;
   right: 5%;
 }

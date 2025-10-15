@@ -1,13 +1,30 @@
 "use client";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {slides} from "@/onboarding_data";
 import "@/styles/onboarding.css";
 import OnboardingSlide from "./components/page";
+import {usePiNetwork} from "@/app/hooks/usePiNetwork";
+import {useRouter} from "next/navigation";
 
 export default function OnboardingCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const {authenticate, isLoading, error, isSDKReady, user} = usePiNetwork();
+  const router = useRouter();
+
+  // Store username when user data becomes available after authentication
+  useEffect(() => {
+    if (user?.username) {
+      localStorage.setItem("pi_username", user.username);
+      console.log(
+        "Username stored in localStorage after onboarding auth:",
+        user.username
+      );
+    }
+  }, [user]);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % slides.length);
@@ -47,40 +64,112 @@ export default function OnboardingCarousel() {
     setTouchEndX(null);
   };
 
+  const handlePiAuthentication = async () => {
+    try {
+      setAuthError(null);
+      console.log("Button clicked - Starting Pi Network authentication...");
+      console.log("SDK Ready:", isSDKReady);
+      console.log("Is Loading:", isLoading);
+      console.log("Current Error:", error);
+
+      // Authenticate with Pi Network and backend
+      const authResult = await authenticate();
+      console.log("Authentication response:", authResult);
+
+      // Set first visit cache and user data
+      const {UserStorage} = await import("../../utils/userStorage");
+      UserStorage.setHasVisited();
+      UserStorage.setOnboardingCompleted();
+      console.log("User storage updated");
+
+      // Navigate to edit-username page or events if user already exists
+      if (authResult && authResult.username) {
+        console.log("User has username, redirecting to events");
+        router.push(
+          "/onboarding/edit-username?username=" + authResult.username
+        );
+      } else {
+        console.log("No username found, staying on current page");
+        // Could redirect to a username setup page or handle accordingly
+      }
+    } catch (error) {
+      console.error("Pi Network authentication failed:", error);
+      setAuthError(
+        `Authentication failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  };
+
   return (
-    <div
-      className="relative w-full max-w-lg mx-auto overflow-hidden"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Slides */}
+    <div className="onboarding-container">
       <div
-        className="flex transition-transform duration-500 ease-in-out"
-        style={{transform: `translateX(-${currentIndex * 100}%)`}}
+        className="slides-wrapper"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
-        {slides.map((data, idx) => (
-          <div key={idx} className="w-full flex-shrink-0">
-            <OnboardingSlide
-              data={data}
-              isLastSlide={idx === slides.length - 1}
+        {/* Slides */}
+        <div className="slides-content">
+          {slides.map((data, idx) => (
+            <div
+              key={idx}
+              className={`slide ${idx === currentIndex ? "active" : ""}`}
+            >
+              <OnboardingSlide data={data} />
+            </div>
+          ))}
+        </div>
+
+        {/* Navigation Dots */}
+        <div className="nav-dots">
+          {slides.map((_, idx) => (
+            <button
+              type="button"
+              title="slide_nav"
+              key={idx}
+              onClick={() => goToSlide(idx)}
+              className={`nav-dot ${idx === currentIndex ? "active" : ""}`}
             />
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Navigation Dots */}
-      <div className="nav-dots flex justify-center">
-        {slides.map((_, idx) => (
-          <button
-            title="slide_nav"
-            key={idx}
-            onClick={() => goToSlide(idx)}
-            className={`w-3 h-3 rounded-full ${
-              idx === currentIndex ? "bg-purple-600 w-8" : "bg-gray-300"
-            }`}
-          />
-        ))}
+      {/* Static Authentication Button */}
+      <div className="auth-section">
+        {/* Debug info - remove in production */}
+        <div className="debug-info">
+          Debug: SDK Ready: {isSDKReady ? "✅" : "❌"} | Loading:{" "}
+          {isLoading ? "⏳" : "✅"} | Window.Pi:{" "}
+          {typeof window !== "undefined" && window.Pi ? "✅" : "❌"}
+        </div>
+
+        <button
+          type="button"
+          title="Authenticate with Pi Network"
+          onClick={handlePiAuthentication}
+          disabled={isLoading}
+          className={`auth-button ${isLoading ? "loading" : ""} ${
+            !isSDKReady ? "not-ready" : ""
+          }`}
+        >
+          {isLoading ? (
+            <>
+              <div className="loading-spinner"></div>
+              Authenticating...
+            </>
+          ) : !isSDKReady ? (
+            "Loading Pi SDK..."
+          ) : (
+            "Authenticate with Pi Network"
+          )}
+        </button>
+
+        {/* Error message */}
+        {(error || authError) && (
+          <div className="auth-error">{error || authError}</div>
+        )}
       </div>
     </div>
   );

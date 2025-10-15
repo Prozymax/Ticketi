@@ -1,17 +1,23 @@
 "use client";
 
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
+import { useEventCreation } from "@/app/contexts/EventCreationContext";
 import "@/styles/create-event.css";
 import "@/styles/mobileview/create-event.css";
 
 export default function SchedulePage() {
-  const [location, setLocation] = useState("");
-  const [startDate, setStartDate] = useState("Sept 12, 2025");
-  const [startTime, setStartTime] = useState("00:00GMT");
-  const [endDate, setEndDate] = useState("Sept 12, 2025");
-  const [endTime, setEndTime] = useState("00:00GMT");
+  const { state, updateSchedule, setStep } = useEventCreation();
+  const [location, setLocation] = useState(state.eventData.location);
+  const [startDate, setStartDate] = useState(state.eventData.startDate || "Sept 12, 2025");
+  const [startTime, setStartTime] = useState(state.eventData.startTime || "00:00GMT");
+  const [endDate, setEndDate] = useState(state.eventData.endDate || "Sept 12, 2025");
+  const [endTime, setEndTime] = useState(state.eventData.endTime || "00:00GMT");
   const router = useRouter();
+
+  useEffect(() => {
+    setStep(2);
+  }, []); // Remove dependencies to prevent infinite loop
 
   const handleBack = () => {
     router.back();
@@ -19,7 +25,7 @@ export default function SchedulePage() {
 
   const handleNext = () => {
     if (location.trim()) {
-      // Navigate to tickets step of event creation
+      updateSchedule(location, startDate, startTime, endDate, endTime);
       router.push("/create-event/tickets");
     }
   };

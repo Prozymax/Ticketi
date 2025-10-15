@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import '@/styles/edit-username.css';
 import '@/styles/mobileview/edit-username.css';
 
 export default function EditUsernamePage() {
-  const [username, setUsername] = useState('woodylightyearx');
-  const router = useRouter();
+  const [username, setUsername] = useState('pioneer');
+  const [isLoading, setIsLoading] = useState(true);
+  c
 
   const handleContinue = () => {
     // Handle username update logic here

@@ -10,6 +10,7 @@ export default function FinalizingProfilePage() {
   const [verifiedStatus] = useState(true)
   const router = useRouter();
 
+  // TODO: set the profile that is to set te ticket brand name and other useful user settings
   useEffect(() => {
     // Simulate profile setup progress
     const interval = setInterval(() => {

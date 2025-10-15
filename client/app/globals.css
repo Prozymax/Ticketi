@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --splash-background: #1F0349;
+  --splash-background: #1f0349;
   --background: #000000;
-  --foreground: #FFFFFF;
-  --secondary: #F62585;
-  --accent: #7D5B9C;
+  --foreground: #ffffff;
+  --secondary: #f62585;
+  --accent: #7d5b9c;
   --accent-mid: rgba(76, 53, 98, 0.629);
   --username-display: #e2d7ec;
   --accent-bold: #472083;
@@ -16,7 +16,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* --background: #0a0a0a; */ /* dark mode background */
-    --splash-background: #1F0348;
+    --splash-background: #1f0348;
     --background: #000000;
     --foreground: #ededed;
   }
@@ -28,19 +28,26 @@
   margin: 0;
 }
 
+.nav-bottom {
+  padding: 3% 0;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   padding: 0 2%;
   font-family: var(--font-nunito);
+  padding-bottom: 5rem; /* Space for bottom navigation */
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: var(--font-fredoka);
-  line-height:  3rem;
+  line-height: 3rem;
   margin: 3% 0;
 }
 
 .color-span {
-  color: var(--secondary)
+  color: var(--secondary);
 }

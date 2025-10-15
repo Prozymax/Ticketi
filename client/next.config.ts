@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-
+  // Reduce font preload warnings
+  experimental: {
+    optimizePackageImports: ['@next/font']
+  }
 };
 
 export default nextConfig;

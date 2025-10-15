@@ -1,3 +1,7 @@
+.nav-bottom {
+  display: none;
+}
+
 .create-event-container {
   min-height: 100vh;
   color: white;
