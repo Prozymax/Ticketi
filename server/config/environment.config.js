@@ -122,9 +122,8 @@ class EnvironmentConfig {
                 androidUrl
             ].filter(Boolean),
             production: [
-                allowedOrigin,
-                capacitorUrl,
-                androidUrl
+                `https://${allowedOrigin}`, // secured a name dns
+                `https://www.${allowedOrigin}`, // secured cname dns
             ].filter(Boolean)
         };
 

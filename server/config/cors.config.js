@@ -17,6 +17,7 @@ class CorsConfig {
         const corsOptions = {
             origin: (origin, callback) => {
                 const allowedOrigins = config.server.corsOrigins;
+                console.log(allowedOrigins);
 
                 // Allow requests with no origin (mobile apps, Postman, etc.)
                 if (!origin) {
