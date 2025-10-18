@@ -3,7 +3,6 @@
 import {useState, useEffect, useCallback} from "react";
 import {PiNetworkService} from "../lib/PiNetwork";
 import {apiService, AuthResponseData, BackendUser} from "../lib/api";
-import CookieAuthService from "../utils/cookieAuth";
 
 interface UsePiNetworkReturn {
   piService: PiNetworkService | null;
@@ -93,12 +92,17 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       setIsAuthenticated(true);
       setUser(backendAuthResult.user);
 
-      // Store minimal user data for UI purposes (sensitive data is in HTTP-only cookies)
-      CookieAuthService.storeUserData({
+      // Store token in localStorage as pioneer-key
+      localStorage.setItem('pioneer-key', backendAuthResult.user.token);
+      
+      // Store minimal user data for UI purposes
+      const userInfo = {
         username: backendAuthResult.user.username,
         id: backendAuthResult.user.id,
         isVerified: backendAuthResult.user.isVerified,
-      });
+        timestamp: Date.now(),
+      };
+      localStorage.setItem("pi_user_info", JSON.stringify(userInfo));
 
       console.log("Authentication successful");
       return backendAuthResult.user;
@@ -112,7 +116,8 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       setUser(null);
 
       // Clear any stored auth data on error
-      CookieAuthService.clearAll();
+      localStorage.removeItem('pioneer-key');
+      localStorage.removeItem('pi_user_info');
     } finally {
       setIsLoading(false);
     }
@@ -212,7 +217,7 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
 
   const logout = useCallback(async () => {
     try {
-      // Call server logout to clear HTTP-only cookies
+      // Call server logout endpoint
       await apiService.logout();
     } catch (error) {
       console.error("Server logout failed:", error);
@@ -221,18 +226,30 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       setIsAuthenticated(false);
       setUser(null);
       setError(null);
-      CookieAuthService.clearAll();
+      localStorage.removeItem('pioneer-key');
+      localStorage.removeItem('pi_user_info');
     }
   }, []);
 
   // Check for stored user data on mount and verify with server
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const userData = CookieAuthService.getUserData();
-      if (userData) {
+      const pioneerKey = localStorage.getItem('pioneer-key');
+      const userInfoStr = localStorage.getItem('pi_user_info');
+      
+      if (pioneerKey && userInfoStr) {
         try {
+          const userData = JSON.parse(userInfoStr);
+          
+          // Check if data is not too old (24 hours)
+          const isExpired = Date.now() - userData.timestamp > 24 * 60 * 60 * 1000;
+          if (isExpired) {
+            localStorage.removeItem('pioneer-key');
+            localStorage.removeItem('pi_user_info');
+            return;
+          }
+
           // Verify authentication with server by making a test request
-          // The server will check the HTTP-only cookie
           const response = await apiService.healthCheck();
           if (response) {
             // If we can make authenticated requests, restore user state
@@ -241,6 +258,7 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
               id: userData.id,
               username: userData.username,
               isVerified: userData.isVerified,
+              token: pioneerKey,
               piWalletAddress: '', // Will be populated by server if needed
               piData: {} // Will be populated by server if needed
             } as BackendUser);
@@ -248,7 +266,8 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
         } catch (error) {
           console.error("Auth verification failed:", error);
           // Clear invalid auth data
-          CookieAuthService.clearAll();
+          localStorage.removeItem('pioneer-key');
+          localStorage.removeItem('pi_user_info');
         }
       }
     };

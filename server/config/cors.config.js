@@ -38,6 +38,8 @@ class CorsConfig {
                 'Content-Type',
                 'Authorization',
                 'X-Requested-With',
+                'X-Access-Token',
+                'x-access-token',
                 'Accept',
                 'Origin',
                 'Cache-Control',
@@ -109,7 +111,7 @@ class CorsConfig {
                 res.header('Access-Control-Allow-Origin', origin || '*');
                 res.header('Access-Control-Allow-Credentials', 'true');
                 res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-                res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Accept,Origin,Cache-Control,X-File-Name');
+                res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,x-access-token,X-Access-Token,Accept,Origin,Cache-Control,X-File-Name');
                 res.header('Access-Control-Max-Age', '86400');
 
                 return res.status(200).end();

@@ -4,9 +4,9 @@ const authRouter = express.Router();
 authRouter.use(express.json());
 const { ApiResponse } = require('../../utils/response.utils.js');
 const AuthService = require('../../services/auth.service.js');
-const cookieService = require('../../utils/cookieService');
 const authController = require('../../controllers/auth.controller.js');
 const { User } = require('../../models/index.model.js');
+const { authenticateToken } = require('../../middleware/auth.middleware.js');
 
 // Health check endpoint
 authRouter.get('/', async (req, response) => {
@@ -37,7 +37,7 @@ authRouter.post('/authenticate', async (request, response) => {
 
     try {
         const userVerified = await AuthService.confirmUser(username);
-
+// TODO: Not everytime user gets a new token fix
         if (userVerified.error) {
             // User doesn't exist, create new user
             const { error, message, user } = await AuthService.verifyAndCreateUser(accessToken, username);
@@ -67,7 +67,6 @@ authRouter.post('/authenticate', async (request, response) => {
 // Logout endpoint to clear cookies
 authRouter.post('/logout', (request, response) => {
     try {
-        cookieService.clearAuthCookie(response);
         return ApiResponse.success(response, null, 'Logged out successfully', 200);
     } catch (error) {
         console.error('Logout error:', error);

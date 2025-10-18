@@ -17,7 +17,6 @@ export default function EmptyEventsComponent() {
 
   return (
     <div className="home-container">
-
       {/* Main Content */}
       <div className="main-content">
         {/* Welcome Section */}
@@ -45,14 +44,18 @@ export default function EmptyEventsComponent() {
             There seems to be no event near you or in your region. Start
             creating your next successful events in a few steps
           </p>
-          <button className="create-event-button" onClick={handleCreateEvent}>
+          <button
+            className="create-event-button"
+            disabled
+            onClick={handleCreateEvent}
+          >
             Create Event Ticket
           </button>
         </div>
 
         {/* Explore Events Section */}
         <div className="explore-section">
-          <div className="explore-icon">
+          <div className="explore-icon flex justify-center">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
               <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
               <path
@@ -68,7 +71,11 @@ export default function EmptyEventsComponent() {
           <p className="explore-description">
             Find out the next event around you before tickets are sold out
           </p>
-          <button className="explore-button" onClick={handleExploreEvents}>
+          <button
+            className="explore-button"
+            disabled
+            onClick={handleExploreEvents}
+          >
             Find out what&apos;s Happening
           </button>
         </div>

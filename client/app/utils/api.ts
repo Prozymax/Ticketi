@@ -1,6 +1,13 @@
 import axios from "axios";
-import {UserStorage} from "./userStorage";
 import {apiService} from "@/app/lib/api";
+
+// Get token from localStorage
+const getAccessToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('pioneer-key');
+  }
+  return null;
+};
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6001";
 
@@ -12,14 +19,11 @@ const api = axios.create({
   },
 });
 
-// Configure axios to include cookies
-api.defaults.withCredentials = true;
-
-// Add auth token to requests (fallback for Authorization header if needed)
+// Add auth token to requests
 api.interceptors.request.use((config) => {
-  const token = UserStorage.getUserToken();
+  const token = getAccessToken();
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers["x-access-token"] = token;
   }
   return config;
 });
@@ -230,7 +234,7 @@ export const purchaseAPI = {
         data: response.data,
         message: response.message,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error.message || "Failed to fetch purchases",

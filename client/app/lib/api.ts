@@ -2,7 +2,16 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6001";
 
-interface ApiResponse<T = any> {
+// Get token from localStorage
+const getAccessToken = (): string | null => {
+  if (typeof window !== "undefined") {
+    console.log(localStorage.getItem("pioneer-key"), 'local storage')
+    return localStorage.getItem("pioneer-key");
+  }
+  return null;
+};
+
+interface ApiResponse<T = unknown> {
   success: boolean;
   status?: number;
   message: string;
@@ -15,6 +24,7 @@ interface BackendUser {
   username: string;
   piWalletAddress: string;
   isVerified: boolean;
+  token: string;
   email?: string;
   firstName?: string;
   lastName?: string;
@@ -85,7 +95,7 @@ interface PaymentData {
 interface PaymentResponse {
   id: string;
   amount: number;
-  status: 'pending' | 'approved' | 'completed' | 'cancelled' | 'failed';
+  status: "pending" | "approved" | "completed" | "cancelled" | "failed";
   transactionHash?: string;
   purchaseId: string;
   createdAt: string;
@@ -104,23 +114,25 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseUrl}${endpoint}`;
+      const accessToken = getAccessToken();
+      console.log(accessToken, 'jishdushdu')
 
       const response = await fetch(url, {
         headers: {
+          "x-access-token": accessToken || "",
           "Content-Type": "application/json",
           ...options.headers,
         },
-        credentials: 'include', // Include cookies in requests
         ...options,
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        console.log(data)
+        console.log(data);
         throw new Error(data.message || data.error || "Request failed");
       }
-      console.log(data)
+      console.log(data);
       return data;
     } catch (error) {
       console.error("API request failed:", error);
@@ -129,11 +141,16 @@ class ApiService {
   }
 
   // confirm user verification status before login
-  async confirmUserVerification(username: string): Promise<ConfirmVerificationData> {
-    console.log("API: Calling Backend for user confirmation with username:", username);
+  async confirmUserVerification(
+    username: string
+  ): Promise<ConfirmVerificationData> {
+    console.log(
+      "API: Calling Backend for user confirmation with username:",
+      username
+    );
 
     const response = await this.makeRequest<ConfirmVerificationData>(
-      `/api/auth/confirm-username?username=${encodeURIComponent(username)}`,
+      `/api/auth/confirm-username?username=${encodeURIComponent(username)}`
     );
 
     console.log("API: Backend response:", response);
@@ -142,18 +159,17 @@ class ApiService {
   }
 
   // Authenticate user with Pi Network access token
-  async authenticateUser(accessToken: string, username: string): Promise<AuthResponseData> {
-    console.log(
-      "API: Calling backend authentication with token:",
-      accessToken.substring(0, 20) + "...",
-      username
-    );
+  async authenticateUser(
+    piAccessToken: string,
+    username: string
+  ): Promise<AuthResponseData> {
+    console.log("API: Calling backend authentication with token:", username);
 
     const response = await this.makeRequest<AuthResponseData>(
       "/api/auth/authenticate",
       {
         method: "POST",
-        body: JSON.stringify({accessToken, username}),
+        body: JSON.stringify({accessToken: piAccessToken, username}),
       }
     );
 
@@ -163,103 +179,152 @@ class ApiService {
   }
 
   // Health check
-  async healthCheck(): Promise<{message: string; timestamp: string; environment: string}> {
+  async healthCheck(): Promise<{
+    message: string;
+    timestamp: string;
+    environment: string;
+  }> {
     console.log("API: Checking backend health at:", `${this.baseUrl}/api/auth`);
-    const response = await this.makeRequest<{message: string; timestamp: string; environment: string}>("/api/auth");
+    const response = await this.makeRequest<{
+      message: string;
+      timestamp: string;
+      environment: string;
+    }>("/api/auth");
     console.log("API: Health check response:", response);
     // For health check, the response structure is different (no data wrapper)
     return {
       message: response.message,
-      timestamp: response.timestamp,
-      environment: (response as unknown).environment
+      timestamp: response.timestamp || "",
+      environment: (response as {environment?: string}).environment || "",
     };
   }
 
   async onIncompletePayment(paymentId: string): Promise<ApiResponse> {
-    console.log("API: Calling backend onIncompletePayment with paymentId:", paymentId);
+    console.log(
+      "API: Calling backend onIncompletePayment with paymentId:",
+      paymentId
+    );
     const response = await this.makeRequest("/api/payment/on-incomplete", {
       method: "POST",
       body: JSON.stringify({paymentId}),
     });
     console.log("API: onIncompletePayment response:", response);
-    // Return the data property which contains the actual response data
-    return response.data;
+    return response;
   }
 
   async onServerApproval(paymentId: string): Promise<ApiResponse> {
-    console.log("API: Calling backend onServerApproval with paymentId:", paymentId);
+    console.log(
+      "API: Calling backend onServerApproval with paymentId:",
+      paymentId
+    );
     const response = await this.makeRequest("/api/payment/on-server-approval", {
       method: "POST",
       body: JSON.stringify({paymentId}),
     });
     console.log("API: onServerApproval response:", response);
-    // Return the data property which contains the actual response data
-    return response.data;
+    return response;
   }
 
   async onServerCancellation(paymentId: string): Promise<ApiResponse> {
-    console.log("API: Calling backend onServerCancellation with paymentId:", paymentId);
-    const response = await this.makeRequest("/api/payment/on-server-cancellation", {
-      method: "POST",
-      body: JSON.stringify({paymentId}),
-    });
+    console.log(
+      "API: Calling backend onServerCancellation with paymentId:",
+      paymentId
+    );
+    const response = await this.makeRequest(
+      "/api/payment/on-server-cancellation",
+      {
+        method: "POST",
+        body: JSON.stringify({paymentId}),
+      }
+    );
     console.log("API: onServerCancellation response:", response);
-    // Return the data property which contains the actual response data
-    return response.data;
+    return response;
   }
 
-  async onServerCompletion(paymentId: string, transactionHash?: string): Promise<ApiResponse> {
-    console.log("API: Calling backend onServerCompletion with paymentId:", paymentId);
-    const response = await this.makeRequest("/api/payment/on-server-completion", {
-      method: "POST",
-      body: JSON.stringify({paymentId, transactionHash}),
-    });
+  async onServerCompletion(
+    paymentId: string,
+    transactionHash?: string
+  ): Promise<ApiResponse> {
+    console.log(
+      "API: Calling backend onServerCompletion with paymentId:",
+      paymentId
+    );
+    const response = await this.makeRequest(
+      "/api/payment/on-server-completion",
+      {
+        method: "POST",
+        body: JSON.stringify({paymentId, transactionHash}),
+      }
+    );
     console.log("API: onServerCompletion response:", response);
-    return response.data;
+    return response;
   }
 
   // Payment API methods
-  async createPayment(paymentData: PaymentData): Promise<ApiResponse<PaymentResponse>> {
+  async createPayment(
+    paymentData: PaymentData
+  ): Promise<ApiResponse<PaymentResponse>> {
     console.log("API: Creating payment:", paymentData);
-    const response = await this.makeRequest<PaymentResponse>("/api/payment/create", {
-      method: "POST",
-      body: JSON.stringify(paymentData),
-    });
+    const response = await this.makeRequest<PaymentResponse>(
+      "/api/payment/create",
+      {
+        method: "POST",
+        body: JSON.stringify(paymentData),
+      }
+    );
     console.log("API: Payment creation response:", response);
     return response;
   }
 
-  async approvePayment(paymentId: string): Promise<ApiResponse<PaymentResponse>> {
+  async approvePayment(
+    paymentId: string
+  ): Promise<ApiResponse<PaymentResponse>> {
     console.log("API: Approving payment:", paymentId);
-    const response = await this.makeRequest<PaymentResponse>(`/api/payment/approve/${paymentId}`, {
-      method: "POST",
-    });
+    const response = await this.makeRequest<PaymentResponse>(
+      `/api/payment/approve/${paymentId}`,
+      {
+        method: "POST",
+      }
+    );
     console.log("API: Payment approval response:", response);
     return response;
   }
 
-  async completePayment(paymentId: string, transactionHash: string): Promise<ApiResponse<PaymentResponse>> {
+  async completePayment(
+    paymentId: string,
+    transactionHash: string
+  ): Promise<ApiResponse<PaymentResponse>> {
     console.log("API: Completing payment:", paymentId, transactionHash);
-    const response = await this.makeRequest<PaymentResponse>(`/api/payment/complete/${paymentId}`, {
-      method: "POST",
-      body: JSON.stringify({transactionHash}),
-    });
+    const response = await this.makeRequest<PaymentResponse>(
+      `/api/payment/complete/${paymentId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({transactionHash}),
+      }
+    );
     console.log("API: Payment completion response:", response);
     return response;
   }
 
   async cancelPayment(paymentId: string): Promise<ApiResponse> {
     console.log("API: Cancelling payment:", paymentId);
-    const response = await this.makeRequest(`/api/payment/cancel/${paymentId}`, {
-      method: "POST",
-    });
+    const response = await this.makeRequest(
+      `/api/payment/cancel/${paymentId}`,
+      {
+        method: "POST",
+      }
+    );
     console.log("API: Payment cancellation response:", response);
     return response;
   }
 
-  async getPaymentStatus(paymentId: string): Promise<ApiResponse<PaymentResponse>> {
+  async getPaymentStatus(
+    paymentId: string
+  ): Promise<ApiResponse<PaymentResponse>> {
     console.log("API: Getting payment status:", paymentId);
-    const response = await this.makeRequest<PaymentResponse>(`/api/payment/status/${paymentId}`);
+    const response = await this.makeRequest<PaymentResponse>(
+      `/api/payment/status/${paymentId}`
+    );
     console.log("API: Payment status response:", response);
     return response;
   }
@@ -281,7 +346,9 @@ class ApiService {
 
   async getUserPurchases(page = 1, limit = 10): Promise<ApiResponse> {
     console.log("API: Getting user purchases");
-    const response = await this.makeRequest(`/api/purchases?page=${page}&limit=${limit}`);
+    const response = await this.makeRequest(
+      `/api/purchases?page=${page}&limit=${limit}`
+    );
     console.log("API: User purchases response:", response);
     return response;
   }
@@ -296,7 +363,9 @@ class ApiService {
   // Event API methods
   async getUserEvents(page = 1, limit = 10): Promise<ApiResponse> {
     console.log("API: Getting user events");
-    const response = await this.makeRequest(`/api/events/user?page=${page}&limit=${limit}`);
+    const response = await this.makeRequest(
+      `/api/events/user?page=${page}&limit=${limit}`
+    );
     console.log("API: User events response:", response);
     return response;
   }
@@ -326,7 +395,9 @@ class ApiService {
     return response;
   }
 
-  async updateUserProfile(profileData: ProfileUpdateData): Promise<ApiResponse<UserProfile>> {
+  async updateUserProfile(
+    profileData: ProfileUpdateData
+  ): Promise<ApiResponse<UserProfile>> {
     console.log("API: Updating user profile:", profileData);
     const response = await this.makeRequest<UserProfile>("/api/profile", {
       method: "PUT",
@@ -356,13 +427,13 @@ class ApiService {
 
 export const apiService = new ApiService();
 export type {
-  ApiResponse, 
-  AuthResponseData, 
-  ConfirmVerificationData, 
-  BackendUser, 
-  PaymentData, 
+  ApiResponse,
+  AuthResponseData,
+  ConfirmVerificationData,
+  BackendUser,
+  PaymentData,
   PaymentResponse,
   UserProfile,
   UserStats,
-  ProfileUpdateData
+  ProfileUpdateData,
 };

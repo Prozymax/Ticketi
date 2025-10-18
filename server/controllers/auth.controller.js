@@ -1,7 +1,7 @@
 const bufferGen = require("../utils/buffer_gen.utils");
-const cookieService = require("../utils/cookieService");
 const { ApiResponse } = require("../utils/response.utils")
 const jwt = require('jsonwebtoken');
+const tokenService = require("../utils/token.utils");
 
 
 class AuthController {
@@ -23,12 +23,10 @@ class AuthController {
                 accessToken: fullUser.access_token
             };
 
-            const encryptedDataToken = bufferGen.encodeBase64(JSON.stringify(payload))
+            console.log(payload)
 
-            const jwtToken = jwt.sign({ data: encryptedDataToken }, process.env.JWT_SECRET, { expiresIn: '24h' });
-
-            // Set secure encrypted cookie with the JWT token
-            cookieService.setAuthCookieWithExpiry(response, jwtToken, 24 * 60 * 60); // 24 hours in seconds
+            const { error, message, token } = tokenService.generateAuthToken(JSON.stringify(payload))
+            if(error) return ApiResponse.error(response, message, 500)
 
             // Return user data without sensitive information
             const responseData = {
@@ -38,8 +36,7 @@ class AuthController {
                     username: fullUser.username,
                     piWalletAddress: fullUser.piWalletAddress || fullUser.pi_wallet_address,
                     isVerified: fullUser.is_verified,
-                    firstName: fullUser.first_name,
-                    lastName: fullUser.last_name
+                    token
                 }
             };
 

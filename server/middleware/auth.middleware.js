@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models/index.model');
 const { logger } = require('../utils/logger');
-const cookieService = require('../utils/cookieService');
 const bufferGen = require('../utils/buffer_gen.utils');
+const tokenService = require('../utils/token.utils');
+const { serverUrl, frontendUrl } = require('../config/url.config');
 
 /**
  * Authentication middleware to verify Pi access tokens from cookies or Authorization header
@@ -10,31 +11,32 @@ const bufferGen = require('../utils/buffer_gen.utils');
 const authenticateToken = async (req, res, next) => {
     try {
         // Try to get Pi access token from cookie first, then from Authorization header
-        let userToken = cookieService.getAuthToken(req);
-        console.log(userToken)
+        let { token: userToken, error, expired, message } = tokenService.getAuthToken(req)
 
         if (!userToken) {
             return res.status(401).json({
                 success: false,
-                message: 'Access token required'
+                message: 'User Token missing'
             });
+        }
+
+        if (error) {
+            return res.status(401).json({
+                success: false,
+                message: message
+            });
+        }
+
+        if (expired) {
+            return Response.redirect(`${frontendUrl}/login`)
         }
 
         const userDataObject = bufferGen.decodeBase64(userToken);
-        console.log(typeof(userDataObject))
 
-        const userData = typeof(userData) == 'string' ? JSON.parse(userData) : userData;
-       
-        // Check if token is expired
-        if (new Date() > new Date(authRecord.expires_at)) {
-            return res.status(401).json({
-                success: false,
-                message: 'Access token expired'
-            });
-        }
+        const userData = typeof(userDataObject) == 'string' ? JSON.parse(userDataObject) : userDataObject;
 
         // Get user from the auth record
-        const user = await User.findByPk(userData.id, {
+        const user = await User.findByPk(userData.userId, {
             attributes: { exclude: ['password'] }
         });
 
@@ -45,9 +47,10 @@ const authenticateToken = async (req, res, next) => {
             });
         }
 
-        // Add user and access token to request object
+        console.log(user)
+
+        // Add user to request object
         req.user = user;
-        req.accessToken = accessToken;
         next();
     } catch (error) {
         logger.error('Authentication error:', error);
@@ -64,8 +67,6 @@ const authenticateToken = async (req, res, next) => {
  */
 const optionalAuth = async (req, res, next) => {
     try {
-        // Try to get token from cookie first, then from Authorization header
-        let token = cookieService.getAuthToken(req);
         
         if (!token) {
             const authHeader = req.headers['authorization'];

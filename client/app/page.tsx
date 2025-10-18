@@ -7,6 +7,7 @@ import {useEffect, useState} from "react";
 export default function LandingPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  console.log(process.env.NEXT_PUBLIC_PI_SANDBOX, process.env.NODE_ENV)
 
   useEffect(() => {
     const checkUserStatus = () => {

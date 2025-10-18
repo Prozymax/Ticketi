@@ -36,6 +36,7 @@ export class CookieAuthService {
     username: string;
     id: string;
     isVerified: boolean;
+    token: string;
   }): void {
     const userInfo = {
       username: userData.username,
@@ -45,7 +46,10 @@ export class CookieAuthService {
     };
     
     localStorage.setItem("pi_user_info", JSON.stringify(userInfo));
+    localStorage.setItem('pioneer-key', userData?.token)
   }
+
+
 
   /**
    * Get stored user data for UI purposes
@@ -90,6 +94,7 @@ export class CookieAuthService {
   static clearAll(): void {
     this.clearClientAuthData();
     localStorage.removeItem("pi_user_info");
+    localStorage.removeItem("pioneer-key");
   }
 }
 

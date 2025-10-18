@@ -7,6 +7,7 @@ class ProfileService {
      * @returns {Object} user profile data
      */
     getUserProfile = async (userId) => {
+        console.log('userid', userId)
         try {
             const user = await User.findByPk(userId, {
                 attributes: [

@@ -11,7 +11,7 @@ class AuthenticationService {
     confirmUser = async (username) => {
         console.log(username)
         const user = await User.findOne({
-            attributes: ['is_verified', 'username'],
+            attributes: ['id', 'is_verified', 'username'],
             where: { username }
         });
         console.log(user)

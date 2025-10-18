@@ -13,7 +13,7 @@ let environment = process.env.NODE_ENV,
     frontend_urls = {
         devFrontendUrl: process.env.devFrontendUrl,
         testFrontendUrl: process.env.testFrontendUrl,
-        productionFrontendUrl: process.env.productionFrontendUrl
+        productionFrontendUrl: process.env.productionUrl
     },
 
     allowed_origins = {

@@ -5,9 +5,16 @@ class ProfileController {
     /**
      * Get current user's profile
      */
-    getProfile = async (req, res) => {
+    async getProfile(req, res) {
         try {
-            const userId = req.user.userId; // From auth middleware
+            console.log('Getting user profile...');
+            console.log('User from middleware:', req.user);
+            
+            if (!req.user || !req.user.id) {
+                return ApiResponse.error(res, 'User not authenticated', 401, 'Authentication required');
+            }
+
+            const userId = req.user.id; // From auth middleware
 
             const result = await profileService.getUserProfile(userId);
 
@@ -25,9 +32,13 @@ class ProfileController {
     /**
      * Update current user's profile
      */
-    updateProfile = async (req, res) => {
+    async updateProfile(req, res) {
         try {
-            const userId = req.user.userId; // From auth middleware
+            if (!req.user || !req.user.id) {
+                return ApiResponse.error(res, 'User not authenticated', 401, 'Authentication required');
+            }
+
+            const userId = req.user.id; // From auth middleware
             const updateData = req.body;
 
             const result = await profileService.updateUserProfile(userId, updateData);
@@ -46,9 +57,13 @@ class ProfileController {
     /**
      * Get current user's statistics
      */
-    getStats = async (req, res) => {
+    async getStats(req, res) {
         try {
-            const userId = req.user.userId; // From auth middleware
+            if (!req.user || !req.user.id) {
+                return ApiResponse.error(res, 'User not authenticated', 401, 'Authentication required');
+            }
+
+            const userId = req.user.id; // From auth middleware
 
             const result = await profileService.getUserStats(userId);
 
@@ -58,7 +73,7 @@ class ProfileController {
 
             return ApiResponse.success(res, result.stats, result.message, 200);
         } catch (error) {
-            console.error('Stats fetch error:', error);
+            console.error('Error: ', error)
             return ApiResponse.error(res, 'Failed to fetch stats', 500, 'Internal server error');
         }
     }

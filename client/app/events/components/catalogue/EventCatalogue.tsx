@@ -74,7 +74,7 @@ export default function EventCatalogue({ events = [] } : { events? : EventProp[]
         ))}
       </div>
 
-      <p className="create-event" onClick={handleCreateEvent}>
+      <p className="create-event" disabled onClick={handleCreateEvent}>
         <i className="fa-solid fa-plus"></i>&nbsp;&nbsp;Create Event
       </p>
     </div>

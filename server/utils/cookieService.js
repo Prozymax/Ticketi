@@ -21,7 +21,7 @@ class CookieService {
      * @param {string} token - JWT token to encrypt and store
      * @param {Object} options - Additional cookie options
      */
-    setAuthCookie(res, token, options = {}) {
+    setAuthCoo(res, token, options = {}) {
         try {
             // For now, use simple base64 encoding until crypto is fixed
             // In production, you should use proper encryption
@@ -45,33 +45,7 @@ class CookieService {
      * @param {Object} req - Express request object
      * @returns {string|null} - Decrypted JWT token or null if not found/invalid
      */
-    getAuthToken(req) {
-        try {
-            console.log('🍪 All cookies received:', req.cookies);
-            console.log('🔍 Looking for cookie:', this.cookieName);
-
-            const encodedToken = req.cookies[this.cookieName];
-
-            if (!encodedToken) {
-                console.log('❌ Auth cookie not found');
-                return null;
-            }
-
-            console.log('✅ Auth cookie found, decoding...');
-            // Decode the token (simple base64 for now)
-            const jwtToken = bufferGen.decodeBase64(encodedToken);
-            console.log(jwtToken)
-
-            const userDataToken = jwt.verify(jwtToken, process.env.JWT_SECRET)
-
-            console.log(userDataToken)
-
-            return userDataToken;
-        } catch (error) {
-            console.error('Error getting auth token from cookie:', error);
-            return null;
-        }
-    }
+    
 
     /**
      * Clear authentication cookie
