@@ -16,7 +16,7 @@ function PaymentSuccessContent() {
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [router]);
+  }, [router]); 
 
   return (
     <div
