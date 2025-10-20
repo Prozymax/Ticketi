@@ -1,4 +1,5 @@
 // API service for backend communication
+import { formatError, logError } from "../utils/errorHandler";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6001";
 
@@ -135,8 +136,9 @@ class ApiService {
       console.log(data);
       return data;
     } catch (error) {
-      console.error("API request failed:", error);
-      throw error;
+      logError("API Request", error);
+      // Re-throw with formatted error message
+      throw new Error(formatError(error));
     }
   }
 

@@ -133,23 +133,6 @@ export default function LoginPage() {
   return (
     <div className="login-container">
       {/* Header with back button */}
-      <div className="header">
-        <button
-          title="back-button"
-          className="back-button"
-          onClick={handleBack}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M15 18L9 12L15 6"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-      </div>
 
       {/* Main content */}
       <div className="content">

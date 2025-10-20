@@ -1,0 +1,442 @@
+/* Payment Page Styles */
+.payment-page {
+  background-color: #0a0a0a;
+  color: #ffffff;
+  min-height: 100vh;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.payment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #333;
+  position: sticky;
+  top: 0;
+  background-color: #0a0a0a;
+  z-index: 100;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+.header-spacer {
+  width: 40px;
+}
+
+/* Event Image Section */
+.event-image-section {
+  padding: 30px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.event-image {
+  width: 100%;
+  max-width: 400px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 16px;
+  background-color: #333;
+}
+
+/* Event Title */
+.event-title-section {
+  padding: 0 20px 30px 20px;
+  text-align: center;
+}
+
+.event-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: #888;
+}
+
+/* Amount Section */
+.amount-section {
+  padding: 0 20px 40px 20px;
+  text-align: center;
+}
+
+.main-amount {
+  font-size: 48px;
+  font-weight: 700;
+  color: #d4af37;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.usdt-badge {
+  display: inline-block;
+  background-color: #333;
+  color: #888;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Payment Details */
+.payment-details {
+  padding: 0 20px 30px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 16px;
+  color: #888;
+}
+
+.detail-value {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Cost Breakdown */
+.cost-breakdown {
+  padding: 30px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.breakdown-row:last-child {
+  margin-bottom: 0;
+}
+
+.breakdown-label {
+  font-size: 16px;
+  color: #888;
+}
+
+.breakdown-value {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.total-row .breakdown-label,
+.total-row .breakdown-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Error Section */
+.error-section {
+  padding: 0 20px 20px 20px;
+}
+
+.error-message {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Pay Section */
+.pay-section {
+  padding: 20px;
+  margin-top: auto;
+}
+
+.pay-button {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pay-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  transform: translateY(-1px);
+}
+
+.pay-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-spinner {
+  width:}
+}
+   16px;nt-size: fovalue {
+   akdown-l-row .bretato
+  .,akdown-label.brel-row ota
+
+  .t }14px;
+ ize:     font-se {
+alukdown-v
+  .brean-label,reakdow  .blue,
+-va .detaillabel,
+  .detail-}
+
+ 16px;
+  -size: font  itle {
+   .event-t}
+
+ 
+  ze: 38px;  font-si {
+  in-amount .ma{
+ th: 360px) dia (max-wide */
+@mebilsmall moa Extr}
+}
+
+/* : 16px;
+  ze    font-sig: 16px;
+
+    paddinton {ut-b.pay
+  
+px;
+  }ding: 16padon {
+    .pay-secti
+
+  
+  }x 14px;ng: 10p    paddize: 13px;
+ont-si f {
+   ssager-meerro}
+
+  .x;
+  x 16p0 16px 16ppadding: 
+     {ion.error-sect
+  }
+
+  x;7pze: 1ont-si {
+    fuedown-val .breaktal-row,
+  .toabeldown-l-row .breaktal .to
+  }
+
+ 5px;e: 1-sizont{
+    flue eakdown-va
+  .brel,labdown-eak
+
+  .br
+  }16px;-bottom: rgin    ma{
+-row   .breakdown  }
+
+px;
+ng: 24px 16  paddi  n {
+st-breakdow
+  .co  }
+x;
+nt-size: 15pfolue {
+    -va .detailil-label,
+ 
+
+  .deta16px;
+  }: n-bottom{
+    margiail-row .det
+  }
+
+  px;4px 166px 2g: 0 1paddins {
+    -detail
+  .payment
+  }
+x;ize: 13p   font-s
+  6px 14px;ng:addi  p {
+  -badge .usdtx;
+  }
+
+ -size: 42p
+    fontunt {ain-amo
+
+  .m
+  }16px;x 32px g: 0 16paddin  pon {
+  -sectimount
+  .a }
+: 18px;
+   font-sizetle {
+  .event-ti
+    }
+4px 16px;
+ 0 16px 2ding:n {
+    padtitle-sectiovent-
+  .e
+  }
+t: 180px;    height-image {
+  .even  }
+
+px;
+ing: 24px 16  padd  n {
+e-sectioag-iment
+  .ev;
+  }
+ 17px-size:
+    font-title {page .
+ x;
+  }
+dding: 16pr {
+    paayment-headepx) {
+  .ph: 480max-widt
+@media (Specific */le 
+
+/* Mobix;
+  }
+}t-size: 52p
+    fon {ain-amount
+  .m  }
+220px;
+ht: eigge {
+    hvent-ima
+  }
+
+  .e0px;-width: 48   max-page {
+ entpaym {
+  .: 1024px)idth(min-w*/
+@media e  Responsiv Desktop
+}
+
+/*  }19px;
+ze: font-sipx;
+    : 20
+    paddingay-button { .p  }
+
+ 24px;
+ing: addn {
+    psectio .pay-
+ 
+  }
+ 14px 18px;dding:papx;
+     15-size:  font{
+  e ssagrror-me  }
+
+  .ex;
+4p4px 20 24px 2adding: {
+    ption sec  .error-
+
+;
+  }px: 19 font-sizevalue {
+   own-eakdal-row .brotlabel,
+  .treakdown-ow .b
+  .total-r }
+17px;
+ ze: -si   fontn-value {
+ akdow,
+  .bredown-label  .break
+  }
+
+x; 40px 24p  padding:
+  n {st-breakdow  .co
+  }
+px;
+size: 17
+    font--value { .detailabel,
+ tail-l
+  .dex;
+  }
+px 40px 24png: 0 24   paddis {
+ iltaent-de}
+
+  .paym  ;
+: 15px  font-sizepx 20px;
+   padding: 10
+   badge {
+
+  .usdt- 56px;
+  }-size:
+    font {untin-amoma }
+
+  .px;
+ 0px 24ng: 0 24px 5    paddi{
+tion -secmount  }
+
+  .aize: 22px;
+-s  font{
+  event-title }
+
+  .4px;
+   40px 2 24pxng: 0 paddiction {
+   le-sevent-tit }
+
+  .et: 240px;
+ heigh
+    image {vent-
+  .e  }
+px 24px;
+40ing: 
+    padd-section {ge.event-ima  ;
+  }
+
+size: 20px  font-
+  ge-title {
+  .pa
+  }
+ng: 24px;{
+    paddier ent-headym .pa
+ 33;
+  }
+d #31px solight: r-ri    borde
+olid #333; sleft: 1pxder-  borauto;
+   0   margin: 600px;
+   max-width:
+   age {-pyment .pa {
+ 768px)n-width: (mi*/
+@media e esponsiv/* Tablet R
+
+ }
+}e(360deg);orm: rotattransf% { ; }
+  100g)e(0detatansform: ro 0% { tr spin {
+ es
+
+@keyframinite;
+}near inf 1s lipinanimation: s: 50%;
+  diusborder-rafff;
+   #ffflid-top: 2px so
+  border55, 0.3);55, 255, 2id rgba(2x solorder: 2p  b20px;
+t: x;
+  heigh 20p

@@ -1,0 +1,500 @@
+/* Ticket Modal Styles */
+.ticket-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ticket-modal {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.ticket-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+.header-spacer {
+  width: 40px;
+}
+
+/* Progress Bar */
+.progress-container {
+  padding: 16px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #333;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-fill {
+  width: 33%;
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #a855f7);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-step {
+  font-size: 14px;
+  color: #888;
+}
+
+.progress-step.active {
+  color: #8b5cf6;
+  font-weight: 500;
+}
+
+/* Event Image */
+.event-image-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.event-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  background-color: #333;
+}
+
+/* Available Tickets */
+.available-tickets {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 20px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.available-label {
+  font-size: 16px;
+  color: #888;
+}
+
+.ticket-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.ticket-count svg {
+  color: #8b5cf6;
+}
+
+/* Ticket Selection */
+.ticket-selection {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 16px;
+  color: #ffffff;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.quantity-input,
+.ticket-type-select {
+  width: 100%;
+  padding: 16px;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.quantity-input:focus,
+.ticket-type-select:focus {
+  outline: none;
+  border-color: #8b5cf6;
+}
+
+.quantity-input {
+  text-align: left;
+}
+
+.ticket-type-select {
+  cursor: pointer;
+}
+
+.ticket-type-select option {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+/* Price Breakdown */
+.price-breakdown {
+  padding: 20px;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.price-row:last-child {
+  margin-bottom: 0;
+}
+
+.price-label {
+  font-size: 16px;
+  color: #888;
+}
+
+.price-value {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.total-row .price-label,
+.total-row .price-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Error Section */
+.error-section {
+  padding: 0 20px 16px 20px;
+}
+
+.error-message {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Confirm Section */
+.confirm-section {
+  padding: 20px;
+}
+
+.confirm-button {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.confirm-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  transform: translateY(-1px);
+}
+
+.confirm-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Desktop Responsive */
+@media (min-width: 768px) {
+  .ticket-modal-overlay {
+    padding: 40px;
+  }
+
+  .ticket-modal {
+    max-width: 520px;
+    max-height: 85vh;
+  }
+
+  .ticket-modal-header {
+    padding: 24px 24px 20px 24px;
+  }
+
+  .modal-title {
+    font-size: 20px;
+  }
+
+  .progress-container {
+    padding: 20px 24px;
+  }
+
+  .event-image-container {
+    padding: 24px;
+  }
+
+  .event-image {
+    height: 240px;
+  }
+
+  .available-tickets {
+    padding: 0 24px 24px 24px;
+  }
+
+  .ticket-selection {
+    padding: 24px;
+  }
+
+  .form-label {
+    font-size: 17px;
+  }
+
+  .quantity-input,
+  .ticket-type-select {
+    padding: 18px;
+    font-size: 17px;
+  }
+
+  .price-breakdown {
+    padding: 24px;
+  }
+
+  .price-row {
+    margin-bottom: 18px;
+  }
+
+  .price-label,
+  .price-value {
+    font-size: 17px;
+  }
+
+  .total-row .price-label,
+  .total-row .price-value {
+    font-size: 19px;
+  }
+
+  .confirm-section {
+    padding: 24px;
+  }
+
+  .confirm-button {
+    padding: 18px;
+    font-size: 17px;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1024px) {
+  .ticket-modal {
+    max-width: 560px;
+  }
+
+  .event-image {
+    height: 260px;
+  }
+}
+
+/* Mobile Specific */
+@media (max-width: 480px) {
+  .ticket-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .ticket-modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 95vh;
+    width: 100%;
+    animation: modalSlideUpMobile 0.3s ease-out;
+  }
+
+  @keyframes modalSlideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .ticket-modal-header {
+    padding: 16px 16px 12px 16px;
+  }
+
+  .modal-title {
+    font-size: 17px;
+  }
+
+  .progress-container {
+    padding: 12px 16px;
+  }
+
+  .event-image-container {
+    padding: 16px;
+  }
+
+  .event-image {
+    height: 180px;
+  }
+
+  .available-tickets {
+    padding: 0 16px 16px 16px;
+  }
+
+  .ticket-selection {
+    padding: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+
+  .quantity-input,
+  .ticket-type-select {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .price-breakdown {
+    padding: 16px;
+  }
+
+  .price-row {
+    margin-bottom: 14px;
+  }
+
+  .price-label,
+  .price-value {
+    font-size: 15px;
+  }
+
+  .total-row .price-label,
+  .total-row .price-value {
+    font-size: 17px;
+  }
+
+  .error-section {
+    padding: 0 16px 12px 16px;
+  }
+
+  .error-message {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+
+  .confirm-section {
+    padding: 16px;
+  }
+
+  .confirm-button {
+    padding: 14px;
+    font-size: 15px;
+  }
+}
+
+/* Dark theme scrollbar */
+.ticket-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ticket-modal::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.ticket-modal::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.ticket-modal::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}

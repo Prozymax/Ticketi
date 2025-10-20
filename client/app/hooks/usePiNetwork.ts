@@ -3,6 +3,7 @@
 import {useState, useEffect, useCallback} from "react";
 import {PiNetworkService} from "../lib/PiNetwork";
 import {apiService, AuthResponseData, BackendUser} from "../lib/api";
+import {formatError, logError} from "../utils/errorHandler";
 
 interface UsePiNetworkReturn {
   piService: PiNetworkService | null;
@@ -108,9 +109,8 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       return backendAuthResult.user;
 
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Authentication failed";
-      console.error("Authentication error:", err);
+      const errorMessage = formatError(err);
+      logError("Authentication", err);
       setError(errorMessage);
       setIsAuthenticated(false);
       setUser(null);
@@ -144,8 +144,8 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
         const paymentId = await piService.createPayment(amount, memo, metadata);
         return paymentId;
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Payment creation failed";
+        const errorMessage = formatError(err);
+        logError("Payment Creation", err);
         setError(errorMessage);
         throw err;
       } finally {
@@ -186,8 +186,8 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
         );
         return result;
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Payment creation failed";
+        const errorMessage = formatError(err);
+        logError("Payment Creation with Backend", err);
         setError(errorMessage);
         throw err;
       } finally {
@@ -207,8 +207,8 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       try {
         piService.openShareDialog(title, message);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Share dialog failed";
+        const errorMessage = formatError(err);
+        logError("Share Dialog", err);
         setError(errorMessage);
       }
     },
@@ -264,7 +264,7 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
             } as BackendUser);
           }
         } catch (error) {
-          console.error("Auth verification failed:", error);
+          logError("Auth Verification", error);
           // Clear invalid auth data
           localStorage.removeItem('pioneer-key');
           localStorage.removeItem('pi_user_info');

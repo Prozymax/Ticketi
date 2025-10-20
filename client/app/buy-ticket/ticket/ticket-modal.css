@@ -1,0 +1,476 @@
+/* Ticket Modal Styles */
+.ticket-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.ticket-modal {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.ticket-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+.header-spacer {
+  width: 40px;
+}
+
+/* Progress Bar */
+.progress-container {
+  padding: 16px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #333;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-fill {
+  width: 33%;
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #a855f7);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-step {
+  font-size: 14px;
+  color: #888;
+}
+
+.progress-step.active {
+  color: #8b5cf6;
+  font-weight: 500;
+}
+
+/* Event Image */
+.event-image-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.event-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  background-color: #333;
+}
+
+/* Available Tickets */
+.available-tickets {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 20px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.available-label {
+  font-size: 16px;
+  color: #888;
+}
+
+.ticket-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.ticket-count svg {
+  color: #8b5cf6;
+}
+
+/* Ticket Selection */
+.ticket-selection {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 16px;
+  color: #ffffff;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.quantity-input,
+.ticket-type-select {
+  width: 100%;
+  padding: 16px;
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.quantity-input:focus,
+.ticket-type-select:focus {
+  outline: none;
+  border-color: #8b5cf6;
+}
+
+.quantity-input {
+  text-align: left;
+}
+
+.ticket-type-select {
+  cursor: pointer;
+}
+
+.ticket-type-select option {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+/* Price Breakdown */
+.price-breakdown {
+  padding: 20px;
+  border-top: 1px solid #333;
+  border-bottom: 1px solid #333;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.price-row:las
+}66;nd: #6
+  backgrou:hover {r-thumbollbait-scr::-webk-modal
+.ticketpx;
+}
+: 3-radiusborder  #555;
+ackground: {
+  bhumb r-tit-scrollbaal::-webk
+.ticket-mod
+}
+#2a2a2a;: nd
+  backgrourack {ollbar-tcrkit-s-modal::-web.ticket;
+}
+
+h: 6px{
+  widtar ollbit-screbk-modal::-wicket
+.tscrollbar */ theme rk/* Da}
+}
+
+ 15px;
+  ont-size: f14px;
+   : dding paton {
+   utirm-b .conf;
+  }
+
+ : 16pxpaddingion {
+    nfirm-sect}
+
+  .co: 17px;
+  ont-size    fce-value {
+row .pri
+  .total-label,-row .price-
+
+  .totalx;
+  } 15p font-size:
+   rice-value {.pabel,
+  
+  .price-l14px;
+  }
+om:  margin-bott
+   ow {ice-r
+
+  .pr16px;
+  } padding: down {
+   -break .price
+
+ 15px;
+  }ze:    font-six;
+ dding: 14p  pat {
+  ece-sel.ticket-typy-input,
+   .quantit
+
+ 10px;
+  }: argin-bottomx;
+    m15pze: 
+    font-sim-label {
+
+  .forx;
+  }m: 20pto  margin-botup {
+    .form-gro}
+
+g: 16px;
+   paddin{
+   n ket-selectio
+  .tic;
+  }
+16pxpx px 16: 0 16adding  p  tickets {
+ .available-x;
+  }
+
+ t: 180p
+    heighage {ent-im
+
+  .ev
+  }: 16px;ing {
+    paddcontainermage-t-i
+  .even }
+2px 16px;
+ ding: 1  padtainer {
+  s-con .progresx;
+  }
+
+  17pze:   font-si{
+ l-title moda
+  .x;
+  }
+x 16p 12p6pxng: 16px 1ddier {
+    pa-modal-head
+
+  .ticket   }
+  }
+ lateY(0);m: trans transfor
+     
+    to {0%);
+    }lateY(10ansform: tr trans   {
+  from 
+    e {MobilmodalSlideUprames @keyf }
+
+  ;
+ s ease-out 0.3MobileideUpdalSlimation: mo    an100%;
+  width: 
+  ht: 95vh;ig
+    max-he;0px 20px 0 0: 2us border-radimodal {
+   ticket-
+  .
+  }
+s: flex-end;itemn-
+    aligding: 0;
+    padl-overlay {icket-moda .tpx) {
+ 80: 4ax-width
+@media (m/c * Specifibile* Mo
+}
+
+/;
+  }ight: 260px    hege {
+nt-imave
+
+  .e;
+  }dth: 560px
+    max-wi {et-modal  .tick4px) {
+th: 102in-wid@media (mtop */
+rge DeskLa
+
+/* x;
+  }
+} 17pize: font-s
+   ing: 18px;
+    paddm-button { .confir
+ 
+
+  }ng: 24px;di{
+    padection onfirm-s
+
+  .c }px;
+ size: 19t-onue {
+    fe-valrical-row .p .totbel,
+ larice-.pal-row ot
+  }
+
+  .tpx;: 17zeont-si
+    flue {  .price-vael,
+ce-lab.pri }
+
+  x;
+ -bottom: 18pinmarg {
+    e-row}
+
+  .pricpx;
+   24  padding:own {
+  -breakd
+
+  .price
+  }size: 17px;    font-;
+ 18px padding:ct {
+   elecket-type-st,
+  .tiantity-inpu  }
+
+  .quize: 17px;
+    font-s{
+orm-label  .f
+
+   }
+ng: 24px; paddi{
+   tion -selecket.tic
+   }
+24px;
+ px  24ding: 0 24px padkets {
+   ble-tic
+  .availax;
+  }
+height: 240pmage {
+    nt-i
+  .eve
+  }
+4px;adding: 2{
+    pe-container ent-imag
+
+  .ev24px;
+  }ding: 20px 
+    pad {iners-conta.progres;
+  }
+
+  -size: 20px    font{
+l-title .moda
+  
+  }
+px;20px 24px 24px padding: 24ader {
+    odal-het-m  .ticke
+
+85vh;
+  }ax-height: px;
+    m20h: 5dt  max-wial {
+  .ticket-mod
+
+  x;
+  }ng: 40ppaddilay {
+    l-over.ticket-moda  8px) {
+ 76 (min-width:mediasive */
+@ Respon
+/* Desktop; }
+}
+360deg)tate(nsform: rotra { }
+  100%); 0degotate(sform: r{ tran  0% spin {
+yframes }
+
+@ke infinite;
+n 1s lineartion: spi anima%;
+ -radius: 50f;
+  borderfffd #ffop: 2px soli-tderor
+  b0.3);, 255, a(255, 255 rgbidr: 2px sol
+  bordeight: 20px;px;
+  he width: 20pinner {
+ ding-s;
+}
+
+.loam: noneansfor
+  trowed;r: not-all;
+  cursopacity: 0.7led {
+  otton:disabrm-buonfi);
+}
+
+.c1pxslateY(-rm: tran transfo
+ 3ea); #9337c3aed,eg, #ient(135dadr-gr lineaund:ckgro
+  babled) {r:not(:disaoveton:hutfirm-bcon8px;
+}
+
+.: gap center;
+  nt:ustify-conte;
+  jnter: celign-itemsflex;
+  a
+  display: ase;ll 0.2s e: aansition;
+  tror: pointerurs0;
+  c: 60ightont-we 16px;
+  ft-size:;
+  fon #ffffffolor:  cs: 12px;
+iur-rade;
+  borde border: non);
+ a855f7, #8b5cf6, #5degnt(13inear-gradie l background:ng: 16px;
+   paddi0%;
+10{
+  width: irm-button }
+
+.confpx;
+padding: 20tion {
+  rm-sec.confion */
+cti* Confirm Se
+/
+}
+fffff;lor: #f00;
+  co 7ht:weig
+  font-x; 18p  font-size:ue {
+ .price-valtotal-rowl,
+.ice-labe .prtal-row
+
+.to: 600;
+}font-weightf;
+  r: #fffffcolo;
+  : 16pxsizee {
+  font-luice-va
+}
+
+.prcolor: #888;: 16px;
+    font-sizel {
+e-labepric
+.m: 0;
+}
+gin-botto{
+  mart-child 
