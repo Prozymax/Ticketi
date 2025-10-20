@@ -1,6 +1,6 @@
 "use client";
 
-import {useState} from "react";
+import {useState, Suspense} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image";
 import {usePiNetwork} from "../../hooks/usePiNetwork";
@@ -16,7 +16,7 @@ interface PaymentPageProps {
   };
 }
 
-export default function PaymentPage({eventData}: PaymentPageProps) {
+function PaymentContent({eventData}: PaymentPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const {createPayment, isLoading: piLoading, error: piError} = usePiNetwork();
@@ -538,5 +538,45 @@ export default function PaymentPage({eventData}: PaymentPageProps) {
         </div>
       </div>
     </>
+  );
+}
+
+function PaymentLoadingFallback() {
+  return (
+    <div style={{
+      backgroundColor: "#0a0a0a",
+      color: "#ffffff",
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{
+          width: "40px",
+          height: "40px",
+          border: "3px solid #333",
+          borderTop: "3px solid #8b5cf6",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite",
+          margin: "0 auto 16px auto",
+        }} />
+        <p>Loading payment...</p>
+      </div>
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default function PaymentPage({eventData}: PaymentPageProps) {
+  return (
+    <Suspense fallback={<PaymentLoadingFallback />}>
+      <PaymentContent eventData={eventData} />
+    </Suspense>
   );
 }

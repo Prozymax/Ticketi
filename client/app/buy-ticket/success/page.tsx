@@ -1,13 +1,13 @@
 "use client";
 
 import {useRouter, useSearchParams} from "next/navigation";
-import {useEffect, useState} from "react";
+import {useEffect, useState, Suspense} from "react";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [paymentId] = useState(searchParams.get("paymentId"));
-  const [eventId] = useState(searchParams.get("eventId"));
+  // const [eventId] = useState(searchParams.get("eventId")); // Not used currently
 
   useEffect(() => {
     // Auto redirect after 5 seconds
@@ -132,5 +132,53 @@ export default function PaymentSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div
+      style={{
+        backgroundColor: "#0a0a0a",
+        color: "#ffffff",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div style={{textAlign: "center"}}>
+        <div
+          style={{
+            width: "40px",
+            height: "40px",
+            border: "3px solid #333",
+            borderTop: "3px solid #8b5cf6",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+            margin: "0 auto 16px auto",
+          }}
+        />
+        <p>Loading...</p>
+      </div>
+      <style jsx>{`
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
