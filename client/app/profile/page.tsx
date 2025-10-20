@@ -4,6 +4,8 @@ import {useRouter} from "next/navigation";
 import {useEffect} from "react";
 import {useProfile} from "../hooks/useProfile";
 import {usePiNetwork} from "../hooks/usePiNetwork";
+import {formatError} from "../utils/errorHandler";
+import ErrorDisplay from "../components/ErrorDisplay";
 import Image from "next/image";
 import "@/styles/profile-new.css";
 
@@ -94,14 +96,12 @@ export default function ProfilePage() {
           <h1 className="profile-title">Your Account</h1>
         </div>
         <div className="error-container">
-          <p className="error-message">Error loading profile: {error}</p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="retry-button"
-          >
-            Retry
-          </button>
+          <ErrorDisplay
+            error={error}
+            title="Profile Loading Error"
+            showDetails={true}
+            onRetry={() => window.location.reload()}
+          />
         </div>
       </div>
     );

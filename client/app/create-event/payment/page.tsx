@@ -5,6 +5,8 @@ import {useRouter} from "next/navigation";
 import {useEventCreation} from "@/app/contexts/EventCreationContext";
 import {eventAPI, CreateEventRequest} from "@/app/utils/api";
 import {usePiNetwork} from "@/app/hooks/usePiNetwork";
+import {formatError} from "@/app/utils/errorHandler";
+import ErrorDisplay from "@/app/components/ErrorDisplay";
 import "@/styles/payment.css";
 import "@/styles/create-event.css";
 
@@ -199,7 +201,15 @@ export default function PaymentPage() {
 
             {/* Error message */}
             {(paymentError || piError) && (
-              <div className="payment-error">{paymentError || piError}</div>
+              <ErrorDisplay
+                error={paymentError || piError}
+                title="Payment Error"
+                showDetails={true}
+                onRetry={() => {
+                  setPaymentError(null);
+                  handleConfirmPayment();
+                }}
+              />
             )}
           </div>
         </div>

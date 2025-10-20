@@ -1,6 +1,8 @@
 'use client';
 
 import { usePiNetwork } from '../hooks/usePiNetwork';
+import { formatError } from '../utils/errorHandler';
+import ErrorDisplay from './ErrorDisplay';
 
 interface AuthStatusProps {
   showDetails?: boolean;
@@ -22,7 +24,11 @@ export default function AuthStatus({ showDetails = false, className = '' }: Auth
   if (error) {
     return (
       <div className={`auth-status error ${className}`}>
-        <span>⚠️ {error}</span>
+        <ErrorDisplay
+          error={error}
+          title="Authentication Status Error"
+          showDetails={showDetails}
+        />
       </div>
     );
   }

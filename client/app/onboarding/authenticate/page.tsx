@@ -5,6 +5,8 @@ import "@/styles/onboarding.css";
 import OnboardingSlide from "./components/page";
 import {usePiNetwork} from "@/app/hooks/usePiNetwork";
 import {useRouter} from "next/navigation";
+import {formatError, logError} from "@/app/utils/errorHandler";
+import ErrorDisplay from "@/app/components/ErrorDisplay";
 
 export default function OnboardingCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -93,12 +95,9 @@ export default function OnboardingCarousel() {
         // Could redirect to a username setup page or handle accordingly
       }
     } catch (error) {
-      console.error("Pi Network authentication failed:", error);
-      setAuthError(
-        `Authentication failed: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      const errorMessage = formatError(error);
+      logError("Pi Network Authentication (Onboarding)", error);
+      setAuthError(errorMessage);
     }
   };
 
@@ -138,12 +137,6 @@ export default function OnboardingCarousel() {
 
       {/* Static Authentication Button */}
       <div className="auth-section">
-        {/* Debug info - remove in production */}
-        <div className="debug-info">
-          Debug: SDK Ready: {isSDKReady ? "✅" : "❌"} | Loading:{" "}
-          {isLoading ? "⏳" : "✅"} | Window.Pi:{" "}
-          {typeof window !== "undefined" && window.Pi ? "✅" : "❌"}
-        </div>
 
         <button
           type="button"
@@ -168,7 +161,15 @@ export default function OnboardingCarousel() {
 
         {/* Error message */}
         {(error || authError) && (
-          <div className="auth-error">{error || authError}</div>
+          <ErrorDisplay
+            error={error || authError}
+            title="Authentication Error"
+            showDetails={true}
+            onRetry={() => {
+              setAuthError(null);
+              handlePiAuthentication();
+            }}
+          />
         )}
       </div>
     </div>

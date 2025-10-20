@@ -2,6 +2,7 @@
 
 import React from "react";
 import {usePiNetwork} from "../hooks/usePiNetwork";
+import ErrorDisplay from "./ErrorDisplay";
 
 export const PiNetworkDemo: React.FC = () => {
   const {
@@ -96,7 +97,11 @@ export const PiNetworkDemo: React.FC = () => {
             marginBottom: "20px",
           }}
         >
-          <p>Error: {error}</p>
+          <ErrorDisplay
+            error={error}
+            title="Pi Network Error"
+            showDetails={true}
+          />
         </div>
       )}
 

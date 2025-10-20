@@ -44,11 +44,7 @@ export default function EmptyEventsComponent() {
             There seems to be no event near you or in your region. Start
             creating your next successful events in a few steps
           </p>
-          <button
-            className="create-event-button"
-            disabled
-            onClick={handleCreateEvent}
-          >
+          <button className="create-event-button" onClick={handleCreateEvent}>
             Create Event Ticket
           </button>
         </div>
@@ -71,11 +67,7 @@ export default function EmptyEventsComponent() {
           <p className="explore-description">
             Find out the next event around you before tickets are sold out
           </p>
-          <button
-            className="explore-button"
-            disabled
-            onClick={handleExploreEvents}
-          >
+          <button className="explore-button" onClick={handleExploreEvents}>
             Find out what&apos;s Happening
           </button>
         </div>

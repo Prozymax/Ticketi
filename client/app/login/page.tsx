@@ -4,6 +4,8 @@ import {useRouter} from "next/navigation";
 import {useState, useEffect} from "react";
 import {usePiNetwork} from "../hooks/usePiNetwork";
 import {apiService} from "../lib/api";
+import {formatError, logError} from "../utils/errorHandler";
+import ErrorDisplay from "../components/ErrorDisplay";
 import Image from "next/image";
 import "@/styles/login.css";
 import "@/styles/mobileview/login.css";
@@ -63,7 +65,7 @@ export default function LoginPage() {
             setUserVerificationStatus(null);
           }
         } catch (error) {
-          console.error("Failed to verify stored username:", error);
+          logError("Username Verification", error);
           // On error, show input for manual entry
           setShowUsernameInput(true);
           setUserVerificationStatus(null);
@@ -122,8 +124,9 @@ export default function LoginPage() {
 
       // Redirect to events page
     } catch (error) {
-      console.error("Authentication failed:", error);
-      setAuthError("Authentication failed. Please try again.");
+      const errorMessage = formatError(error);
+      logError("Pi Network Authentication", error);
+      setAuthError(errorMessage);
 
       // If authentication fails, redirect to onboarding
       router.push("/onboarding/authenticate");
@@ -185,7 +188,15 @@ export default function LoginPage() {
 
             {/* Error message */}
             {(error || authError) && (
-              <div className="auth-error">{error || authError}</div>
+              <ErrorDisplay
+                error={error || authError}
+                title="Authentication Error"
+                showDetails={true}
+                onRetry={() => {
+                  setAuthError(null);
+                  handlePiNetworkAuth();
+                }}
+              />
             )}
           </div>
         </div>
