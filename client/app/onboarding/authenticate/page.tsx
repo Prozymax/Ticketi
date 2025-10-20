@@ -28,6 +28,10 @@ export default function OnboardingCarousel() {
     }
   }, [user]);
 
+  const handleExploration = async () => {
+    router.push("/events");
+  }
+
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % slides.length);
   };
@@ -169,7 +173,14 @@ export default function OnboardingCarousel() {
             "Authenticate with Pi Network"
           )}
         </button>
-
+        <br />
+        <button
+          type="button"
+          className="explore-button text-center w-[100%]"
+          onClick={handleExploration}
+        >
+          Explore Events
+        </button>
         {/* Error message */}
         {(error || authError) && (
           <ErrorDisplay
