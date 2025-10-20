@@ -95,6 +95,18 @@ export default function OnboardingCarousel() {
         // Could redirect to a username setup page or handle accordingly
       }
     } catch (error) {
+      // Enhanced debugging for Pi browser
+      console.log("=== AUTHENTICATION ERROR DEBUG ===");
+      console.log("Error type:", typeof error);
+      console.log("Error constructor:", error?.constructor?.name);
+      console.log("Error object:", error);
+      console.log(
+        "Error keys:",
+        error && typeof error === "object" ? Object.keys(error) : "N/A"
+      );
+      console.log("Error JSON:", JSON.stringify(error, null, 2));
+      console.log("=== END DEBUG ===");
+
       const errorMessage = formatError(error);
       logError("Pi Network Authentication (Onboarding)", error);
       setAuthError(errorMessage);
@@ -137,7 +149,6 @@ export default function OnboardingCarousel() {
 
       {/* Static Authentication Button */}
       <div className="auth-section">
-
         <button
           type="button"
           title="Authenticate with Pi Network"

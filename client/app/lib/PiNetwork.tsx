@@ -132,9 +132,26 @@ export class PiNetworkService {
           console.log(auth);
           resolve(auth);
         })
-        .catch((error: Error) => {
+        .catch((error: unknown) => {
           console.error("Authentication failed:", error);
-          reject(error);
+          
+          // Enhanced error handling for Pi SDK errors
+          let errorMessage = "Authentication failed";
+          
+          if (error && typeof error === 'object') {
+            const errorObj = error as Record<string, unknown>;
+            if (typeof errorObj.message === 'string') {
+              errorMessage = errorObj.message;
+            } else if (typeof errorObj.error === 'string') {
+              errorMessage = errorObj.error;
+            } else if (typeof errorObj.code === 'string') {
+              errorMessage = `Pi SDK Error: ${errorObj.code}`;
+            }
+          } else if (typeof error === 'string') {
+            errorMessage = error;
+          }
+          
+          reject(new Error(errorMessage));
         });
     });
   }
@@ -198,9 +215,26 @@ export class PiNetworkService {
           }
           reject(new Error("Payment was cancelled by user"));
         },
-        onError: (error: Error, payment?: IncompletePayment) => {
+        onError: (error: unknown, payment?: IncompletePayment) => {
           console.error("Payment error:", error, payment);
-          reject(error);
+          
+          // Enhanced error handling for Pi SDK payment errors
+          let errorMessage = "Payment failed";
+          
+          if (error && typeof error === 'object') {
+            const errorObj = error as Record<string, unknown>;
+            if (typeof errorObj.message === 'string') {
+              errorMessage = errorObj.message;
+            } else if (typeof errorObj.error === 'string') {
+              errorMessage = errorObj.error;
+            } else if (typeof errorObj.code === 'string') {
+              errorMessage = `Pi Payment Error: ${errorObj.code}`;
+            }
+          } else if (typeof error === 'string') {
+            errorMessage = error;
+          }
+          
+          reject(new Error(errorMessage));
         },
       };
 

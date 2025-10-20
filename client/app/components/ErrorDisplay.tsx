@@ -19,7 +19,24 @@ export default function ErrorDisplay({
   if (!error) return null;
 
   const userFriendlyMessage = createUserFriendlyError(error);
-  const detailedMessage = formatError(error);
+  let detailedMessage = formatError(error);
+  
+  // Fallback if formatError still returns [object Object]
+  if (detailedMessage === "[object Object]" || detailedMessage.includes("[object Object]")) {
+    detailedMessage = `Error details: ${JSON.stringify(error, (key, value) => {
+      if (typeof value === 'function') return '[Function]';
+      if (typeof value === 'object' && value !== null) {
+        // Prevent circular references
+        try {
+          JSON.stringify(value);
+          return value;
+        } catch {
+          return '[Circular Reference]';
+        }
+      }
+      return value;
+    }, 2)}`;
+  }
 
   return (
     <div className={`error-display ${className}`}>
