@@ -22,10 +22,6 @@ export default function LoginPage() {
     username: string;
   } | null>(null);
 
-    const handleExploration = async () => {
-      router.push("/events");
-    };
-
   // Load stored username and check verification status on mount
   useEffect(() => {
     const loadStoredUsername = async () => {
@@ -204,10 +200,6 @@ export default function LoginPage() {
               />
             )}
           </div>
-          <br/>
-            <button className="explore-button text-center w-[100%]" onClick={handleExploration}>
-              Explore Events
-            </button>
         </div>
       </div>
     </div>
