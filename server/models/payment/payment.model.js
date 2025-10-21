@@ -10,24 +10,27 @@ const Payment = sequelize.define('Payment', {
     userId: {
         type: DataTypes.UUID,
         allowNull: false,
+        field: 'user_id',
         references: {
-            model: 'Users',
+            model: 'users',
             key: 'id'
         }
     },
     purchaseId: {
         type: DataTypes.UUID,
         allowNull: true,
+        field: 'purchase_id',
         references: {
-            model: 'Purchases',
+            model: 'purchases',
             key: 'id'
         }
     },
     eventId: {
         type: DataTypes.UUID,
         allowNull: true,
+        field: 'event_id',
         references: {
-            model: 'Events',
+            model: 'events',
             key: 'id'
         }
     },
@@ -51,16 +54,19 @@ const Payment = sequelize.define('Payment', {
     paymentMethod: {
         type: DataTypes.STRING(50),
         allowNull: false,
-        defaultValue: 'pi_network'
+        defaultValue: 'pi_network',
+        field: 'payment_method'
     },
     piPaymentId: {
         type: DataTypes.STRING(255),
         allowNull: true,
-        unique: true
+        unique: true,
+        field: 'pi_payment_id'
     },
     transactionHash: {
         type: DataTypes.STRING(255),
-        allowNull: true
+        allowNull: true,
+        field: 'transaction_hash'
     },
     memo: {
         type: DataTypes.TEXT,
@@ -72,36 +78,28 @@ const Payment = sequelize.define('Payment', {
     },
     completedAt: {
         type: DataTypes.DATE,
-        allowNull: true
-    },
-    createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
-    },
-    updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
+        allowNull: true,
+        field: 'completed_at'
     }
 }, {
     tableName: 'payments',
     timestamps: true,
+    underscored: true,
     indexes: [
         {
-            fields: ['userId']
+            fields: ['user_id']
         },
         {
-            fields: ['purchaseId']
+            fields: ['purchase_id']
         },
         {
             fields: ['status']
         },
         {
-            fields: ['piPaymentId']
+            fields: ['pi_payment_id']
         },
         {
-            fields: ['createdAt']
+            fields: ['created_at']
         }
     ]
 });

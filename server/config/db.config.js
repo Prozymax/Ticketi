@@ -274,7 +274,7 @@ class DatabaseManager {
                 console.log('Creating missing tables without affecting existing data.');
                 
                 // Create only missing tables without force
-                await this.sequelize.sync({ force: true });
+                await this.sequelize.sync({ alter: false });
                 response.status = true;
                 console.log('Missing tables created successfully');
             }
