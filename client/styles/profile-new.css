@@ -15,7 +15,6 @@
 
 .profile-title {
   font-size: 24px;
-  font-weight: 600;
   margin: 0;
   color: #ffffff;
 }
@@ -84,14 +83,16 @@
 }
 
 .section-title {
+  width: 100%;
+  text-align: left;;
   font-size: 16px;
-  font-weight: 600;
   margin: 0 0 20px 0;
   color: #888;
 }
 
 .menu-item {
   width: 100%;
+  text-align: left;
   display: flex;
   align-items: center;
   padding: 15px 0;

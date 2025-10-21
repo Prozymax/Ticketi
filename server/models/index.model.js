@@ -152,6 +152,27 @@ EventCategory.belongsTo(Category, {
     as: 'category' 
 });
 
+// Followers Relationships
+User.hasMany(Followers, {
+    foreignKey: 'followerId',
+    as: 'following'
+});
+
+User.hasMany(Followers, {
+    foreignKey: 'followingId',
+    as: 'followers'
+});
+
+Followers.belongsTo(User, {
+    foreignKey: 'followingId',
+    as: 'followedUser'
+});
+
+Followers.belongsTo(User, {
+    foreignKey: 'followerId',
+    as: 'followerUser'
+});
+
 // Export all models
 module.exports = {
     Auth,

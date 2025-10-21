@@ -128,7 +128,7 @@ export default function ProfilePage() {
         
         <div className="user-info">
           <h2 className="username">
-            {profile?.username || 'Woodylightyearx'}
+            {profile?.username || 'piooner_1234'}
           </h2>
           
           {profile?.isVerified && (
@@ -142,7 +142,7 @@ export default function ProfilePage() {
         <div className="follows-section">
           <div className="follows-label">Follows</div>
           <div className="follows-count">
-            0
+            {profile?.followersCount || 0}
           </div>
         </div>
       </div>
@@ -166,7 +166,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div onClick={handleCurrency} className="menu-item">
+        {/* <div onClick={handleCurrency} className="menu-item">
           <div className="menu-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
@@ -179,7 +179,7 @@ export default function ProfilePage() {
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-        </div>
+        </div> */}
 
         <div onClick={handleDisplayLanguage} className="menu-item">
           <div className="menu-icon">

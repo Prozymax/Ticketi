@@ -12,7 +12,7 @@ class ProfileService {
             const user = await User.findByPk(userId, {
                 attributes: [
                     'id',
-                    'username', 
+                    'username',
                     'email',
                     'firstName',
                     'lastName',
@@ -21,24 +21,51 @@ class ProfileService {
                     'isVerified',
                     'lastLogin',
                     'createdAt'
+                ],
+                include: [
+                    {
+                        association: 'followers',
+                        attributes: ['id'],
+                        required: false
+                    },
+                    {
+                        association: 'following',
+                        attributes: ['id'],
+                        required: false
+                    }
                 ]
             });
 
             if (!user) {
-                return { error: true, message: 'User not found', user: null };
+                return { error: true, message: 'User not found', user: [] };
             }
 
-            return { 
-                error: false, 
-                message: 'Profile retrieved successfully', 
-                user: user.toJSON() 
+            const followersCount = user.followers ? user.followers.length : 0;
+            const followingCount = user.following ? user.following.length : 0;
+
+            const userWithStats = {
+                ...user.toJSON(),
+                followersCount,
+                followingCount
+            };
+
+            // Remove the followers and following arrays from the response to keep it clean
+            delete userWithStats.followers;
+            delete userWithStats.following;
+
+            console.log('User profile with stats:', userWithStats);
+
+            return {
+                error: false,
+                message: 'Profile retrieved successfully',
+                user: userWithStats
             };
         } catch (error) {
             console.error('Error fetching user profile:', error);
-            return { 
-                error: true, 
-                message: 'Failed to fetch profile', 
-                user: null 
+            return {
+                error: true,
+                message: 'Failed to fetch profile',
+                user: null
             };
         }
     }
@@ -53,7 +80,7 @@ class ProfileService {
         try {
             const allowedFields = [
                 'email',
-                'firstName', 
+                'firstName',
                 'lastName',
                 'profileImage'
             ];
@@ -79,7 +106,7 @@ class ProfileService {
                 attributes: [
                     'id',
                     'username',
-                    'email', 
+                    'email',
                     'firstName',
                     'lastName',
                     'piWalletAddress',

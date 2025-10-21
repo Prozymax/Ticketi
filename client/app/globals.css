@@ -40,6 +40,10 @@ body {
   padding-bottom: 5rem; /* Space for bottom navigation */
 }
 
+button {
+  font-family: var(--font-nunito);
+}
+
 h1,
 h2,
 h3 {

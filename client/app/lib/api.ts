@@ -52,6 +52,8 @@ interface UserProfile {
   isVerified: boolean;
   lastLogin?: string;
   createdAt: string;
+  followersCount: number;
+  followingCount: number;
 }
 
 interface UserStats {

@@ -227,7 +227,7 @@ class DatabaseManager {
             // Environment-based sync strategy
             const isDevelopment = this.environment === 'development';
             const isProduction = this.environment === 'production';
-            
+
             // Check if FORCE_SYNC environment variable is explicitly set
             const forceSync = process.env.FORCE_SYNC === 'true';
 
@@ -255,7 +255,7 @@ class DatabaseManager {
 
             if (tablesExist) {
                 console.log('✅ All tables exist. Performing safe sync.');
-                
+
                 if (isProduction) {
                     // In production, be very conservative - don't alter existing tables
                     console.log('🔒 Production mode: Skipping table alterations for safety');
@@ -264,7 +264,7 @@ class DatabaseManager {
                     console.log('Database sync skipped in production (tables exist)');
                 } else {
                     // In development, allow safe alterations
-                    await this.sequelize.sync({ alter: true });
+                    // await this.sequelize.sync({ alter: true });
                     response.status = false;
                     response.error = null;
                     console.log('Database safely synced with force: false');
@@ -272,7 +272,7 @@ class DatabaseManager {
             } else {
                 console.log(`📋 Missing tables detected: ${missingTables.join(', ')}`);
                 console.log('Creating missing tables without affecting existing data.');
-                
+
                 // Create only missing tables without force
                 await this.sequelize.sync({ alter: false });
                 response.status = true;

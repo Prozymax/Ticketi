@@ -16,8 +16,8 @@ class AuthenticationService {
         });
         console.log(user ? user : 'User does not exist')
 
-        if (!user) return { message: 'User doesn\'t exist', error: true, verified: null, user: null }
-        if (!user.dataValues.is_verified) return { user, message: 'User not verified', error: true, verified: false }
+        if (!user) return { message: 'User doesn\'t exist', error: true, verified: null, user: [] }
+        if (!user.dataValues.is_verified) return { user: [], message: 'User not verified', error: true, verified: false }
 
         return { user: user.toJSON(), message: 'User verified', error: false, verified: true };
     }
