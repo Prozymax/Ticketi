@@ -4,11 +4,13 @@ const User = require('./user/user.model');
 const Event = require('./event/event.model');
 const Ticket = require('./ticket/ticket.model');
 const Purchase = require('./purchase/purchase.model');
+const Payment = require('./payment/payment.model');
 const NFTTicket = require('./nft_ticket/nft_ticket.model');
 const UserSettings = require('./settings/user_settings.model');
 const Category = require('./category/category.model');
 const EventCategory = require('./event_category/event_category.model');
 const BlockchainTransaction = require('./blockchain/blockchain_transaction.model');
+const Followers = require('./followers/followers.model.js');
 
 // Define Model Relationships
 
@@ -31,6 +33,11 @@ User.hasOne(Auth, {
 User.hasMany(Purchase, { 
     foreignKey: 'userId', 
     as: 'purchases' 
+});
+
+User.hasMany(Payment, { 
+    foreignKey: 'userId', 
+    as: 'payments' 
 });
 
 User.hasOne(UserSettings, { 
@@ -93,6 +100,27 @@ Purchase.hasOne(NFTTicket, {
     as: 'nftTicket' 
 });
 
+Purchase.hasOne(Payment, { 
+    foreignKey: 'purchaseId', 
+    as: 'payment' 
+});
+
+// Payment Relationships
+Payment.belongsTo(User, { 
+    foreignKey: 'userId', 
+    as: 'user' 
+});
+
+Payment.belongsTo(Purchase, { 
+    foreignKey: 'purchaseId', 
+    as: 'purchase' 
+});
+
+Payment.belongsTo(Event, { 
+    foreignKey: 'eventId', 
+    as: 'event' 
+});
+
 // NFT Ticket Relationships
 NFTTicket.belongsTo(Purchase, { 
     foreignKey: 'purchaseId', 
@@ -131,8 +159,10 @@ module.exports = {
     Event,
     Ticket,
     Purchase,
+    Payment,
     NFTTicket,
     UserSettings,
+    Followers,
     Category,
     EventCategory,
     BlockchainTransaction

@@ -30,19 +30,21 @@ authRouter.get('/confirm-username', async (request, response) => {
 authRouter.post('/authenticate', async (request, response) => {
     const { username, accessToken } = request.body;
     console.log(request.body)
-    
+
     if (!username) {
         return ApiResponse.error(response, 'Username not found', 403, 'Username not found');
     }
 
     try {
         const userVerified = await AuthService.confirmUser(username);
-// TODO: Not everytime user gets a new token fix
+        // TODO: Not everytime user gets a new token fix
         if (userVerified.error) {
+            console.log(userVerified.message)
             // User doesn't exist, create new user
             const { error, message, user } = await AuthService.verifyAndCreateUser(accessToken, username);
 
-            if (error) {
+            if (error) { 
+                console.error('Error creating user:', message);
                 return ApiResponse.error(response, message, 403, message);
             }
 
@@ -50,15 +52,15 @@ authRouter.post('/authenticate', async (request, response) => {
             return await authController.login(response, user);
         } else {
             // User exists, login with existing user
-             await User.update({ 
+            await User.update({
                 lastLogin: new Date(),
                 accessToken
-                }, 
+            },
                 { where: { username } }
             );
             return await authController.login(response, userVerified.user);
         }
-    } catch(error) {
+    } catch (error) {
         console.error('Authentication error:', error);
         return ApiResponse.error(response, 'Authentication failed', 500, 'Failed to authenticate user');
     }

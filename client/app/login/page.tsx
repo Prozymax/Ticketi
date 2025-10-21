@@ -65,6 +65,7 @@ export default function LoginPage() {
           } else {
             // User doesn't exist or is not verified - show input for manual entry
             console.log("Stored username not verified, showing input");
+            router.push('/onboarding/authenticate')
             setShowUsernameInput(true);
             setUserVerificationStatus(null);
           }

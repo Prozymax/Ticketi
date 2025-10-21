@@ -224,6 +224,24 @@ class DatabaseManager {
                 models = require('../models/index.model');
             }
 
+            // Environment-based sync strategy
+            const isDevelopment = this.environment === 'development';
+            const isProduction = this.environment === 'production';
+            
+            // Check if FORCE_SYNC environment variable is explicitly set
+            const forceSync = process.env.FORCE_SYNC === 'true';
+
+            console.log(`Database sync mode: ${this.environment}`);
+            console.log(`Force sync enabled: ${forceSync}`);
+
+            if (forceSync && isDevelopment) {
+                console.log('⚠️  DEVELOPMENT: Force syncing database (this will drop all data)');
+                await this.sequelize.sync({ force: true });
+                response.status = true;
+                console.log('Database forcefully synced in development mode');
+                return response;
+            }
+
             // Get all model table names
             const modelTableNames = Object.values(models)
                 .filter(model => typeof model.getTableName === 'function')
@@ -233,26 +251,40 @@ class DatabaseManager {
 
             // Check if all model tables exist
             const tablesExist = modelTableNames.every((tableName) => tables.includes(tableName));
+            const missingTables = modelTableNames.filter(tableName => !tables.includes(tableName));
 
             if (tablesExist) {
-                console.log('All tables exist. Syncing with force: false.');
-                // await this.sequelize.sync({ alter: true });
-                response.status = false; // Indicates soft sync  
-                response.error = 'Database is up-to-date';
-                console.log('Database already synced');
+                console.log('✅ All tables exist. Performing safe sync.');
+                
+                if (isProduction) {
+                    // In production, be very conservative - don't alter existing tables
+                    console.log('🔒 Production mode: Skipping table alterations for safety');
+                    response.status = false;
+                    response.error = null;
+                    console.log('Database sync skipped in production (tables exist)');
+                } else {
+                    // In development, allow safe alterations
+                    await this.sequelize.sync({ force: false });
+                    response.status = false;
+                    response.error = null;
+                    console.log('Database safely synced with force: false');
+                }
             } else {
-                console.log('Some tables are missing. Syncing with force: true.');
-                await this.sequelize.sync({ force: true });
-                response.status = true; // Indicates force sync  
-                console.log('Database forcefully synced');
+                console.log(`📋 Missing tables detected: ${missingTables.join(', ')}`);
+                console.log('Creating missing tables without affecting existing data.');
+                
+                // Create only missing tables without force
+                await this.sequelize.sync({ alter: false });
+                response.status = true;
+                console.log('Missing tables created successfully');
             }
         } catch (error) {
-            console.log('Error syncing Database:', error.message);
+            console.log('❌ Error syncing Database:', error.message);
             console.error(error)
-            response.error = error.message; // Store the error message  
+            response.error = error.message;
         }
 
-        return response; // Return the response object with status and error  
+        return response;
     }
 }
 

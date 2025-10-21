@@ -123,6 +123,7 @@ class PiNetworkService {
         })
 
         if(!response || response.error) {
+            console.error(response.error)
             return { success: false, error: response.error || 'Unknown error' }
         }
 
