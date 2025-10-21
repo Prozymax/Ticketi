@@ -8,9 +8,7 @@ const Auth = require('../models/auth/auth.model');
 
 class PiNetworkService {
     constructor() {
-        this.baseUrl = process.env.NODE_ENV !== 'development'
-            ? process.env.MAINNET_API_URL
-            : process.env.TESTNET_API_URL;
+        this.baseUrl = process.env.PI_API_URL;
 
         this.apiKey = process.env.PI_API_KEY;
 
@@ -74,6 +72,7 @@ class PiNetworkService {
     apiCaller = async (endpoint, options = {}) => {
         try {
             logger.info(`🔗 Pi API Request: ${options.method || 'GET'} ${this.baseUrl}/${endpoint}`);
+            console.log(`🔗 Pi API Request: ${options.method || 'GET'} ${this.baseUrl}/${endpoint}`);
 
             const config = {
                 url: endpoint,
