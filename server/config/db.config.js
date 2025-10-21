@@ -264,7 +264,7 @@ class DatabaseManager {
                     console.log('Database sync skipped in production (tables exist)');
                 } else {
                     // In development, allow safe alterations
-                    await this.sequelize.sync({ force: false });
+                    await this.sequelize.sync({ alter: true });
                     response.status = false;
                     response.error = null;
                     console.log('Database safely synced with force: false');
