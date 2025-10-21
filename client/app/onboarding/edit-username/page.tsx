@@ -86,7 +86,7 @@ export default function EditUsernamePage() {
                 <Image
                   width={80}
                   height={80}
-                  src="https://img.icons8.com/fluency/48/instagram-verification-badge.png"
+                  src="/icons/verified.png"
                   alt="instagram-verification-badge"
                 />
               </div>

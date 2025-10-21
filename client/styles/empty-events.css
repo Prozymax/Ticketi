@@ -148,6 +148,15 @@
   transform: translateY(0);
 }
 
+@media screen and (max-width: 768px) {
+  .create-myevent-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    min-width: 400px;
+    margin-block: 3rem;
+  }
+}
+
 /* Responsive Design */
 @media (min-width: 768px) {
   .empty-events-container {

@@ -102,8 +102,8 @@ main {
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.2);
@@ -111,10 +111,10 @@ main {
 
 .verified-badge {
   position: absolute;
-  bottom: 5px;
+  bottom: 0px;
   right: 10px;
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   display: flex;
   align-items: center;
