@@ -32,12 +32,12 @@ export default function LandingPage() {
           }
 
           // First time visitor, go to onboarding
-          router.push("/onboarding/authenticate");
+          router.push("/splash/terms");
         });
       } catch (error) {
         console.error("Error checking user status:", error);
         // Fallback to onboarding if there's an error
-        router.push("/onboarding/authenticate");
+        router.push("/splash/terms");
       }
     };
 
