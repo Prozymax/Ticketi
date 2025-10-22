@@ -5,6 +5,7 @@ import Image from "next/image";
 
 interface EventCardProps {
   event: {
+    id?: string;
     image: string;
     title: string;
     ticket_price: string;
@@ -19,8 +20,11 @@ export default function EventCard({event}: EventCardProps) {
   const router = useRouter();
 
   const handleDetailsClick = () => {
-    // Navigate to event details page
-    router.push(`/events/${event.title.toLowerCase().replace(/\s+/g, "-")}`);
+    // Navigate to event details page using ID if available, otherwise use title
+    const eventPath = event.id
+      ? `/events/${event.id}`
+      : `/events/${event.title.toLowerCase().replace(/\s+/g, "-")}`;
+    router.push(eventPath);
   };
 
   // Safety check for event object
@@ -28,17 +32,18 @@ export default function EventCard({event}: EventCardProps) {
     return null;
   }
 
+  console.log('Events:  ', event)
+
   return (
     <div className="event-card">
       {/* Event Image */}
       <div className="event-image-container">
-        <Image
-          src={`/events/${event.image || 'placeholder.png'}`}
-          alt={event.title || 'Event'}
+        <img
+          src={event.image}
+          alt={event.title || "Event"}
           className="event-image"
           width={400}
           height={240}
-          priority
         />
         <div className="image-overlay"></div>
       </div>
@@ -47,9 +52,9 @@ export default function EventCard({event}: EventCardProps) {
       <div className="event-content">
         {/* Header with title and price */}
         <div className="event-header">
-          <h3 className="event-title">{event.title || 'Untitled Event'}</h3>
+          <h3 className="event-title">{event.title || "Untitled Event"}</h3>
           <div className="event-price">
-            <span className="price-amount">{event.ticket_price || '0'}</span>
+            <span className="price-amount">{event.ticket_price || "0"}</span>
             <span className="pi-symbol">π</span>
           </div>
         </div>
@@ -76,7 +81,7 @@ export default function EventCard({event}: EventCardProps) {
                 />
               </svg>
             </div>
-            <span className="detail-text">{event.venue || 'TBD'}</span>
+            <span className="detail-text">{event.venue || "TBD"}</span>
           </div>
 
           {/* Date and Time */}
@@ -119,7 +124,7 @@ export default function EventCard({event}: EventCardProps) {
                 />
               </svg>
             </div>
-            <span className="detail-text">Date: {event.data || 'TBD'}</span>
+            <span className="detail-text">Date: {event.data || "TBD"}</span>
             <div className="detail-icon time-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <circle
@@ -136,7 +141,7 @@ export default function EventCard({event}: EventCardProps) {
                 />
               </svg>
             </div>
-            <span className="detail-text">{event.time || 'TBD'}</span>
+            <span className="detail-text">{event.time || "TBD"}</span>
           </div>
 
           {/* Tickets Available */}

@@ -239,7 +239,7 @@ class PurchaseService {
                 return { success: false, error: 'Event not found' };
             }
 
-            if (event.createdBy !== creatorUserId) {
+            if (event.organizerId !== creatorUserId) {
                 return { success: false, error: 'Unauthorized to view event sales' };
             }
 

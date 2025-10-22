@@ -105,6 +105,12 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       };
       localStorage.setItem("pi_user_info", JSON.stringify(userInfo));
 
+      // Also update UserStorage for compatibility with other parts of the app
+      const { UserStorage } = await import("../utils/userStorage");
+      UserStorage.setUserToken(backendAuthResult.user.token);
+      UserStorage.setUserData(backendAuthResult.user);
+      UserStorage.setOnboardingCompleted();
+
       console.log("Authentication successful");
       return backendAuthResult.user;
 
@@ -118,6 +124,14 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       // Clear any stored auth data on error
       localStorage.removeItem('pioneer-key');
       localStorage.removeItem('pi_user_info');
+      
+      // Also clear UserStorage
+      try {
+        const { UserStorage } = await import("../utils/userStorage");
+        UserStorage.clearUserData();
+      } catch (error) {
+        console.error('Failed to clear UserStorage:', error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -134,7 +148,7 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       }
 
       if (!isAuthenticated) {
-        throw new Error("User not authenticated");
+        throw new Error("User not authenticated. Please authenticate with Pi Network to create payments.");
       }
 
       setIsLoading(true);
@@ -147,6 +161,12 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
         const errorMessage = formatError(err);
         logError("Payment Creation", err);
         setError(errorMessage);
+        
+        // Check if it's a scope-related error and provide better error message
+        if (errorMessage.includes("payments") && errorMessage.includes("scope")) {
+          throw new Error("Payment authorization required. Please authenticate with Pi Network to enable payments.");
+        }
+        
         throw err;
       } finally {
         setIsLoading(false);
@@ -169,7 +189,7 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       }
 
       if (!isAuthenticated) {
-        throw new Error("User not authenticated");
+        throw new Error("User not authenticated. Please authenticate with Pi Network to create payments.");
       }
 
       setIsLoading(true);
@@ -189,6 +209,12 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
         const errorMessage = formatError(err);
         logError("Payment Creation with Backend", err);
         setError(errorMessage);
+        
+        // Check if it's a scope-related error and provide better error message
+        if (errorMessage.includes("payments") && errorMessage.includes("scope")) {
+          throw new Error("Payment authorization required. Please authenticate with Pi Network to enable payments.");
+        }
+        
         throw err;
       } finally {
         setIsLoading(false);
@@ -228,6 +254,14 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       setError(null);
       localStorage.removeItem('pioneer-key');
       localStorage.removeItem('pi_user_info');
+      
+      // Also clear UserStorage
+      try {
+        const { UserStorage } = await import("../utils/userStorage");
+        UserStorage.clearUserData();
+      } catch (error) {
+        console.error('Failed to clear UserStorage:', error);
+      }
     }
   }, []);
 

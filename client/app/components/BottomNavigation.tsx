@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useRouter, usePathname } from 'next/navigation';
-import '@/styles/bottom-navigation.css';
+import {useRouter, usePathname} from "next/navigation";
+import "@/styles/bottom-navigation.css";
 
 const BottomNavigation = () => {
   const router = useRouter();
@@ -9,9 +9,9 @@ const BottomNavigation = () => {
 
   const navItems = [
     {
-      id: 'home',
-      label: 'Home',
-      path: '/events',
+      id: "home",
+      label: "Home",
+      path: "/events",
       icon: (active: boolean) => (
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
           <path
@@ -20,16 +20,16 @@ const BottomNavigation = () => {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            fill={active ? 'currentColor' : 'none'}
-            fillOpacity={active ? '0.2' : '0'}
+            fill={active ? "currentColor" : "none"}
+            fillOpacity={active ? "0.2" : "0"}
           />
         </svg>
       ),
     },
     {
-      id: 'events',
-      label: 'My Events',
-      path: '/event-hub',
+      id: "events",
+      label: "My Events",
+      path: "/event-hub",
       icon: (active: boolean) => (
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
           <rect
@@ -41,8 +41,8 @@ const BottomNavigation = () => {
             ry="2"
             stroke="currentColor"
             strokeWidth="2"
-            fill={active ? 'currentColor' : 'none'}
-            fillOpacity={active ? '0.2' : '0'}
+            fill={active ? "currentColor" : "none"}
+            fillOpacity={active ? "0.2" : "0"}
           />
           <line
             x1="16"
@@ -72,9 +72,9 @@ const BottomNavigation = () => {
       ),
     },
     {
-      id: 'profile',
-      label: 'Profile',
-      path: '/profile',
+      id: "profile",
+      label: "Profile",
+      path: "/profile",
       icon: (active: boolean) => (
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
           <path
@@ -90,8 +90,8 @@ const BottomNavigation = () => {
             r="4"
             stroke="currentColor"
             strokeWidth="2"
-            fill={active ? 'currentColor' : 'none'}
-            fillOpacity={active ? '0.2' : '0'}
+            fill={active ? "currentColor" : "none"}
+            fillOpacity={active ? "0.2" : "0"}
           />
         </svg>
       ),
@@ -99,16 +99,34 @@ const BottomNavigation = () => {
   ];
 
   const isActive = (path: string) => {
-    if (path === '/') {
-      return pathname === '/';
+    if (path === "/") {
+      return pathname === "/";
     }
     return pathname.startsWith(path);
   };
 
-  // Only show navigation on specific pages (exclude home/splash page)
-  const showNavigation = ['/events', '/event-hub', '/profile'].some(route => 
-    pathname.startsWith(route)
-  );
+  // Define which pages should show navigation
+  const shouldShowNavigation = () => {
+    // Always hide on these pages
+    if (pathname === '/' || pathname.startsWith('/onboarding') || pathname.startsWith('/create-event')) {
+      return false;
+    }
+    
+    // Hide on event details pages (but not main events page)
+    if (pathname.startsWith('/events/') && pathname !== '/events') {
+      return false;
+    }
+    
+    // Show on these main pages
+    if (pathname === '/events' || pathname.startsWith('/event-hub') || pathname.startsWith('/profile')) {
+      return true;
+    }
+    
+    // Hide on all other pages
+    return false;
+  };
+
+  const showNavigation = shouldShowNavigation();
 
   if (!showNavigation) {
     return null;
@@ -119,23 +137,29 @@ const BottomNavigation = () => {
       <div className="flex justify-center gap-20 items-center max-w-[100%] mx-auto">
         {navItems.map((item) => {
           const active = isActive(item.path);
-          
+
           return (
             <button
               key={item.id}
               onClick={() => router.push(item.path)}
               className={`flex flex-col gap-3 items-center justify-center py-3 px-4 transition-all duration-300 transform ${
                 active
-                  ? 'text-[#F62585] scale-105'
-                  : 'text-gray-500 hover:text-gray-300 hover:scale-105'
+                  ? "text-[#F62585] scale-105"
+                  : "text-gray-500 hover:text-gray-300 hover:scale-105"
               }`}
             >
-              <div className={`mb-2 transition-all duration-300 ${active ? 'drop-shadow-lg' : ''}`}>
+              <div
+                className={`mb-2 transition-all duration-300 ${
+                  active ? "drop-shadow-lg" : ""
+                }`}
+              >
                 {item.icon(active)}
               </div>
-              <span className={`text-xs font-medium transition-all duration-300 ${
-                active ? 'font-semibold' : 'font-normal'
-              }`}>
+              <span
+                className={`text-xs font-medium transition-all duration-300 ${
+                  active ? "font-semibold" : "font-normal"
+                }`}
+              >
                 {item.label}
               </span>
             </button>

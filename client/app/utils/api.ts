@@ -3,8 +3,8 @@ import {apiService} from "@/app/lib/api";
 
 // Get token from localStorage
 const getAccessToken = (): string | null => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('pioneer-key');
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("pioneer-key");
   }
   return null;
 };
@@ -36,6 +36,7 @@ export interface CreateEventRequest {
   endDate: string;
   startTime: string;
   endTime: string;
+  eventImage?: File | null;
   ticketTypes: {
     ticketType: string;
     price: number;
@@ -100,6 +101,78 @@ export const eventAPI = {
     }
   },
 
+  async getMyEvents(): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.getMyEvents();
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch my events",
+      };
+    }
+  },
+
+  async getEventsNearLocation(
+    location: string,
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.getEventsNearLocation(
+        location,
+        page,
+        limit
+      );
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch events near location",
+      };
+    }
+  },
+
+  async getTrendingEvents(page = 1, limit = 10): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.getTrendingEvents(page, limit);
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch trending events",
+      };
+    }
+  },
+
+  async getEventsAroundWorld(page = 1, limit = 10): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.getEventsAroundWorld(page, limit);
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch events around world",
+      };
+    }
+  },
+
   async getEventById(eventId: string): Promise<ApiResponse<any>> {
     try {
       const response = await apiService.getEventById(eventId);
@@ -112,6 +185,41 @@ export const eventAPI = {
       return {
         success: false,
         error: error.message || "Failed to fetch event",
+      };
+    }
+  },
+
+  async updateEvent(
+    eventId: string,
+    eventData: any
+  ): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.updateEvent(eventId, eventData);
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to update event",
+      };
+    }
+  },
+
+  async publishEvent(eventId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.publishEvent(eventId);
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to publish event",
       };
     }
   },
@@ -234,7 +342,7 @@ export const purchaseAPI = {
         data: response.data,
         message: response.message,
       };
-    } catch (error: unknown) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message || "Failed to fetch purchases",
@@ -250,10 +358,61 @@ export const purchaseAPI = {
         data: response.data,
         message: response.message,
       };
-    } catch (error: unknown) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message || "Failed to fetch purchase",
+      };
+    }
+  },
+};
+
+// Follow API
+export const followAPI = {
+  async followUser(followingId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.followUser(followingId);
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to follow user",
+      };
+    }
+  },
+
+  async unfollowUser(followingId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.unfollowUser(followingId);
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to unfollow user",
+      };
+    }
+  },
+
+  async checkFollowStatus(userId: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await apiService.checkFollowStatus(userId);
+      return {
+        success: response.success,
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to check follow status",
       };
     }
   },

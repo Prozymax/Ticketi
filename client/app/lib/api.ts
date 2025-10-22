@@ -1,12 +1,12 @@
 // API service for backend communication
-import { formatError, logError } from "../utils/errorHandler";
+import {formatError, logError} from "../utils/errorHandler";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6001";
 
 // Get token from localStorage
-const getAccessToken = (): string | null => {
+export const getAccessToken = (): string | null => {
   if (typeof window !== "undefined") {
-    console.log(localStorage.getItem("pioneer-key"), 'local storage')
+    console.log(localStorage.getItem("pioneer-key"), "local storage");
     return localStorage.getItem("pioneer-key");
   }
   return null;
@@ -118,7 +118,6 @@ class ApiService {
     try {
       const url = `${this.baseUrl}${endpoint}`;
       const accessToken = getAccessToken();
-      console.log(accessToken, 'jishdushdu')
 
       const response = await fetch(url, {
         headers: {
@@ -374,6 +373,41 @@ class ApiService {
     return response;
   }
 
+  async getMyEvents(): Promise<ApiResponse> {
+    console.log("API: Getting my events");
+    const response = await this.makeRequest("/api/events/my");
+    console.log("API: My events response:", response);
+    return response;
+  }
+
+  async getEventsNearLocation(location: string, page = 1, limit = 10): Promise<ApiResponse> {
+    console.log("API: Getting events near location:", location);
+    console.log("API: Encoded location:", encodeURIComponent(location));
+    const response = await this.makeRequest(
+      `/api/events/near?location=${encodeURIComponent(location)}&page=${page}&limit=${limit}`
+    );
+    console.log("API: Events near location response:", response);
+    return response;
+  }
+
+  async getTrendingEvents(page = 1, limit = 10): Promise<ApiResponse> {
+    console.log("API: Getting trending events");
+    const response = await this.makeRequest(
+      `/api/events/trending?page=${page}&limit=${limit}`
+    );
+    console.log("API: Trending events response:", response);
+    return response;
+  }
+
+  async getEventsAroundWorld(page = 1, limit = 10): Promise<ApiResponse> {
+    console.log("API: Getting events around world");
+    const response = await this.makeRequest(
+      `/api/events/world?page=${page}&limit=${limit}`
+    );
+    console.log("API: Events around world response:", response);
+    return response;
+  }
+
   async getEventById(eventId: string): Promise<ApiResponse> {
     console.log("API: Getting event by ID:", eventId);
     const response = await this.makeRequest(`/api/events/${eventId}`);
@@ -383,11 +417,147 @@ class ApiService {
 
   async createEvent(eventData: unknown): Promise<ApiResponse> {
     console.log("API: Creating event:", eventData);
-    const response = await this.makeRequest("/api/events", {
+
+    // Check if eventData contains a file
+    const hasFile =
+      eventData &&
+      typeof eventData === "object" &&
+      "eventImage" in eventData &&
+      eventData.eventImage instanceof File;
+
+    if (hasFile) {
+      // Use FormData for file upload
+      const formData = new FormData();
+
+      console.log(
+        "API: Creating event with file upload, eventData:",
+        eventData
+      );
+
+      // Add all event data fields to FormData
+      Object.entries(eventData as Record<string, any>).forEach(
+        ([key, value]) => {
+          if (key === "eventImage" && value instanceof File) {
+            console.log(
+              "API: Adding file to FormData:",
+              value.name,
+              value.size
+            );
+            formData.append("eventImage", value);
+          } else if (key === "ticketTypes" && Array.isArray(value)) {
+            formData.append("ticketTypes", JSON.stringify(value));
+          } else if (value !== null && value !== undefined) {
+            formData.append(key, String(value));
+          }
+        }
+      );
+
+      // Log FormData contents
+      console.log("API: FormData contents:");
+      for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}:`, value);
+      }
+
+      // Make request with FormData (don't set Content-Type, let browser set it)
+      const url = `${this.baseUrl}/api/events`;
+      const accessToken = getAccessToken();
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "x-access-token": accessToken || "",
+          // Don't set Content-Type for FormData
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || "Request failed");
+      }
+
+      console.log("API: Event creation response:", data);
+      return data;
+    } else {
+      // Use regular JSON request
+      const response = await this.makeRequest("/api/events", {
+        method: "POST",
+        body: JSON.stringify(eventData),
+      });
+      console.log("API: Event creation response:", response);
+      return response;
+    }
+  }
+
+  async updateEvent(
+    eventId: string,
+    updateData: unknown
+  ): Promise<ApiResponse> {
+    console.log("API: Updating event:", eventId, updateData);
+
+    // Check if updateData contains a file
+    const hasFile =
+      updateData &&
+      typeof updateData === "object" &&
+      "eventImage" in updateData &&
+      updateData.eventImage instanceof File;
+
+    if (hasFile) {
+      // Use FormData for file upload
+      const formData = new FormData();
+
+      // Add all update data fields to FormData
+      Object.entries(updateData as Record<string, any>).forEach(
+        ([key, value]) => {
+          if (key === "eventImage" && value instanceof File) {
+            formData.append("eventImage", value);
+          } else if (key === "ticketTypes" && Array.isArray(value)) {
+            formData.append("ticketTypes", JSON.stringify(value));
+          } else if (value !== null && value !== undefined) {
+            formData.append(key, String(value));
+          }
+        }
+      );
+
+      // Make request with FormData
+      const url = `${this.baseUrl}/api/events/${eventId}`;
+      const accessToken = getAccessToken();
+
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "x-access-token": accessToken || "",
+          // Don't set Content-Type for FormData
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || "Request failed");
+      }
+
+      console.log("API: Event update response:", data);
+      return data;
+    } else {
+      // Use regular JSON request
+      const response = await this.makeRequest(`/api/events/${eventId}`, {
+        method: "PUT",
+        body: JSON.stringify(updateData),
+      });
+      console.log("API: Event update response:", response);
+      return response;
+    }
+  }
+
+  async publishEvent(eventId: string): Promise<ApiResponse> {
+    console.log("API: Publishing event:", eventId);
+    const response = await this.makeRequest(`/api/events/${eventId}/publish`, {
       method: "POST",
-      body: JSON.stringify(eventData),
     });
-    console.log("API: Event creation response:", response);
+    console.log("API: Event publish response:", response);
     return response;
   }
 
@@ -425,6 +595,33 @@ class ApiService {
       method: "POST",
     });
     console.log("API: Logout response:", response);
+    return response;
+  }
+
+  // Follow API methods
+  async followUser(followingId: string): Promise<ApiResponse> {
+    console.log("API: Following user:", followingId);
+    const response = await this.makeRequest("/api/follow/follow", {
+      method: "POST",
+      body: JSON.stringify({ followingId }),
+    });
+    console.log("API: Follow user response:", response);
+    return response;
+  }
+
+  async unfollowUser(followingId: string): Promise<ApiResponse> {
+    console.log("API: Unfollowing user:", followingId);
+    const response = await this.makeRequest(`/api/follow/unfollow/${followingId}`, {
+      method: "DELETE",
+    });
+    console.log("API: Unfollow user response:", response);
+    return response;
+  }
+
+  async checkFollowStatus(userId: string): Promise<ApiResponse> {
+    console.log("API: Checking follow status for user:", userId);
+    const response = await this.makeRequest(`/api/follow/status/${userId}`);
+    console.log("API: Follow status response:", response);
     return response;
   }
 }

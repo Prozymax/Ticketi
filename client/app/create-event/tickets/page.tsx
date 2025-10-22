@@ -165,34 +165,10 @@ export default function TicketsPage() {
               />
             </div>
 
-            {/* Add More Guest Button */}
-            <div className="add-guest-section">
-              <button
-                type="button"
-                className="add-guest-btn"
-                onClick={handleAddMoreGuest}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <line
-                    x1="12"
-                    y1="5"
-                    x2="12"
-                    y2="19"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <line
-                    x1="5"
-                    y1="12"
-                    x2="19"
-                    y2="12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                </svg>
-                Add more guest
-              </button>
-            </div>
+            {/* {/* Add More Guest Button */}
+            {/* <div className="add-guest-section">
+             <input title="image" type="file" name="event_image" id="event-image" />
+            </div>  */}
           </div>
         </div>
       </div>

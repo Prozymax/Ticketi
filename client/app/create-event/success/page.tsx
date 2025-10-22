@@ -18,7 +18,7 @@ interface EventData {
 
 export default function SuccessPage() {
   const router = useRouter();
-  const { state } = useEventCreation();
+  const { state, reset } = useEventCreation();
   const [eventData, setEventData] = useState<EventData | null>(null);
 
   useEffect(() => {
@@ -43,9 +43,10 @@ export default function SuccessPage() {
   }, [state.eventData, router]);
 
   const handleComplete = () => {
-    // Clear event data and navigate to home
+    // Clear event data and navigate to event hub (My Events)
     localStorage.removeItem('eventData');
-    router.push('/');
+    reset(); // Reset the event creation context now that we're done
+    router.push('/event-hub');
   };
 
   const handleShare = () => {

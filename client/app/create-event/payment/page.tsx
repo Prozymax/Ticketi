@@ -5,14 +5,14 @@ import {useRouter} from "next/navigation";
 import {useEventCreation} from "@/app/contexts/EventCreationContext";
 import {eventAPI, CreateEventRequest} from "@/app/utils/api";
 import {usePiNetwork} from "@/app/hooks/usePiNetwork";
-import {formatError} from "@/app/utils/errorHandler";
+
 import ErrorDisplay from "@/app/components/ErrorDisplay";
 import "@/styles/payment.css";
 import "@/styles/create-event.css";
 
 export default function PaymentPage() {
   const router = useRouter();
-  const {state, reset} = useEventCreation();
+  const {state} = useEventCreation();
   const {eventData} = state;
   const {createPayment, isLoading: piLoading, error: piError} = usePiNetwork();
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +41,7 @@ export default function PaymentPage() {
         endDate: eventData.endDate,
         startTime: eventData.startTime,
         endTime: eventData.endTime,
+        eventImage: eventData.eventImage,
         ticketTypes: [
           {
             ticketType: "Regular",
@@ -73,35 +74,26 @@ export default function PaymentPage() {
       console.log("Payment created successfully:", paymentId);
       console.log("Event created successfully:", eventResult.data);
 
-      const eventUpdate = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/events/${eventResult.data.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({status: "published"}),
-        }
-      );
+      // Publish the event after successful payment
+      const eventId = eventResult.data.event?.id || eventResult.data.id;
+      console.log("Publishing event with ID:", eventId);
 
-      if (!eventUpdate.ok) {
-        throw new Error("Failed to update event status");
+      const publishResult = await eventAPI.publishEvent(eventId);
+
+      if (!publishResult.success) {
+        throw new Error(publishResult.error || "Failed to publish event");
       }
 
-      // Reset the form state
-      reset();
+      console.log("Event published successfully:", publishResult.data);
 
-      // Navigate to success page
+      // Navigate to success page (don't reset context yet - success page needs the data)
       router.push("/create-event/success");
     } catch (error: unknown) {
       console.error("Payment/Event creation failed:", error);
       if (error instanceof Error) {
         setPaymentError(error.message || "Payment failed. Please try again.");
-        if (
-          error.message == 'Cannot create a payment without "payments" scope'
-        ) {
-          router.push("/login");
-        }
+        // Let the ErrorDisplay component handle authentication errors
+        // instead of automatically redirecting to login
       }
     } finally {
       setIsLoading(false);
@@ -206,6 +198,10 @@ export default function PaymentPage() {
                 title="Payment Error"
                 showDetails={true}
                 onRetry={() => {
+                  setPaymentError(null);
+                  handleConfirmPayment();
+                }}
+                onAuthRetry={() => {
                   setPaymentError(null);
                   handleConfirmPayment();
                 }}

@@ -12,6 +12,7 @@ export default function CreateEventPage() {
   const [eventDescription, setEventDescription] = useState(
     state.eventData.description
   );
+  const [eventImage, setEventImage] = useState<File | null>(state.eventData.eventImage || null);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,9 +23,14 @@ export default function CreateEventPage() {
     router.back();
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setEventImage(file);
+  };
+
   const handleNext = () => {
     if (eventTitle.trim() && eventDescription.trim()) {
-      updateBasicInfo(eventTitle, eventDescription);
+      updateBasicInfo(eventTitle, eventDescription, eventImage);
       router.push("/create-event/schedule");
     }
   };
@@ -100,6 +106,33 @@ export default function CreateEventPage() {
                 className="textarea-input"
                 rows={6}
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Event Image Section */}
+        <div className="form-section">
+          <div className="form-card">
+            <div className="field-header">
+              <h3 className="field-title">Event Image</h3>
+              <p className="field-description">
+                Upload an image that represents your event (optional)
+              </p>
+            </div>
+            <div className="input-container">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="file-input"
+                title="Upload event image"
+                aria-label="Upload event image"
+              />
+              {eventImage && (
+                <div className="image-preview">
+                  <p className="selected-file">Selected: {eventImage.name}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

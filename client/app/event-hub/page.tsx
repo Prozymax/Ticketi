@@ -3,7 +3,7 @@
 import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import {Plus} from "lucide-react";
-import {events as myEventsData} from "@/my-events-data";
+import {eventAPI} from "@/app/utils/api";
 
 // Import components
 import EmptyEvents from "./events/components/empyEvents";
@@ -22,65 +22,29 @@ export default function EventHubPage() {
   const [events, setEvents] = useState<any[]>([]);
   const [tickets, setTickets] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch both events and tickets data
     const fetchData = async () => {
       try {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        setLoading(true);
+        setError(null);
 
-        // Mock events data from my-events-data.ts
-        setEvents(myEventsData);
-
-        // Mock tickets data
-        const mockTickets = [
-          // {
-          //   id: "TKT-001-2024",
-          //   eventTitle: "Token2049 Singapore",
-          //   eventImage: "/events/event.png",
-          //   venue:
-          //     "Marina Bay Sands (10 Bayfront Avenue, Singapore, 018956, SG)",
-          //   date: "October 1st & 2nd",
-          //   time: "10am Daily UTC",
-          //   ticketType: "General Admission",
-          //   price: 12.998,
-          //   currency: "π",
-          //   purchaser: {
-          //     id: "USR-001",
-          //     name: "woodylightyearx",
-          //     email: "woody@example.com",
-          //     avatar: "/api/placeholder/50/50",
-          //   },
-          //   purchaseDate: "2024-09-15T10:30:00Z",
-          //   status: "valid",
-          // },
-          // {
-          //   id: "TKT-002-2024",
-          //   eventTitle: "Woody's End of Year Pi House Party",
-          //   eventImage: "/images/event.png",
-          //   venue:
-          //     "Marina Bay Sands (10 Bayfront Avenue, Singapore, 018956, SG)",
-          //   date: "October 1st & 2nd",
-          //   time: "10am Daily UTC",
-          //   ticketType: "VIP Access",
-          //   price: 25.5,
-          //   currency: "π",
-          //   purchaser: {
-          //     id: "USR-001",
-          //     name: "woodylightyearx",
-          //     email: "woody@example.com",
-          //     avatar: "/api/placeholder/50/50",
-          //   },
-          //   purchaseDate: "2024-09-20T14:15:00Z",
-          //   status: "valid",
-          // },
-        ];
-
-        setTickets(mockTickets);
+        // Fetch real events data from API
+        const eventsResponse = await eventAPI.getMyEvents();
+        if (eventsResponse.success && eventsResponse.data) {
+          setEvents(eventsResponse.data);
+        } else {
+          console.error("Failed to fetch events:", eventsResponse.error);
+          setError(eventsResponse.error || "Failed to fetch events");
+          setEvents([]);
+        }
+        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setError(error instanceof Error ? error.message : "An unexpected error occurred");
         setEvents([]);
         setTickets([]);
         setLoading(false);
@@ -102,6 +66,24 @@ export default function EventHubPage() {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
+        <p>Loading your events...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <div className="error-message">
+          <h3>Error Loading Events</h3>
+          <p>{error}</p>
+          <button 
+            className="retry-button" 
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }

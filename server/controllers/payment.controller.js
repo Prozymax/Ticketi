@@ -160,7 +160,7 @@ class PaymentController {
     static async approvePayment(req, res) {
         try {
             const { paymentId } = req.params;
-            // const userId = req.user.id;
+            const userId = req.user.id;
 
             // logger.info('Approving payment:', { paymentId, userId });
 

@@ -21,8 +21,8 @@ Auth.belongsTo(User, {
 
 // User Relationships
 User.hasMany(Event, { 
-    foreignKey: 'createdBy', 
-    as: 'createdEvents' 
+    foreignKey: 'organizerId', 
+    as: 'organizedEvents' 
 });
 
 User.hasOne(Auth, { 
@@ -47,8 +47,8 @@ User.hasOne(UserSettings, {
 
 // Event Relationships
 Event.belongsTo(User, { 
-    foreignKey: 'createdBy', 
-    as: 'creator' 
+    foreignKey: 'organizerId', 
+    as: 'organizer' 
 });
 
 Event.hasMany(Ticket, { 

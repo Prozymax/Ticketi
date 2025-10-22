@@ -17,7 +17,7 @@ class TicketService {
                 return { success: false, error: 'Event not found' };
             }
 
-            if (event.createdBy !== userId) {
+            if (event.organizerId !== userId) {
                 await transaction.rollback();
                 return { success: false, error: 'Unauthorized to create tickets for this event' };
             }
@@ -111,7 +111,7 @@ class TicketService {
             }
 
             // Check if user owns the event
-            if (ticket.event.createdBy !== userId) {
+            if (ticket.event.organizerId !== userId) {
                 return { success: false, error: 'Unauthorized to update this ticket' };
             }
 

@@ -14,8 +14,13 @@ export default function LandingPage() {
       try {
         // Import the utility (dynamic import for client-side only)
         import("./utils/userStorage").then(({UserStorage}) => {
+          // Check for authentication tokens (both UserStorage and pioneer-key)
+          const userToken = UserStorage.getUserToken();
+          const pioneerKey = localStorage.getItem('pioneer-key');
+          const isLoggedIn = UserStorage.isLoggedIn() || !!pioneerKey;
+          
           // If user is already logged in and has a valid token, go to events
-          if (UserStorage.isLoggedIn() && UserStorage.getUserToken()) {
+          if (isLoggedIn && (userToken || pioneerKey)) {
             router.push("/events");
             return;
           }

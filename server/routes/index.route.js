@@ -7,6 +7,7 @@ const { authRouter } = require('./auth/auth.route');
 const { eventRouter } = require('./event/event.route');
 const { purchaseRouter } = require('./purchase/purchase.route');
 const { profileRouter } = require('./profile/profile.route');
+const { followRouter } = require('./follow/follow.route');
 const { errorHandler } = require('../middleware/error.middleware');
 const { handleDatabaseOverflow } = require('../middleware/db.middleware');
 // const HealthRouter = require('./health/health.routes')
@@ -20,7 +21,8 @@ const apiRoutes = [
     { routes: 'events', handlers: eventRouter },
     { routes: 'purchases', handlers: purchaseRouter },
     { routes: 'payment', handlers: paymentRouter },
-    { routes: 'profile', handlers: profileRouter }
+    { routes: 'profile', handlers: profileRouter },
+    { routes: 'follow', handlers: followRouter }
 ]
 
 // Mount health routes at root level (not under /api)

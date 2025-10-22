@@ -84,7 +84,7 @@ export default function LoginPage() {
     };
 
     loadStoredUsername();
-  }, [user]);
+  }, [router, user]);
 
   // Store username when user data becomes available after authentication
   useEffect(() => {
@@ -194,6 +194,10 @@ export default function LoginPage() {
                 title="Authentication Error"
                 showDetails={true}
                 onRetry={() => {
+                  setAuthError(null);
+                  handlePiNetworkAuth();
+                }}
+                onAuthRetry={() => {
                   setAuthError(null);
                   handlePiNetworkAuth();
                 }}

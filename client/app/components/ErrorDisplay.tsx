@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { formatError, createUserFriendlyError } from "../utils/errorHandler";
+import { usePiNetwork } from "../hooks/usePiNetwork";
+import { useRouter } from "next/navigation";
 
 interface ErrorDisplayProps {
   error: unknown;
@@ -7,6 +9,7 @@ interface ErrorDisplayProps {
   showDetails?: boolean;
   className?: string;
   onRetry?: () => void;
+  onAuthRetry?: () => void; // Called after successful authentication
 }
 
 export default function ErrorDisplay({
@@ -15,11 +18,20 @@ export default function ErrorDisplay({
   showDetails = false,
   className = "",
   onRetry,
+  onAuthRetry,
 }: ErrorDisplayProps) {
+  const { authenticate, isLoading: authLoading } = usePiNetwork();
+  const router = useRouter();
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
   if (!error) return null;
 
   const userFriendlyMessage = createUserFriendlyError(error);
   let detailedMessage = formatError(error);
+  
+  // Check if this is an authentication-related error
+  const isAuthError = isAuthenticationError(error);
+  const shouldShowAuthButton = isAuthError && (onAuthRetry || onRetry);
   
   // Fallback if formatError still returns [object Object]
   if (detailedMessage === "[object Object]" || detailedMessage.includes("[object Object]")) {
@@ -37,6 +49,34 @@ export default function ErrorDisplay({
       return value;
     }, 2)}`;
   }
+
+  // Handle authentication retry
+  const handleAuthRetry = async () => {
+    if (!authenticate) return;
+    
+    setIsAuthenticating(true);
+    try {
+      const authResult = await authenticate();
+      if (authResult) {
+        // Authentication successful, retry the original action
+        if (onAuthRetry) {
+          onAuthRetry();
+        } else if (onRetry) {
+          onRetry();
+        }
+      }
+    } catch (authError) {
+      console.error("Authentication retry failed:", authError);
+      // The error will be handled by the usePiNetwork hook
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  // Handle redirect to login
+  const handleRedirectToLogin = () => {
+    router.push('/login');
+  };
 
   return (
     <div className={`error-display ${className}`}>
@@ -121,6 +161,60 @@ export default function ErrorDisplay({
           height: 20px;
           flex-shrink: 0;
         }
+
+        .auth-button {
+          background-color: var(--accent);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 16px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .auth-button:hover:not(:disabled) {
+          background-color: var(--accent-bold);
+        }
+
+        .auth-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .login-button {
+          background: none;
+          border: 1px solid var(--accent);
+          color: var(--accent);
+          border-radius: 6px;
+          padding: 8px 16px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .login-button:hover {
+          background-color: var(--accent);
+          color: white;
+        }
+
+        .loading-spinner {
+          width: 14px;
+          height: 14px;
+          border: 2px solid transparent;
+          border-top: 2px solid currentColor;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
       `}</style>
 
       <div className="error-title">
@@ -143,13 +237,67 @@ export default function ErrorDisplay({
         </details>
       )}
 
-      {onRetry && (
-        <div className="error-actions">
+      <div className="error-actions">
+        {shouldShowAuthButton ? (
+          <>
+            <button 
+              className="auth-button" 
+              onClick={handleAuthRetry}
+              disabled={isAuthenticating || authLoading}
+            >
+              {isAuthenticating || authLoading ? (
+                <>
+                  <div className="loading-spinner"></div>
+                  Authenticating...
+                </>
+              ) : (
+                'Authenticate & Retry'
+              )}
+            </button>
+            <button 
+              className="login-button" 
+              onClick={handleRedirectToLogin}
+            >
+              Go to Login
+            </button>
+          </>
+        ) : onRetry ? (
           <button className="retry-button" onClick={onRetry}>
             Try Again
           </button>
-        </div>
-      )}
+        ) : null}
+      </div>
     </div>
   );
+}
+
+// Helper function to detect authentication-related errors
+function isAuthenticationError(error: unknown): boolean {
+  if (!error) return false;
+  
+  const errorStr = formatError(error).toLowerCase();
+  
+  // Check for common authentication error patterns
+  const authErrorPatterns = [
+    'unauthorized',
+    'token',
+    'authentication',
+    'authenticate',
+    'login',
+    'access denied',
+    'forbidden',
+    'invalid token',
+    'expired token',
+    'missing token',
+    'token missing',
+    'not authenticated',
+    'auth',
+    'session expired',
+    'please log in',
+    'middleware',
+    '401',
+    '403'
+  ];
+  
+  return authErrorPatterns.some(pattern => errorStr.includes(pattern));
 }

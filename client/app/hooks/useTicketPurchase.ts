@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { apiService } from "../lib/api";
 import { formatError, logError } from "../utils/errorHandler";
+import { useAuthenticatedAction } from "./useAuthenticatedAction";
 
 interface TicketPurchaseData {
   eventId: string;
@@ -14,66 +15,88 @@ interface TicketPurchaseData {
 interface UseTicketPurchaseReturn {
   isLoading: boolean;
   error: string | null;
-  purchaseTickets: (data: TicketPurchaseData) => Promise<boolean>;
+  purchaseTickets: (data: TicketPurchaseData) => Promise<{ success: boolean; purchaseId?: string; paymentId?: string }>;
   clearError: () => void;
+  isAuthenticating: boolean;
 }
 
 export const useTicketPurchase = (): UseTicketPurchaseReturn => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Define the actual purchase action
+  const purchaseAction = useCallback(async (data: TicketPurchaseData) => {
+    // Step 1: Create purchase request
+    const purchaseResponse = await apiService.createPurchase({
+      eventId: data.eventId,
+      ticketId: data.ticketType || "regular",
+      quantity: data.quantity,
+    });
 
-  const purchaseTickets = useCallback(async (data: TicketPurchaseData): Promise<boolean> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Create purchase request
-      const purchaseResponse = await apiService.createPurchase({
-        eventId: data.eventId,
-        ticketId: "regular", // This should come from the ticket type
-        quantity: data.quantity,
-      });
-
-      if (!purchaseResponse.success) {
-        throw new Error(purchaseResponse.message || "Failed to create purchase");
-      }
-
-      // Create payment request
-      const paymentResponse = await apiService.createPayment({
-        ticketId: "regular",
-        quantity: data.quantity,
-        eventId: data.eventId,
-        amount: data.totalAmount,
-        memo: `Ticket purchase for event ${data.eventId}`,
-        metadata: {
-          ticketType: data.ticketType,
-          purchaseId: purchaseResponse.data?.id,
-        },
-      });
-
-      if (!paymentResponse.success) {
-        throw new Error(paymentResponse.message || "Failed to create payment");
-      }
-
-      return true;
-    } catch (err) {
-      const errorMessage = formatError(err);
-      logError("Ticket Purchase", err);
-      setError(errorMessage);
-      return false;
-    } finally {
-      setIsLoading(false);
+    if (!purchaseResponse.success) {
+      throw new Error(purchaseResponse.message || "Failed to create purchase");
     }
+
+    const purchaseId = purchaseResponse.data?.id;
+    if (!purchaseId) {
+      throw new Error("Purchase created but no ID returned");
+    }
+
+    // Step 2: Create payment request
+    const paymentResponse = await apiService.createPayment({
+      amount: data.totalAmount,
+      memo: `Ticket purchase for event ${data.eventId}`,
+      metadata: {
+        ticketType: data.ticketType,
+        purchaseId: purchaseId,
+        eventId: data.eventId,
+        quantity: data.quantity,
+        paymentType: "ticket_purchase"
+      },
+      purchaseId: purchaseId,
+      eventId: data.eventId
+    });
+
+    if (!paymentResponse.success) {
+      throw new Error(paymentResponse.message || "Failed to create payment");
+    }
+
+    const paymentId = paymentResponse.data?.id;
+    return {
+      success: true,
+      purchaseId,
+      paymentId
+    };
   }, []);
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  // Use the authenticated action hook
+  const {
+    execute,
+    isLoading,
+    error,
+    clearError,
+    isAuthenticating
+  } = useAuthenticatedAction(purchaseAction, {
+    retryOnAuth: true,
+    onSuccess: (result) => {
+      console.log("Ticket purchase successful:", result);
+    },
+    onError: (error) => {
+      logError("Ticket Purchase", error);
+    }
+  });
+
+  const purchaseTickets = useCallback(async (data: TicketPurchaseData) => {
+    try {
+      return await execute(data);
+    } catch (error) {
+      // Return failure result instead of throwing
+      return { success: false };
+    }
+  }, [execute]);
 
   return {
     isLoading,
     error,
     purchaseTickets,
     clearError,
+    isAuthenticating,
   };
 };

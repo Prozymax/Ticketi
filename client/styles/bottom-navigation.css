@@ -23,11 +23,17 @@ body:has(.bottom-navigation) {
   padding-bottom: 1rem !important;
 }
 
+/* Hide bottom navigation on specific pages */
 .create-event-container ~ .bottom-navigation,
 .home-main ~ .bottom-navigation,
 .event-details-container ~ .bottom-navigation,
 .onboarding-container ~ .bottom-navigation {
-  display: none;
+  display: none !important;
+}
+
+/* Hide navigation when body has specific classes */
+body.hide-bottom-nav .bottom-navigation {
+  display: none !important;
 }
 
 /* Responsive adjustments */

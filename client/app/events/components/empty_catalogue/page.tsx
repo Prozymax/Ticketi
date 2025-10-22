@@ -2,6 +2,7 @@
 
 import {useRouter} from "next/navigation";
 import "@/styles/home.css";
+import Image from "next/image";
 import "@/styles/mobileview/home.css";
 
 export default function EmptyEventsComponent() {
@@ -52,16 +53,12 @@ export default function EmptyEventsComponent() {
         {/* Explore Events Section */}
         <div className="explore-section">
           <div className="explore-icon flex justify-center">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="8" stroke="white" strokeWidth="2" />
-              <path
-                d="M21 21L16.65 16.65"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Image
+              src="/icons/search.png"
+              alt="search_icon"
+              width={74}
+              height={74}
+            />
           </div>
           <h2 className="explore-title">Explore Events</h2>
           <p className="explore-description">

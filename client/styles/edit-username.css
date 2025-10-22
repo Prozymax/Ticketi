@@ -1,5 +1,5 @@
 body {
-  background: var(--splash-background)
+  background: var(--splash-background);
 }
 
 .edit-username-container {
@@ -15,6 +15,7 @@ body {
 /* Header */
 .header {
   display: flex;
+  width: 90%;
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
@@ -112,9 +113,9 @@ main {
 .verified-badge {
   position: absolute;
   bottom: 0px;
-  right: 10px;
-  width: 150px;
-  height: 150px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -205,11 +206,11 @@ main {
 
 /* Footer links */
 .footer-links {
-    display: flex;
-    align-items: flex-start;
-    font-size: 14px;
-    line-height: 1.5;
-    justify-content: space-between;
+  display: flex;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+  justify-content: space-between;
 
   & p {
     width: 50%;
@@ -278,13 +279,17 @@ main {
   width: 40px;
   height: 40px;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top: 3px solid #8B5CF6;
+  border-top: 3px solid #8b5cf6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

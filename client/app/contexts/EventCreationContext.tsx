@@ -1,6 +1,12 @@
 "use client";
 
-import React, {createContext, useContext, useReducer, ReactNode, useCallback} from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  ReactNode,
+  useCallback,
+} from "react";
 
 export interface EventData {
   title: string;
@@ -12,6 +18,7 @@ export interface EventData {
   endTime: string;
   regularTickets: number;
   ticketPrice: string;
+  eventImage?: File | null;
 }
 
 interface EventCreationState {
@@ -20,7 +27,7 @@ interface EventCreationState {
 }
 
 type EventCreationAction =
-  | {type: "UPDATE_BASIC_INFO"; payload: {title: string; description: string}}
+  | {type: "UPDATE_BASIC_INFO"; payload: {title: string; description: string; eventImage?: File | null}}
   | {
       type: "UPDATE_SCHEDULE";
       payload: {
@@ -49,6 +56,7 @@ const initialState: EventCreationState = {
     endTime: "",
     regularTickets: 0,
     ticketPrice: "0.0π",
+    eventImage: null,
   },
   currentStep: 1,
 };
@@ -65,6 +73,7 @@ function eventCreationReducer(
           ...state.eventData,
           title: action.payload.title,
           description: action.payload.description,
+          ...(action.payload.eventImage !== undefined && { eventImage: action.payload.eventImage }),
         },
       };
     case "UPDATE_SCHEDULE":
@@ -102,7 +111,7 @@ function eventCreationReducer(
 
 interface EventCreationContextType {
   state: EventCreationState;
-  updateBasicInfo: (title: string, description: string) => void;
+  updateBasicInfo: (title: string, description: string, eventImage?: File | null) => void;
   updateSchedule: (
     location: string,
     startDate: string,
@@ -122,26 +131,35 @@ const EventCreationContext = createContext<
 export function EventCreationProvider({children}: {children: ReactNode}) {
   const [state, dispatch] = useReducer(eventCreationReducer, initialState);
 
-  const updateBasicInfo = useCallback((title: string, description: string) => {
-    dispatch({type: "UPDATE_BASIC_INFO", payload: {title, description}});
+  const updateBasicInfo = useCallback((title: string, description: string, eventImage?: File | null) => {
+    dispatch({type: "UPDATE_BASIC_INFO", payload: {title, description, eventImage}});
   }, []);
 
-  const updateSchedule = useCallback((
-    location: string,
-    startDate: string,
-    startTime: string,
-    endDate: string,
-    endTime: string
-  ) => {
-    dispatch({
-      type: "UPDATE_SCHEDULE",
-      payload: {location, startDate, startTime, endDate, endTime},
-    });
-  }, []);
+  const updateSchedule = useCallback(
+    (
+      location: string,
+      startDate: string,
+      startTime: string,
+      endDate: string,
+      endTime: string
+    ) => {
+      dispatch({
+        type: "UPDATE_SCHEDULE",
+        payload: {location, startDate, startTime, endDate, endTime},
+      });
+    },
+    []
+  );
 
-  const updateTickets = useCallback((regularTickets: number, ticketPrice: string) => {
-    dispatch({type: "UPDATE_TICKETS", payload: {regularTickets, ticketPrice}});
-  }, []);
+  const updateTickets = useCallback(
+    (regularTickets: number, ticketPrice: string) => {
+      dispatch({
+        type: "UPDATE_TICKETS",
+        payload: {regularTickets, ticketPrice},
+      });
+    },
+    []
+  );
 
   const setStep = useCallback((step: number) => {
     dispatch({type: "SET_STEP", payload: step});

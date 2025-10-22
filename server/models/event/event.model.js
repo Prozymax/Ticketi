@@ -15,15 +15,7 @@ const Event = sequelize.define('Event', {
         type: DataTypes.TEXT,
         allowNull: true
     },
-    organizerId: {
-        type: DataTypes.UUID,
-        allowNull: true,
-        reference: {
-            model: 'users',
-            key: 'id'
-        },
-        field: 'organizer_id'
-    },
+
     location: {
         type: DataTypes.STRING,
         allowNull: false
