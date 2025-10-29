@@ -8,20 +8,47 @@ class PurchaseService {
      * Create a new purchase
      */
     static async createPurchase(purchaseData) {
+        const transaction = await sequelize.transaction();
+
         try {
             const { userId, eventId, ticketId, quantity } = purchaseData;
 
             // Verify ticket exists and has enough quantity
             const ticket = await Ticket.findByPk(ticketId, {
-                include: [{ model: Event, as: 'event' }]
+                include: [{ model: Event, as: 'event' }],
+                transaction
             });
 
             if (!ticket) {
+                await transaction.rollback();
                 return { success: false, error: 'Ticket not found' };
             }
 
+            if (!ticket.isActive) {
+                await transaction.rollback();
+                return { success: false, error: 'Ticket is not available for sale' };
+            }
+
+            if (ticket.event.status !== 'published') {
+                await transaction.rollback();
+                return { success: false, error: 'Event is not published' };
+            }
+
             if (ticket.availableQuantity < quantity) {
+                await transaction.rollback();
                 return { success: false, error: 'Insufficient ticket quantity available' };
+            }
+
+            // Check sale dates if set
+            const now = new Date();
+            if (ticket.saleStartDate && now < ticket.saleStartDate) {
+                await transaction.rollback();
+                return { success: false, error: 'Ticket sale has not started yet' };
+            }
+
+            if (ticket.saleEndDate && now > ticket.saleEndDate) {
+                await transaction.rollback();
+                return { success: false, error: 'Ticket sale has ended' };
             }
 
             // Calculate total amount
@@ -36,16 +63,20 @@ class PurchaseService {
                 totalAmount,
                 currency: 'PI',
                 paymentStatus: 'pending'
-            });
+            }, { transaction });
 
-            // Update ticket availability
+            // Reserve tickets (reduce available quantity)
             await ticket.update({
-                availableQuantity: ticket.availableQuantity - quantity
-            });
+                availableQuantity: ticket.availableQuantity - quantity,
+                soldQuantity: ticket.soldQuantity + quantity
+            }, { transaction });
+
+            await transaction.commit();
 
             logger.info(`Purchase created successfully: ${purchase.id}`);
             return { success: true, purchase };
         } catch (error) {
+            await transaction.rollback();
             logger.error('Error creating purchase:', error);
             return { success: false, error: error.message };
         }
@@ -164,38 +195,53 @@ class PurchaseService {
     /**
      * Cancel purchase
      */
-    static async cancelPurchase(purchaseId, userId) {
+    static async cancelPurchase(purchaseId, userId = null) {
+        const transaction = await sequelize.transaction();
+
         try {
+            const whereClause = { id: purchaseId };
+            if (userId) {
+                whereClause.userId = userId;
+            }
+
             const purchase = await Purchase.findOne({
-                where: { id: purchaseId, userId },
-                include: [{ model: Ticket, as: 'ticket' }]
+                where: whereClause,
+                include: [{ model: Ticket, as: 'ticket' }],
+                transaction
             });
 
             if (!purchase) {
+                await transaction.rollback();
                 return { success: false, error: 'Purchase not found' };
             }
 
             if (purchase.paymentStatus === 'completed') {
+                await transaction.rollback();
                 return { success: false, error: 'Cannot cancel completed purchase' };
             }
 
-            if (purchase.paymentStatus === 'refunded') {
-                return { success: false, error: 'Purchase already refunded' };
+            if (purchase.paymentStatus === 'cancelled' || purchase.paymentStatus === 'refunded') {
+                await transaction.rollback();
+                return { success: false, error: 'Purchase already cancelled' };
             }
 
             // Update purchase status
-            await purchase.update({ paymentStatus: 'refunded' });
+            await purchase.update({ paymentStatus: 'cancelled' }, { transaction });
 
             // Restore ticket availability
             if (purchase.ticket) {
                 await purchase.ticket.update({
-                    availableQuantity: purchase.ticket.availableQuantity + purchase.quantity
-                });
+                    availableQuantity: purchase.ticket.availableQuantity + purchase.quantity,
+                    soldQuantity: Math.max(0, purchase.ticket.soldQuantity - purchase.quantity)
+                }, { transaction });
             }
+
+            await transaction.commit();
 
             logger.info(`Purchase cancelled successfully: ${purchaseId}`);
             return { success: true, message: 'Purchase cancelled successfully' };
         } catch (error) {
+            await transaction.rollback();
             logger.error('Error cancelling purchase:', error);
             return { success: false, error: error.message };
         }

@@ -12,8 +12,10 @@ import {
   DollarSign,
 } from "lucide-react";
 import {eventAPI, followAPI} from "@/app/utils/api";
+import TicketModal from "@/app/buy-ticket/ticket/ticket";
 import "@/styles/event-details.css";
 import "@/styles/mobileview/event-details.css";
+import Link from "next/link";
 
 interface DatabaseEvent {
   id: string;
@@ -47,6 +49,7 @@ export default function EventDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
 
   // Add class to body to hide bottom navigation
   useEffect(() => {
@@ -145,11 +148,19 @@ export default function EventDetailsPage() {
   };
 
   const handleBuyTicket = () => {
-    // Navigate to ticket purchase with real event ID
-    if (event?.id) {
-      router.push(`/events/${event.id}/purchase`);
-    }
+    // Open ticket modal
+    console.log("Opening ticket modal for event:", event);
+    console.log("Available tickets:", availableTickets);
+    setIsTicketModalOpen(true);
   };
+
+  const closeTicketModal = () => {
+    setIsTicketModalOpen(false);
+  };
+
+  // Check if tickets are available
+  const availableTickets = event ? event.regularTickets - event.ticketsSold : 0;
+  const isTicketAvailable = availableTickets > 0 && event?.status === 'published';
 
   // Helper functions to format data
   const formatDate = (dateStr: string) => {
@@ -236,6 +247,7 @@ export default function EventDetailsPage() {
         {event.organizer && (
           <div className="host-section">
             <div className="host-info">
+              <a href={`https://profiles.pinet.com/profiles/${event.organizer.username}`}>
               <div className="host-avatar">
                 <img
                   src={event.organizer.profileImage || "/Avatar.png"}
@@ -245,7 +257,7 @@ export default function EventDetailsPage() {
                   }}
                 />
                 <div className="verified-badge">✓</div>
-              </div>
+              </div></a>
               <div className="host-details">
                 <span className="host-label">Event Organizer</span>
                 <span className="host-name">
@@ -327,14 +339,33 @@ export default function EventDetailsPage() {
           <p className="about-text">{event.description}</p>
         </div>
       </div>
-{/* disable if all tickets are bought and api should first check the tickets availability before purchasing */}
-{/* TODO: check tickets availabity */}
       {/* Buy Ticket Button */}
       <div className="buy-ticket-container">
-        <button disabled={true} className="buy-ticket-button" onClick={handleBuyTicket}>
-          Buy Ticket
+        <button 
+          disabled={!isTicketAvailable} 
+          className={`buy-ticket-button ${!isTicketAvailable ? 'disabled' : ''}`} 
+          onClick={handleBuyTicket}
+        >
+          {availableTickets === 0 ? 'Sold Out' : 
+           event?.status !== 'published' ? 'Not Available' : 
+           'Buy Ticket'}
         </button>
       </div>
+
+      {/* Ticket Modal */}
+      {event && (
+        <TicketModal
+          isOpen={isTicketModalOpen}
+          onClose={closeTicketModal}
+          event={{
+            id: event.id,
+            title: event.title,
+            image: event.eventImage || "/events/events_sample.jpg",
+            ticketPrice: parseFloat(event.ticketPrice.toString().replace(/[^\d.]/g, '')),
+            availableTickets: availableTickets,
+          }}
+        />
+      )}
     </div>
   );
 }

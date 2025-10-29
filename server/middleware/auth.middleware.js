@@ -47,8 +47,6 @@ const authenticateToken = async (req, res, next) => {
             });
         }
 
-        console.log(user)
-
         // Add user to request object
         req.user = user;
         next();

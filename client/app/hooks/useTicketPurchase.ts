@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { apiService } from "../lib/api";
-import { formatError, logError } from "../utils/errorHandler";
-import { useAuthenticatedAction } from "./useAuthenticatedAction";
+import {useState, useCallback} from "react";
+import {apiService} from "../lib/api";
+import {formatError, logError} from "../utils/errorHandler";
+import {useAuthenticatedAction} from "./useAuthenticatedAction";
 
 interface TicketPurchaseData {
   eventId: string;
+  ticketId: string;
   ticketType: string;
   quantity: number;
   totalAmount: number;
@@ -15,7 +16,9 @@ interface TicketPurchaseData {
 interface UseTicketPurchaseReturn {
   isLoading: boolean;
   error: string | null;
-  purchaseTickets: (data: TicketPurchaseData) => Promise<{ success: boolean; purchaseId?: string; paymentId?: string }>;
+  purchaseTickets: (
+    data: TicketPurchaseData
+  ) => Promise<{success: boolean; purchaseId?: string; paymentId?: string}>;
   clearError: () => void;
   isAuthenticating: boolean;
 }
@@ -23,10 +26,20 @@ interface UseTicketPurchaseReturn {
 export const useTicketPurchase = (): UseTicketPurchaseReturn => {
   // Define the actual purchase action
   const purchaseAction = useCallback(async (data: TicketPurchaseData) => {
-    // Step 1: Create purchase request
+    // Step 1: Check ticket availability first
+    const availabilityResponse = await apiService.checkTicketAvailability(
+      data.ticketId,
+      data.quantity
+    );
+
+    if (!availabilityResponse.success) {
+      throw new Error(availabilityResponse.message || "Ticket not available");
+    }
+
+    // Step 2: Create purchase request
     const purchaseResponse = await apiService.createPurchase({
       eventId: data.eventId,
-      ticketId: data.ticketType || "regular",
+      ticketId: data.ticketId,
       quantity: data.quantity,
     });
 
@@ -39,19 +52,21 @@ export const useTicketPurchase = (): UseTicketPurchaseReturn => {
       throw new Error("Purchase created but no ID returned");
     }
 
-    // Step 2: Create payment request
+    // Step 3: Create payment request
     const paymentResponse = await apiService.createPayment({
+      ticketId: data.ticketId,
+      quantity: data.quantity,
+      eventId: data.eventId,
       amount: data.totalAmount,
       memo: `Ticket purchase for event ${data.eventId}`,
       metadata: {
         ticketType: data.ticketType,
         purchaseId: purchaseId,
         eventId: data.eventId,
+        ticketId: data.ticketId,
         quantity: data.quantity,
-        paymentType: "ticket_purchase"
+        paymentType: "ticket_purchase",
       },
-      purchaseId: purchaseId,
-      eventId: data.eventId
     });
 
     if (!paymentResponse.success) {
@@ -62,35 +77,33 @@ export const useTicketPurchase = (): UseTicketPurchaseReturn => {
     return {
       success: true,
       purchaseId,
-      paymentId
+      paymentId,
     };
   }, []);
 
   // Use the authenticated action hook
-  const {
-    execute,
-    isLoading,
-    error,
-    clearError,
-    isAuthenticating
-  } = useAuthenticatedAction(purchaseAction, {
-    retryOnAuth: true,
-    onSuccess: (result) => {
-      console.log("Ticket purchase successful:", result);
-    },
-    onError: (error) => {
-      logError("Ticket Purchase", error);
-    }
-  });
+  const {execute, isLoading, error, clearError, isAuthenticating} =
+    useAuthenticatedAction(purchaseAction, {
+      retryOnAuth: true,
+      onSuccess: (result) => {
+        console.log("Ticket purchase successful:", result);
+      },
+      onError: (error) => {
+        logError("Ticket Purchase", error);
+      },
+    });
 
-  const purchaseTickets = useCallback(async (data: TicketPurchaseData) => {
-    try {
-      return await execute(data);
-    } catch (error) {
-      // Return failure result instead of throwing
-      return { success: false };
-    }
-  }, [execute]);
+  const purchaseTickets = useCallback(
+    async (data: TicketPurchaseData) => {
+      try {
+        return await execute(data);
+      } catch (error) {
+        // Return failure result instead of throwing
+        return {success: false};
+      }
+    },
+    [execute]
+  );
 
   return {
     isLoading,

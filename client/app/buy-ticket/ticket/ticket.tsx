@@ -4,8 +4,19 @@ import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import Image from "next/image";
 import {useTicketPurchase} from "../../hooks/useTicketPurchase";
+import {apiService} from "../../lib/api";
 import ErrorDisplay from "../../components/ErrorDisplay";
 import "@/styles/ticket-modal.css";
+
+interface Ticket {
+  id: string;
+  ticketType: string;
+  price: number;
+  totalQuantity: number;
+  availableQuantity: number;
+  soldQuantity: number;
+  isActive: boolean;
+}
 
 interface TicketModalProps {
   isOpen: boolean;
@@ -14,8 +25,8 @@ interface TicketModalProps {
     id: string;
     title: string;
     image: string;
-    ticketPrice: number;
-    availableTickets: number;
+    ticketPrice?: number;
+    availableTickets?: number;
   };
 }
 
@@ -26,7 +37,10 @@ export default function TicketModal({
 }: TicketModalProps) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
-  const [ticketType, setTicketType] = useState("Regular");
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loadingTickets, setLoadingTickets] = useState(false);
+  const [ticketError, setTicketError] = useState<string | null>(null);
   const {
     isLoading,
     error: purchaseError,
@@ -35,11 +49,19 @@ export default function TicketModal({
   } = useTicketPurchase();
 
   // Fees calculation
-  const ticketPrice = event.ticketPrice || 12.6;
+  const ticketPrice = selectedTicket?.price || event.ticketPrice || 12.6;
   const platformFee = 0.5;
   const blockchainFee = 0.1;
   const subtotal = ticketPrice * quantity;
   const total = subtotal + platformFee + blockchainFee;
+  const maxQuantity = selectedTicket?.availableQuantity || event.availableTickets || 0;
+
+  // Load tickets when modal opens
+  useEffect(() => {
+    if (isOpen && event.id) {
+      loadEventTickets();
+    }
+  }, [isOpen, event.id]);
 
   // Close modal on escape key
   useEffect(() => {
@@ -60,27 +82,135 @@ export default function TicketModal({
     };
   }, [isOpen, onClose]);
 
+  const loadEventTickets = async () => {
+    try {
+      setLoadingTickets(true);
+      setTicketError(null);
+      
+      console.log("Loading tickets for event:", event.id);
+      const response = await apiService.getEventTickets(event.id);
+      console.log("Tickets API response:", response);
+      
+      if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
+        const ticketList = response.data;
+        setTickets(ticketList);
+        console.log("Loaded tickets from API:", ticketList);
+        
+        // Auto-select first available ticket
+        const availableTicket = ticketList.find((t: Ticket) => t.isActive && t.availableQuantity > 0);
+        if (availableTicket) {
+          setSelectedTicket(availableTicket);
+          console.log("Auto-selected ticket:", availableTicket);
+        }
+      } else {
+        // Fallback: Create a ticket from event data if no tickets exist
+        console.log("No tickets found in API, creating fallback ticket from event data");
+        const fallbackTicket: Ticket = {
+          id: `fallback-${event.id}`,
+          ticketType: 'regular',
+          price: event.ticketPrice || 0,
+          totalQuantity: event.availableTickets || 0,
+          availableQuantity: event.availableTickets || 0,
+          soldQuantity: 0,
+          isActive: true
+        };
+        
+        setTickets([fallbackTicket]);
+        setSelectedTicket(fallbackTicket);
+        console.log("Created fallback ticket:", fallbackTicket);
+      }
+    } catch (error) {
+      console.error("Error loading tickets:", error);
+      
+      // Fallback: Create a ticket from event data on error
+      console.log("API error, creating fallback ticket from event data");
+      const fallbackTicket: Ticket = {
+        id: `fallback-${event.id}`,
+        ticketType: 'regular',
+        price: event.ticketPrice || 0,
+        totalQuantity: event.availableTickets || 0,
+        availableQuantity: event.availableTickets || 0,
+        soldQuantity: 0,
+        isActive: true
+      };
+      
+      setTickets([fallbackTicket]);
+      setSelectedTicket(fallbackTicket);
+      setTicketError(null); // Clear error since we have fallback
+    } finally {
+      setLoadingTickets(false);
+    }
+  };
+
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 1;
-    if (value >= 1 && value <= event.availableTickets) {
+    if (value >= 1 && value <= maxQuantity) {
       setQuantity(value);
     }
   };
 
-  const handleConfirmPayment = async () => {
-    clearError();
+  const handleTicketTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const ticketId = e.target.value;
+    const ticket = tickets.find(t => t.id === ticketId);
+    if (ticket) {
+      setSelectedTicket(ticket);
+      // Reset quantity if current quantity exceeds new ticket's availability
+      if (quantity > ticket.availableQuantity) {
+        setQuantity(Math.min(1, ticket.availableQuantity));
+      }
+    }
+  };
 
-    const success = await purchaseTickets({
+  const handleConfirmPayment = async () => {
+    if (!selectedTicket) {
+      setTicketError("Please select a ticket type");
+      return;
+    }
+
+    clearError();
+    setTicketError(null);
+
+    console.log("Confirming payment for ticket:", selectedTicket);
+
+    // For fallback tickets, skip API availability check
+    if (!selectedTicket.id.startsWith('fallback-')) {
+      try {
+        const availabilityResponse = await apiService.checkTicketAvailability(selectedTicket.id, quantity);
+        
+        if (!availabilityResponse.success) {
+          setTicketError(availabilityResponse.message || "Ticket not available");
+          return;
+        }
+      } catch (error) {
+        console.error("Availability check failed:", error);
+        setTicketError("Failed to check ticket availability");
+        return;
+      }
+    }
+
+    // For fallback tickets, navigate directly to payment without creating purchase record
+    if (selectedTicket.id.startsWith('fallback-')) {
+      console.log("Using fallback ticket, navigating directly to payment");
+      router.push(
+        `/buy-ticket/payment?eventId=${event.id}&quantity=${quantity}&total=${total}&ticketType=${selectedTicket.ticketType}&fallback=true`
+      );
+      onClose();
+      return;
+    }
+
+    // For real tickets, use the normal purchase flow
+    const result = await purchaseTickets({
       eventId: event.id,
-      ticketType,
+      ticketId: selectedTicket.id,
+      ticketType: selectedTicket.ticketType,
       quantity,
       totalAmount: total,
     });
 
-    if (success) {
-      // Navigate to payment confirmation or success page
+    if (result.success) {
+      // Navigate to payment confirmation page
       router.push(
-        `/buy-ticket/payment?eventId=${event.id}&quantity=${quantity}&total=${total}`
+        `/buy-ticket/payment?eventId=${event.id}&ticketId=${selectedTicket.id}&quantity=${quantity}&total=${total}&purchaseId=${result.purchaseId}`
       );
       onClose();
     }
@@ -145,40 +275,60 @@ export default function TicketModal({
                 strokeWidth="2"
               />
             </svg>
-            <span>{event.availableTickets}</span>
+            <span>{loadingTickets ? "Loading..." : maxQuantity}</span>
           </div>
         </div>
 
         {/* Ticket Selection */}
         <div className="ticket-selection">
           <div className="form-group">
-            <label className="form-label">
-              How many tickets you want to buy?
-            </label>
-            <input
-              title="Available Tickets"
-              type="number"
-              min="1"
-              max={event.availableTickets}
-              value={quantity}
-              onChange={handleQuantityChange}
-              className="quantity-input"
-            />
+            <label className="form-label">Ticket Type</label>
+            {loadingTickets ? (
+              <div className="loading-placeholder">Loading tickets...</div>
+            ) : tickets.length > 0 ? (
+              <select
+                title="ticket-type"
+                value={selectedTicket?.id || ""}
+                onChange={(e) => {
+                  console.log("Ticket selection changed:", e.target.value);
+                  handleTicketTypeChange(e);
+                }}
+                className="ticket-type-select"
+              >
+                <option value="">Select ticket type</option>
+                {tickets
+                  .filter(ticket => ticket.isActive && ticket.availableQuantity > 0)
+                  .map(ticket => (
+                    <option key={ticket.id} value={ticket.id}>
+                      {ticket.ticketType} - {ticket.price}π ({ticket.availableQuantity} available)
+                    </option>
+                  ))
+                }
+              </select>
+            ) : (
+              <div className="no-tickets" style={{ color: "#ef4444", padding: "10px", textAlign: "center" }}>
+                No tickets available - Check event status
+              </div>
+            )}
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Ticket Type</label>
-            <select
-              title="ticket-type"
-              value={ticketType}
-              onChange={(e) => setTicketType(e.target.value)}
-              className="ticket-type-select"
-            >
-              <option value="Regular">Regular</option>
-              <option value="VIP">VIP</option>
-              <option value="Premium">Premium</option>
-            </select>
-          </div>
+          {selectedTicket && (
+            <div className="form-group">
+              <label className="form-label">
+                How many tickets you want to buy?
+              </label>
+              <input
+                title="Available Tickets"
+                type="number"
+                min="1"
+                max={maxQuantity}
+                value={quantity}
+                onChange={handleQuantityChange}
+                className="quantity-input"
+                disabled={maxQuantity === 0}
+              />
+            </div>
+          )}
         </div>
 
         {/* Price Breakdown */}
@@ -202,29 +352,58 @@ export default function TicketModal({
         </div>
 
         {/* Error Message */}
-        {purchaseError && (
+        {(purchaseError || ticketError) && (
           <div style={{ padding: "0 20px" }}>
             <ErrorDisplay
-              error={purchaseError}
+              error={purchaseError || ticketError}
               title="Purchase Error"
               showDetails={true}
-              onRetry={clearError}
+              onRetry={() => {
+                clearError();
+                setTicketError(null);
+              }}
             />
           </div>
         )}
 
+        {/* Debug Info */}
+        {/* <div style={{ padding: "0 20px", fontSize: "12px", color: "#666", background: "rgba(255,255,255,0.1)", margin: "10px", borderRadius: "5px" }}>
+          <p>Debug Info:</p>
+          <p>Event ID: {event.id}</p>
+          <p>Loading: {loadingTickets.toString()}</p>
+          <p>Tickets: {tickets.length}</p>
+          <p>Selected: {selectedTicket?.id || 'none'}</p>
+          <p>Max Quantity: {maxQuantity}</p>
+          <p>Available Tickets: {event.availableTickets}</p>
+          <p>Ticket Price: {event.ticketPrice}</p>
+        </div> */}
+
         {/* Confirm Button */}
         <div className="confirm-section">
           <button
-            className={`confirm-button ${isLoading ? "loading" : ""}`}
-            onClick={handleConfirmPayment}
-            disabled={isLoading}
+            className={`confirm-button ${isLoading || loadingTickets || !selectedTicket ? "loading" : ""}`}
+            onClick={() => {
+              console.log("Confirm button clicked!");
+              console.log("Selected ticket:", selectedTicket);
+              console.log("Quantity:", quantity);
+              handleConfirmPayment();
+            }}
+            disabled={isLoading || loadingTickets || !selectedTicket || maxQuantity === 0}
           >
             {isLoading ? (
               <>
                 <div className="loading-spinner"></div>
                 Processing...
               </>
+            ) : loadingTickets ? (
+              <>
+                <div className="loading-spinner"></div>
+                Loading...
+              </>
+            ) : !selectedTicket ? (
+              "Select Ticket Type"
+            ) : maxQuantity === 0 ? (
+              "Sold Out"
             ) : (
               "Confirm to Pay"
             )}

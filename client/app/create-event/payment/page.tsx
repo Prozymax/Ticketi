@@ -32,7 +32,7 @@ export default function PaymentPage() {
       setIsLoading(true);
       setPaymentError(null);
 
-      // First create the event in the database
+      // First create the event in draft status
       const createEventData: CreateEventRequest = {
         title: eventData.title,
         description: eventData.description,
@@ -58,12 +58,14 @@ export default function PaymentPage() {
         throw new Error(eventResult.error || "Failed to create event");
       }
 
-      // Create Pi Network payment
+      const eventId = eventResult.data.event?.id || eventResult.data.id;
+
+      // Create Pi Network payment with event ID
       const paymentId = await createPayment(
         total,
         `Event creation payment for ${eventData.title}`,
         {
-          eventId: eventResult.data.id,
+          eventId: eventId,
           eventTitle: eventData.title,
           ticketType: "Regular",
           ticketCount: eventData.regularTickets,
@@ -74,26 +76,15 @@ export default function PaymentPage() {
       console.log("Payment created successfully:", paymentId);
       console.log("Event created successfully:", eventResult.data);
 
-      // Publish the event after successful payment
-      const eventId = eventResult.data.event?.id || eventResult.data.id;
-      console.log("Publishing event with ID:", eventId);
+      // Note: Event will be published automatically after payment completion
+      // The backend onServerCompletion callback will publish the event when payment is verified
 
-      const publishResult = await eventAPI.publishEvent(eventId);
-
-      if (!publishResult.success) {
-        throw new Error(publishResult.error || "Failed to publish event");
-      }
-
-      console.log("Event published successfully:", publishResult.data);
-
-      // Navigate to success page (don't reset context yet - success page needs the data)
+      // Navigate to success page
       router.push("/create-event/success");
     } catch (error: unknown) {
       console.error("Payment/Event creation failed:", error);
       if (error instanceof Error) {
         setPaymentError(error.message || "Payment failed. Please try again.");
-        // Let the ErrorDisplay component handle authentication errors
-        // instead of automatically redirecting to login
       }
     } finally {
       setIsLoading(false);

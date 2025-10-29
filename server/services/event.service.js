@@ -13,16 +13,27 @@ class EventService {
     createEvent = async (eventData, organizerId, filename) => {
         try {
             console.log('Creating event with data:', eventData);
-            
+
             // Process and combine date and time fields
             const startDateTime = this.combineDateAndTime(eventData.startDate, eventData.startTime);
             const endDateTime = this.combineDateAndTime(eventData.endDate, eventData.endTime);
-            
+
             // Extract ticket information from ticketTypes array
-            const ticketInfo = eventData.ticketTypes && eventData.ticketTypes.length > 0 
-                ? eventData.ticketTypes[0] 
-                : { price: 0, totalQuantity: 0 };
-            
+            let ticketInfo = { price: 0, totalQuantity: 0 };
+            if (eventData.ticketTypes) {
+                try {
+                    const ticketTypes = typeof eventData.ticketTypes === 'string'
+                        ? JSON.parse(eventData.ticketTypes)
+                        : eventData.ticketTypes;
+
+                    if (Array.isArray(ticketTypes) && ticketTypes.length > 0) {
+                        ticketInfo = ticketTypes[0];
+                    }
+                } catch (error) {
+                    console.error('Error parsing ticketTypes:', error);
+                }
+            }
+
             // Parse price to ensure it's a valid number
             let parsedPrice = 0;
             if (ticketInfo.price !== undefined && ticketInfo.price !== null) {
@@ -34,13 +45,13 @@ class EventService {
                     parsedPrice = parseFloat(ticketInfo.price) || 0;
                 }
             }
-            
-            console.log('Parsed ticket info:', { 
-                originalPrice: ticketInfo.price, 
-                parsedPrice, 
-                totalQuantity: ticketInfo.totalQuantity 
+
+            console.log('Parsed ticket info:', {
+                originalPrice: ticketInfo.price,
+                parsedPrice,
+                totalQuantity: ticketInfo.totalQuantity
             });
-            
+
             // Prepare event data for database
             const dbEventData = {
                 title: eventData.title,
@@ -53,9 +64,9 @@ class EventService {
                 organizerId,
                 status: 'draft'
             };
-            
+
             console.log('Processed event data for DB:', dbEventData);
-            
+
             const event = await Event.create(dbEventData);
 
             // Only update eventImage if filename is provided
@@ -84,15 +95,15 @@ class EventService {
     combineDateAndTime = (dateStr, timeStr) => {
         try {
             console.log('Combining date and time:', { dateStr, timeStr });
-            
+
             if (!dateStr) return new Date();
-            
-            // Parse the date string (handles formats like "Sept 12, 2025")
+
+            // Parse the date string (handles both "YYYY-MM-DD" and "Sept 12, 2025" formats)
             const date = new Date(dateStr);
-            
+
             // If timeStr is provided, parse and combine with date
             if (timeStr) {
-                // Handle time formats like "09:00GMT", "12:00GMT", etc.
+                // Handle time formats like "09:00", "12:00", "09:00GMT", "12:00GMT", etc.
                 const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/);
                 if (timeMatch) {
                     const hours = parseInt(timeMatch[1], 10);
@@ -102,7 +113,7 @@ class EventService {
                     return date;
                 }
             }
-            
+
             // If no valid time provided, use the date as is
             console.log('Using date as is:', date);
             return date;
@@ -166,12 +177,22 @@ class EventService {
      */
     getEventById = async (eventId) => {
         try {
+            const Ticket = require('../models/ticket/ticket.model');
+
             const event = await Event.findByPk(eventId, {
-                include: [{
-                    model: User,
-                    as: 'organizer',
-                    attributes: ['id', 'username', 'firstName', 'lastName', 'profileImage', 'isVerified']
-                }]
+                include: [
+                    {
+                        model: User,
+                        as: 'organizer',
+                        attributes: ['id', 'username', 'firstName', 'lastName', 'profileImage', 'isVerified']
+                    },
+                    {
+                        model: Ticket,
+                        as: 'tickets',
+                        where: { isActive: true },
+                        required: false
+                    }
+                ]
             });
 
             if (!event) {
@@ -248,7 +269,7 @@ class EventService {
     updateEvent = async (eventId, updateData, organizerId, filename) => {
         try {
             console.log('Updating event with data:', updateData);
-            
+
             const event = await Event.findOne({
                 where: { id: eventId, organizerId }
             });
@@ -263,12 +284,12 @@ class EventService {
 
             // Process the update data similar to create
             const processedUpdateData = {};
-            
+
             // Handle basic fields
             if (updateData.title) processedUpdateData.title = updateData.title;
             if (updateData.description) processedUpdateData.description = updateData.description;
             if (updateData.location) processedUpdateData.location = updateData.location;
-            
+
             // Handle date and time fields
             if (updateData.startDate) {
                 processedUpdateData.startDate = this.combineDateAndTime(updateData.startDate, updateData.startTime);
@@ -276,32 +297,42 @@ class EventService {
             if (updateData.endDate) {
                 processedUpdateData.endDate = this.combineDateAndTime(updateData.endDate, updateData.endTime);
             }
-            
+
             // Handle ticket information
-            if (updateData.ticketTypes && updateData.ticketTypes.length > 0) {
-                const ticketInfo = updateData.ticketTypes[0];
-                processedUpdateData.regularTickets = ticketInfo.totalQuantity || 0;
-                
-                // Parse price similar to create method
-                let parsedPrice = 0;
-                if (ticketInfo.price !== undefined && ticketInfo.price !== null) {
-                    if (typeof ticketInfo.price === 'string') {
-                        const cleanPrice = ticketInfo.price.replace(/[^\d.]/g, '');
-                        parsedPrice = parseFloat(cleanPrice) || 0;
-                    } else {
-                        parsedPrice = parseFloat(ticketInfo.price) || 0;
+            if (updateData.ticketTypes) {
+                try {
+                    const ticketTypes = typeof updateData.ticketTypes === 'string'
+                        ? JSON.parse(updateData.ticketTypes)
+                        : updateData.ticketTypes;
+
+                    if (Array.isArray(ticketTypes) && ticketTypes.length > 0) {
+                        const ticketInfo = ticketTypes[0];
+                        processedUpdateData.regularTickets = ticketInfo.totalQuantity || 0;
+
+                        // Parse price similar to create method
+                        let parsedPrice = 0;
+                        if (ticketInfo.price !== undefined && ticketInfo.price !== null) {
+                            if (typeof ticketInfo.price === 'string') {
+                                const cleanPrice = ticketInfo.price.replace(/[^\d.]/g, '');
+                                parsedPrice = parseFloat(cleanPrice) || 0;
+                            } else {
+                                parsedPrice = parseFloat(ticketInfo.price) || 0;
+                            }
+                        }
+                        processedUpdateData.ticketPrice = parsedPrice;
                     }
+                } catch (error) {
+                    console.error('Error parsing ticketTypes in update:', error);
                 }
-                processedUpdateData.ticketPrice = parsedPrice;
             }
-            
+
             // If a new image is uploaded, include it in the update
             if (filename) {
                 processedUpdateData.eventImage = `${serverUrl}/${filename}`;
             }
 
             console.log('Processed update data for DB:', processedUpdateData);
-            
+
             await event.update(processedUpdateData);
 
             return {
@@ -320,16 +351,25 @@ class EventService {
     }
 
     /**
-     * Publish event
+     * Publish event (only if payment is completed)
      * @param {string} eventId 
      * @param {string} organizerId 
      * @returns {Object} published event
      */
     publishEvent = async (eventId, organizerId) => {
         try {
+            console.log('=== PublishEvent Called ===');
+            console.log('EventId:', eventId);
+            console.log('OrganizerId:', organizerId);
+
+            const Ticket = require('../models/ticket/ticket.model');
+
             const event = await Event.findOne({
                 where: { id: eventId, organizerId }
             });
+
+            console.log('Event found:', !!event);
+            console.log('Event details:', event ? { id: event.id, title: event.title, status: event.status } : null);
 
             if (!event) {
                 return {
@@ -339,11 +379,23 @@ class EventService {
                 };
             }
 
+            // Note: Payment verification is not needed here because this method
+            // is only called from the payment completion callback after Pi Network
+            // has already verified the payment. The payment record is created
+            // in the controller BEFORE this method is called.
+
+            console.log('=== Publishing event ===');
+            // Update event status to published (don't create duplicate)
             await event.update({
                 isPublished: true,
                 status: 'published'
             });
 
+            console.log('Event updated, creating tickets...');
+            // Create ticket entries for the event
+            await this.createEventTickets(event);
+
+            console.log('=== Event published successfully ===');
             return {
                 error: false,
                 message: 'Event published successfully',
@@ -356,6 +408,34 @@ class EventService {
                 message: 'Failed to publish event',
                 event: null
             };
+        }
+    }
+
+    /**
+     * Create ticket entries for published event
+     * @param {Object} event 
+     */
+    createEventTickets = async (event) => {
+        try {
+            const Ticket = require('../models/ticket/ticket.model');
+
+            // Create ticket entry based on event data
+            await Ticket.create({
+                eventId: event.id,
+                ticketType: 'regular',
+                price: event.ticketPrice,
+                currency: 'PI',
+                totalQuantity: event.regularTickets,
+                availableQuantity: event.regularTickets,
+                soldQuantity: 0,
+                isActive: true,
+                saleStartDate: new Date(),
+                saleEndDate: event.startDate
+            });
+
+            console.log(`Tickets created for event ${event.id}`);
+        } catch (error) {
+            console.error('Error creating event tickets:', error);
         }
     }
 

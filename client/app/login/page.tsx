@@ -59,9 +59,9 @@ export default function LoginPage() {
             setShowUsernameInput(false);
             console.log("Stored username verified successfully");
           } else {
-            // User doesn't exist or is not verified - show input for manual entry
-            console.log("Stored username not verified, showing input");
-            router.push('/onboarding/authenticate')
+            // User doesn't exist or is not verified - clear stored username and show input
+            console.log("Stored username not verified, clearing and showing input");
+            localStorage.removeItem("pi_username");
             setShowUsernameInput(true);
             setUserVerificationStatus(null);
           }
@@ -128,9 +128,7 @@ export default function LoginPage() {
       const errorMessage = formatError(error);
       logError("Pi Network Authentication", error);
       setAuthError(errorMessage);
-
-      // If authentication fails, redirect to onboarding
-      router.push("/onboarding/authenticate");
+      // Stay on login page to allow retry
     }
   };
 

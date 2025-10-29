@@ -130,6 +130,11 @@ class App {
             this.routes();
             logger.info('Initializing routes...');
 
+            // Initialize event scheduler
+            const EventScheduler = require('../services/event.scheduler');
+            EventScheduler.init();
+            logger.info('Event scheduler initialized...');
+
             // Start server
             this.startServer();
             logger.info('Starting server...');

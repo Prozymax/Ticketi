@@ -237,23 +237,84 @@ class PiNetworkService {
 
             if (!result.success) throw new Error(result.error);
 
-            await BlockchainTransaction.update(
-                {
-                    status: 'confirmed',
-                    confirmations: result.data.confirmations || 1,
-                    blockNumber: result.data.blockNumber
-                },
-                { where: { transactionHash: paymentId } }
-            );
+            // Debug: Log what Pi Network API returns
+            console.log('=== Pi Network API Response ===');
+            console.log('Result data:', JSON.stringify(result.data, null, 2));
+            console.log('Metadata from API:', result.data.metadata);
 
-            await Purchase.update(
-                { paymentStatus: 'completed' },
-                { where: { transactionHash: paymentId } }
-            );
+            // Only update blockchain transaction if it exists (for ticket purchases)
+            // For event creation, the transaction will be created in the controller
+            const existingTransaction = await BlockchainTransaction.findOne({
+                where: { transactionHash: paymentId }
+            });
+
+            if (existingTransaction) {
+                await BlockchainTransaction.update(
+                    {
+                        status: 'confirmed',
+                        confirmations: result.data.confirmations || 1,
+                        blockNumber: result.data.blockNumber
+                    },
+                    { where: { transactionHash: paymentId } }
+                );
+                console.log('Updated existing blockchain transaction');
+            } else {
+                console.log('No existing blockchain transaction found (will be created in controller)');
+            }
+
+            // Only update purchase if it exists (for ticket purchases)
+            const existingPurchase = await Purchase.findOne({
+                where: { transactionHash: paymentId }
+            });
+
+            if (existingPurchase) {
+                await Purchase.update(
+                    { paymentStatus: 'completed' },
+                    { where: { transactionHash: paymentId } }
+                );
+                console.log('Updated existing purchase');
+            } else {
+                console.log('No existing purchase found (this is an event creation payment)');
+            }
 
             logger.info('Payment completed successfully:', { paymentId, txid });
 
-            return { success: true, payment: result.data };
+            // Return the payment data from Pi Network API which includes metadata
+            const paymentResponse = { 
+                success: true, 
+                payment: {
+                    id: paymentId,
+                    identifier: result.data.identifier,
+                    // Extract userId from user_uid field
+                    userId: result.data.metadata?.userId || result.data.user_uid,
+                    user_uid: result.data.user_uid,
+                    // Extract eventId and purchaseId from metadata
+                    eventId: result.data.metadata?.eventId,
+                    purchaseId: result.data.metadata?.purchaseId,
+                    // Payment details
+                    amount: result.data.amount,
+                    memo: result.data.memo,
+                    metadata: result.data.metadata,
+                    // Blockchain details
+                    from_address: result.data.from_address,
+                    to_address: result.data.to_address,
+                    direction: result.data.direction,
+                    // Transaction details
+                    txid: result.data.transaction?.txid || txid,
+                    transaction: result.data.transaction,
+                    // Status
+                    status: result.data.status,
+                    network: result.data.network,
+                    created_at: result.data.created_at,
+                    // Include full data for reference
+                    ...result.data
+                }
+            };
+
+            console.log('=== Returning Payment Response ===');
+            console.log('Payment response:', JSON.stringify(paymentResponse.payment, null, 2));
+
+            return paymentResponse;
         } catch (error) {
             logger.error('Payment completion error:', error);
             return { success: false, error: error.message };

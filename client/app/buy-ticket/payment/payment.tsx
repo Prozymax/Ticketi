@@ -1,9 +1,10 @@
 "use client";
 
-import {useState, Suspense} from "react";
+import {useState, useEffect, Suspense} from "react";
 import {useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image";
 import {usePiNetwork} from "../../hooks/usePiNetwork";
+import {apiService} from "../../lib/api";
 import {formatError, logError} from "../../utils/errorHandler";
 import ErrorDisplay from "../../components/ErrorDisplay";
 
@@ -23,36 +24,72 @@ function PaymentContent({eventData}: PaymentPageProps) {
 
   // Get data from URL params or props
   const eventId = searchParams.get("eventId") || eventData?.id || "1";
+  const ticketId = searchParams.get("ticketId") || "";
+  const purchaseId = searchParams.get("purchaseId") || "";
   const quantity = parseInt(searchParams.get("quantity") || "1");
-  // const total = parseFloat(searchParams.get("total") || "13.2"); // Not used currently
+  const total = parseFloat(searchParams.get("total") || "13.2");
+  const ticketType = searchParams.get("ticketType") || "regular";
+  const isFallback = searchParams.get("fallback") === "true";
 
   const [isLoading, setIsLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [event, setEvent] = useState(eventData || null);
+  const [loadingEvent, setLoadingEvent] = useState(!eventData);
 
-  // Event data (could come from API in real implementation)
-  const event = eventData || {
-    id: eventId,
-    title: "Token2049 Singapore",
-    image: "/event-placeholder.jpg",
-    ticketPrice: 12.6,
+  // Load event data if not provided
+  useEffect(() => {
+    if (!eventData && eventId) {
+      loadEventData();
+    }
+  }, [eventId, eventData]);
+
+  const loadEventData = async () => {
+    try {
+      setLoadingEvent(true);
+      const response = await apiService.getEventById(eventId);
+      
+      if (response.success && response.data) {
+        setEvent(response.data);
+      } else {
+        setPaymentError("Failed to load event details");
+      }
+    } catch (error) {
+      console.error("Error loading event:", error);
+      setPaymentError("Failed to load event details");
+    } finally {
+      setLoadingEvent(false);
+    }
   };
 
   // Fees calculation
-  const ticketPrice = event.ticketPrice;
+  const ticketPrice = event?.ticketPrice || 0;
   const platformFee = 0.5;
   const blockchainFee = 0.1;
   const subtotal = ticketPrice * quantity;
-  const calculatedTotal = subtotal + platformFee + blockchainFee;
+  const calculatedTotal = total || (subtotal + platformFee + blockchainFee);
 
   const handleBack = () => {
     router.back();
   };
 
   const handlePayment = async () => {
+    if (!event) {
+      setPaymentError("Missing event information");
+      return;
+    }
+
+    // For fallback tickets, we don't need ticketId or purchaseId
+    if (!isFallback && (!ticketId || !purchaseId)) {
+      setPaymentError("Missing payment information");
+      return;
+    }
+
     setIsLoading(true);
     setPaymentError(null);
 
     try {
+      console.log("Creating payment with fallback:", isFallback);
+      
       // Create Pi Network payment
       const paymentId = await createPayment(
         calculatedTotal,
@@ -60,17 +97,20 @@ function PaymentContent({eventData}: PaymentPageProps) {
         {
           eventId: event.id,
           eventTitle: event.title,
-          ticketType: "Regular",
+          ticketId: ticketId || `fallback-${event.id}`,
+          purchaseId: purchaseId || null,
+          ticketType: ticketType,
           ticketCount: quantity,
           paymentType: "ticket_purchase",
+          isFallback: isFallback,
         }
       );
 
       console.log("Payment created successfully:", paymentId);
 
-      // Navigate to success page or handle payment completion
+      // Navigate to success page
       router.push(
-        `/buy-ticket/success?paymentId=${paymentId}&eventId=${event.id}`
+        `/buy-ticket/success?paymentId=${paymentId}&eventId=${event.id}${purchaseId ? `&purchaseId=${purchaseId}` : ''}`
       );
     } catch (error: unknown) {
       const errorMessage = formatError(error);
@@ -92,6 +132,51 @@ function PaymentContent({eventData}: PaymentPageProps) {
   // Convert Pi to USDT (example rate)
   const piToUsdtRate = 0.267;
   const usdtAmount = (calculatedTotal * piToUsdtRate).toFixed(3);
+
+  // Show loading state while event data is loading
+  if (loadingEvent) {
+    return (
+      <div style={{
+        backgroundColor: "#0a0a0a",
+        color: "#ffffff",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{
+            width: "40px",
+            height: "40px",
+            border: "3px solid #333",
+            borderTop: "3px solid #8b5cf6",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+            margin: "0 auto 16px auto",
+          }} />
+          <p>Loading event details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div style={{
+        backgroundColor: "#0a0a0a",
+        color: "#ffffff",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <p>Event not found</p>
+          <button onClick={() => router.back()}>Go Back</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -477,13 +562,19 @@ function PaymentContent({eventData}: PaymentPageProps) {
         {/* Payment Details */}
         <div className="payment-details">
           <div className="detail-row">
-            <span className="detail-label">Ticket . Regular</span>
+            <span className="detail-label">Ticket . {ticketType.charAt(0).toUpperCase() + ticketType.slice(1)}</span>
             <span className="detail-value">{quantity}</span>
           </div>
           <div className="detail-row">
             <span className="detail-label">Event Title</span>
             <span className="detail-value">{event.title}</span>
           </div>
+          {isFallback && (
+            <div className="detail-row">
+              <span className="detail-label">Mode</span>
+              <span className="detail-value">Direct Purchase</span>
+            </div>
+          )}
         </div>
 
         {/* Cost Breakdown */}

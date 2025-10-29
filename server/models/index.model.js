@@ -95,9 +95,9 @@ Purchase.belongsTo(Ticket, {
     as: 'ticket' 
 });
 
-Purchase.hasOne(NFTTicket, { 
+Purchase.hasMany(NFTTicket, { 
     foreignKey: 'purchaseId', 
-    as: 'nftTicket' 
+    as: 'nftTickets' 
 });
 
 Purchase.hasOne(Payment, { 

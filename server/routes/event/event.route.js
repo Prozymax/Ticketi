@@ -17,6 +17,7 @@ router.get('/:eventId', EventController.getEventById);
 router.put('/:eventId', authenticateToken, uploadSingle('eventImage'), EventController.updateEvent);
 router.delete('/:eventId', authenticateToken, EventController.deleteEvent);
 router.post('/:eventId/publish', authenticateToken, EventController.publishEvent);
+router.post('/admin/check-completions', authenticateToken, EventController.checkEventCompletions);
 
 // Ticket routes
 router.post('/:eventId/tickets', authenticateToken, TicketController.createTickets);

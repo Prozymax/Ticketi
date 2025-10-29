@@ -1,8 +1,8 @@
-import type { NextConfig } from "next";
+import type {NextConfig} from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-   typescript: {
+  typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
@@ -10,8 +10,28 @@ const nextConfig: NextConfig = {
   },
   // Reduce font preload warnings
   experimental: {
-    optimizePackageImports: ['@next/font']
-  }
+    optimizePackageImports: ["@next/font"],
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "6001",
+        pathname: "/uploads/**",
+      },
+      {
+        protocol: "https",
+        hostname: "ticketi.xyz",
+        pathname: "/uploads/**",
+      },
+      {
+        protocol: "https",
+        hostname: "testnet.ticketi.xyz",
+        pathname: "/uploads/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

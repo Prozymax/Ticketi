@@ -109,7 +109,7 @@ const Events = ({events: propEvents}: EventsProps) => {
 
                 {/* Event Details */}
                 <div className="event-details">
-                  <div className="detail-item">
+                  <div className="details-item">
                     <MapPin size={16} className="detail-icon" />
                     <span className="detail-text">{event.location}</span>
                   </div>

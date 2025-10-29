@@ -7,7 +7,7 @@ class EventController {
       console.log('Create Event - Request body:', JSON.stringify(req.body, null, 2));
       console.log('Create Event - Uploaded file:', req.uploadedFile);
       console.log('Create Event - File object:', req.file);
-      
+
       const event = await eventService.createEvent(req.body, req.user.id, req.uploadedFile);
       console.log(event)
       if (!event) return ApiResponse.error(res, 'Error creating event', 500);
@@ -39,7 +39,7 @@ class EventController {
   }
 
   getEventById = async (req, res) => {
-    const { eventId } = req.params;console.log(req.params)
+    const { eventId } = req.params; console.log(req.params)
     const eventResponse = await eventService.getEventById(eventId);
 
     if (!eventResponse || !eventResponse || eventResponse.error) {
@@ -96,9 +96,9 @@ class EventController {
   getEventsNearLocation = async (req, res) => {
     const { location, page, limit } = req.query;
     let pageNumber = page || 1, limitNumber = limit || 10;
-    
+
     console.log('Controller - Location parameter received:', location);
-    
+
     if (!location) {
       return ApiResponse.error(res, 'Location parameter is required', 400);
     }
@@ -131,6 +131,22 @@ class EventController {
       return ApiResponse.error(res, eventsResponse.error || 'Error getting events around world', 500);
     }
     return ApiResponse.success(res, eventsResponse.events, 'Success', 200);
+  }
+
+  checkEventCompletions = async (req, res) => {
+    try {
+      const EventScheduler = require('../services/event.scheduler');
+      const result = await EventScheduler.manualCheck();
+
+      if (result.success) {
+        return ApiResponse.success(res, result, 'Event completion check completed successfully', 200);
+      } else {
+        return ApiResponse.error(res, result.error || 'Error checking event completions', 500);
+      }
+    } catch (error) {
+      console.error('Error in checkEventCompletions:', error);
+      return ApiResponse.error(res, 'Error checking event completions', 500);
+    }
   }
 }
 

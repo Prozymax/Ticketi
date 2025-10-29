@@ -1,6 +1,8 @@
 #vscode workspace
 .vscode
 
+./server/uploads
+
 # Logs
 logs
 *.log

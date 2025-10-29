@@ -160,9 +160,11 @@
   margin-bottom: 1.5rem;
 }
 
-.detail-item {
+.details-item {
   display: flex;
-  align-items: center;
+  text-align: left;
+  justify-content: flex-start;
+  align-items: start;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
@@ -170,6 +172,7 @@
 .detail-row {
   display: flex;
   gap: 1.5rem;
+  justify-content: flex-start;
   flex-wrap: wrap;
 }
 

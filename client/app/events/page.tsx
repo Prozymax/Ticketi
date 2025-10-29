@@ -39,10 +39,25 @@ export default function EventsPage() {
   const [error, setError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<string>("");
 
-  // Get user's location
+  // Get user's location with caching
   useEffect(() => {
     const getUserLocation = async () => {
       try {
+        // Check if location is cached (valid for 24 hours)
+        const cachedLocation = localStorage.getItem('userLocation');
+        const cacheTimestamp = localStorage.getItem('userLocationTimestamp');
+        const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+        if (cachedLocation && cacheTimestamp) {
+          const age = Date.now() - parseInt(cacheTimestamp);
+          if (age < cacheExpiry) {
+            console.log('Using cached location:', cachedLocation);
+            setUserLocation(cachedLocation);
+            return;
+          }
+        }
+
+        // If no cache or expired, fetch location
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -57,7 +72,11 @@ export default function EventsPage() {
                 const location =
                   data.city || data.locality || data.countryName || "Unknown";
                 console.log("Detected location:", location);
-                console.log("Geocoding data:", data);
+                
+                // Cache the location
+                localStorage.setItem('userLocation', location);
+                localStorage.setItem('userLocationTimestamp', Date.now().toString());
+                
                 setUserLocation(location);
               } catch (geocodeError) {
                 console.error("Geocoding error:", geocodeError);
@@ -67,7 +86,8 @@ export default function EventsPage() {
             (error) => {
               console.error("Geolocation error:", error);
               setUserLocation("Unknown");
-            }
+            },
+            { timeout: 5000, maximumAge: 600000 } // 5s timeout, accept 10min old position
           );
         } else {
           setUserLocation("Unknown");
@@ -81,28 +101,24 @@ export default function EventsPage() {
     getUserLocation();
   }, []);
 
-  // Fetch events data
+  // Fetch events data - don't wait for location
   useEffect(() => {
     const fetchEventsData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch all three types of events in parallel
-        const [nearResponse, trendingResponse, worldResponse] =
-          await Promise.all([
-            userLocation && userLocation !== "Unknown"
-              ? eventAPI.getEventsNearLocation(userLocation, 1, 6)
-              : Promise.resolve({success: true, data: []}),
-            eventAPI.getTrendingEvents(1, 6),
-            eventAPI.getEventsAroundWorld(1, 6),
-          ]);
+        // Fetch trending and world events immediately (don't wait for location)
+        const [trendingResponse, worldResponse] = await Promise.all([
+          eventAPI.getTrendingEvents(1, 6),
+          eventAPI.getEventsAroundWorld(1, 6),
+        ]);
 
-        setEventsData({
-          nearYou: nearResponse.success ? nearResponse.data || [] : [],
+        setEventsData(prev => ({
+          ...prev,
           trending: trendingResponse.success ? trendingResponse.data || [] : [],
           aroundWorld: worldResponse.success ? worldResponse.data || [] : [],
-        });
+        }));
 
         setLoading(false);
       } catch (error) {
@@ -114,9 +130,28 @@ export default function EventsPage() {
       }
     };
 
-    // Only fetch events after we have user location (or determined it's unknown)
+    // Fetch events immediately on mount
+    fetchEventsData();
+  }, []);
+
+  // Fetch location-based events separately when location is available
+  useEffect(() => {
+    const fetchNearbyEvents = async () => {
+      if (userLocation && userLocation !== "Unknown") {
+        try {
+          const nearResponse = await eventAPI.getEventsNearLocation(userLocation, 1, 6);
+          setEventsData(prev => ({
+            ...prev,
+            nearYou: nearResponse.success ? nearResponse.data || [] : [],
+          }));
+        } catch (error) {
+          console.error("Error fetching nearby events:", error);
+        }
+      }
+    };
+
     if (userLocation) {
-      fetchEventsData();
+      fetchNearbyEvents();
     }
   }, [userLocation]);
 

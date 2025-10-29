@@ -43,10 +43,10 @@ export default function SuccessPage() {
   }, [state.eventData, router]);
 
   const handleComplete = () => {
-    // Clear event data and navigate to event hub (My Events)
+    // Clear event data and navigate to events page
     localStorage.removeItem('eventData');
     reset(); // Reset the event creation context now that we're done
-    router.push('/event-hub');
+    router.push('/events');
   };
 
   const handleShare = () => {

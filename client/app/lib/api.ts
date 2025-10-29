@@ -332,6 +332,21 @@ class ApiService {
     return response;
   }
 
+  // Ticket API methods
+  async getEventTickets(eventId: string): Promise<ApiResponse> {
+    console.log("API: Getting event tickets:", eventId);
+    const response = await this.makeRequest(`/api/events/${eventId}/tickets`);
+    console.log("API: Event tickets response:", response);
+    return response;
+  }
+
+  async checkTicketAvailability(ticketId: string, quantity = 1): Promise<ApiResponse> {
+    console.log("API: Checking ticket availability:", ticketId, quantity);
+    const response = await this.makeRequest(`/api/events/tickets/${ticketId}/availability?quantity=${quantity}`);
+    console.log("API: Ticket availability response:", response);
+    return response;
+  }
+
   // Purchase API methods
   async createPurchase(purchaseData: {
     eventId: string;
@@ -339,7 +354,7 @@ class ApiService {
     quantity: number;
   }): Promise<ApiResponse> {
     console.log("API: Creating purchase:", purchaseData);
-    const response = await this.makeRequest("/api/purchases", {
+    const response = await this.makeRequest(`/api/events/tickets/${purchaseData.ticketId}/purchase`, {
       method: "POST",
       body: JSON.stringify(purchaseData),
     });

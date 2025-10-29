@@ -7,7 +7,7 @@ import {useEffect, useState} from "react";
 export default function LandingPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
-  console.log(process.env.NEXT_PUBLIC_PI_SANDBOX, process.env.NODE_ENV)
+  console.log(process.env.NEXT_PUBLIC_PI_SANDBOX, process.env.NODE_ENV);
 
   useEffect(() => {
     const checkUserStatus = () => {
@@ -16,14 +16,14 @@ export default function LandingPage() {
         import("./utils/userStorage").then(({UserStorage}) => {
           // Check for authentication tokens (both UserStorage and pioneer-key)
           const userToken = UserStorage.getUserToken();
-          const pioneerKey = localStorage.getItem('pioneer-key');
+          const pioneerKey = localStorage.getItem("pioneer-key");
           const isLoggedIn = UserStorage.isLoggedIn() || !!pioneerKey;
-          
+
           // If user is already logged in and has a valid token, go to events
-          if (isLoggedIn && (userToken || pioneerKey)) {
-            router.push("/events");
-            return;
-          }
+          // if (isLoggedIn && (userToken || pioneerKey)) {
+          //   router.push("/events");
+          //   return;
+          // }
 
           // If user has visited before but not logged in, go to login
           if (UserStorage.hasVisited()) {
@@ -53,7 +53,9 @@ export default function LandingPage() {
   return (
     <main className="flex flex-col items-center main home-main">
       <div className="logo-container">
-        <p className="logo_text">Ticket<span className="color-span">i</span></p>
+        <p className="logo_text">
+          Ticket<span className="color-span">i</span>
+        </p>
       </div>
       {isLoading && (
         <div className="loading-indicator">

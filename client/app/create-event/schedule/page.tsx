@@ -9,10 +9,10 @@ import "@/styles/mobileview/create-event.css";
 export default function SchedulePage() {
   const { state, updateSchedule, setStep } = useEventCreation();
   const [location, setLocation] = useState(state.eventData.location);
-  const [startDate, setStartDate] = useState(state.eventData.startDate || "Sept 12, 2025");
-  const [startTime, setStartTime] = useState(state.eventData.startTime || "00:00GMT");
-  const [endDate, setEndDate] = useState(state.eventData.endDate || "Sept 12, 2025");
-  const [endTime, setEndTime] = useState(state.eventData.endTime || "00:00GMT");
+  const [startDate, setStartDate] = useState(state.eventData.startDate || new Date().toISOString().split('T')[0]);
+  const [startTime, setStartTime] = useState(state.eventData.startTime || "09:00");
+  const [endDate, setEndDate] = useState(state.eventData.endDate || new Date().toISOString().split('T')[0]);
+  const [endTime, setEndTime] = useState(state.eventData.endTime || "17:00");
   const router = useRouter();
 
   useEffect(() => {
@@ -143,16 +143,14 @@ export default function SchedulePage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <select
+                    <input
+                      type="date"
                       title="start_date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       className="date-select"
-                    >
-                      <option value="Sept 12, 2025">Sept 12, 2025</option>
-                      <option value="Sept 13, 2025">Sept 13, 2025</option>
-                      <option value="Sept 14, 2025">Sept 14, 2025</option>
-                    </select>
+                      min={new Date().toISOString().split('T')[0]}
+                    />
                   </div>
                 </div>
                 <div className="time-input-group">
@@ -177,19 +175,13 @@ export default function SchedulePage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <select
+                    <input
+                      type="time"
                       title="start_time"
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
                       className="time-select"
-                    >
-                      <option value="00:00GMT">00:00GMT</option>
-                      <option value="01:00GMT">01:00GMT</option>
-                      <option value="02:00GMT">02:00GMT</option>
-                      <option value="09:00GMT">09:00GMT</option>
-                      <option value="12:00GMT">12:00GMT</option>
-                      <option value="18:00GMT">18:00GMT</option>
-                    </select>
+                    />
                   </div>
                 </div>
               </div>
@@ -243,16 +235,14 @@ export default function SchedulePage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <select
+                    <input
+                      type="date"
                       title="end_date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       className="date-select"
-                    >
-                      <option value="Sept 12, 2025">Sept 12, 2025</option>
-                      <option value="Sept 13, 2025">Sept 13, 2025</option>
-                      <option value="Sept 14, 2025">Sept 14, 2025</option>
-                    </select>
+                      min={startDate || new Date().toISOString().split('T')[0]}
+                    />
                   </div>
                 </div>
                 <div className="time-input-group">
@@ -277,19 +267,13 @@ export default function SchedulePage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <select
+                    <input
+                      type="time"
                       title="end_time"
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
                       className="time-select"
-                    >
-                      <option value="00:00GMT">00:00GMT</option>
-                      <option value="01:00GMT">01:00GMT</option>
-                      <option value="02:00GMT">02:00GMT</option>
-                      <option value="09:00GMT">09:00GMT</option>
-                      <option value="12:00GMT">12:00GMT</option>
-                      <option value="18:00GMT">18:00GMT</option>
-                    </select>
+                    />
                   </div>
                 </div>
               </div>
