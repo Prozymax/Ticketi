@@ -7,8 +7,8 @@ import {eventAPI, CreateEventRequest} from "@/app/utils/api";
 import {usePiNetwork} from "@/app/hooks/usePiNetwork";
 
 import ErrorDisplay from "@/app/components/ErrorDisplay";
-import "@/styles/payment.css";
-import "@/styles/create-event.css";
+import styles from "@/styles/payment.module.css";
+import "@/styles/create-event.module.css";
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -92,13 +92,13 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="create-event-container">
+    <div className={styles["create-event-container"]}>
       {/* Header */}
-      <div className="header">
+      <div className={styles.header}>
         <button
           type="button"
           title="back-button"
-          className="back-button"
+          className={styles["back-button"]}
           onClick={handleBack}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -111,62 +111,72 @@ export default function PaymentPage() {
             />
           </svg>
         </button>
-        <h1 className="page-title">Create Event</h1>
-        <div className="header-spacer"></div>
+        <h1 className={styles["page-title"]}>Create Event</h1>
+        <div className={styles["header-spacer"]}></div>
       </div>
 
       {/* Payment Section */}
-      <div className="payment-section">
-        <h2 className="payment-title">Make payment</h2>
+      <div className={styles["payment-section"]}>
+        <h2 className={styles["payment-title"]}>Make payment</h2>
 
         {/* Payment Card */}
-        <div className="payment-card">
+        <div className={styles["payment-card"]}>
           {/* Event Title */}
-          <div className="event-title-section">
-            <h3 className="event-title">{eventData.title}</h3>
+          <div className={styles["event-title-section"]}>
+            <h3 className={styles["event-title"]}>{eventData.title}</h3>
           </div>
 
           {/* Amount Display */}
-          <div className="amount-section">
-            <div className="main-amount">{total.toFixed(2)}π</div>
-            <div className="usd-equivalent">
+          <div className={styles["amount-section"]}>
+            <div className={styles["main-amount"]}>{total.toFixed(2)}π</div>
+            <div className={styles["usd-equivalent"]}>
               ≈ {(total * 0.267).toFixed(3)}USDT
             </div>
           </div>
 
           {/* Event Details */}
-          <div className="event-details">
-            <div className="detail-row">
-              <span className="detail-label">Ticket . Regular</span>
-              <span className="detail-value">{eventData.regularTickets}</span>
+          <div className={styles["event-details"]}>
+            <div className={styles["detail-row"]}>
+              <span className={styles["detail-label"]}>Ticket . Regular</span>
+              <span className={styles["detail-value"]}>
+                {eventData.regularTickets}
+              </span>
             </div>
-            <div className="detail-row">
-              <span className="detail-label">Event Title</span>
-              <span className="detail-value">{eventData.title}</span>
+            <div className={styles["detail-row"]}>
+              <span className={styles["detail-label"]}>Event Title</span>
+              <span className={styles["detail-value"]}>{eventData.title}</span>
             </div>
           </div>
 
           {/* Cost Breakdown */}
-          <div className="cost-breakdown">
-            <div className="breakdown-row">
-              <span className="breakdown-label">For event creation</span>
-              <span className="breakdown-value">{eventCreationFee}π</span>
+          <div className={styles["cost-breakdown"]}>
+            <div className={styles["breakdown-row"]}>
+              <span className={styles["breakdown-label"]}>
+                For event creation
+              </span>
+              <span className={styles["breakdown-value"]}>
+                {eventCreationFee}π
+              </span>
             </div>
-            <div className="breakdown-row">
-              <span className="breakdown-label">Blockchain fee</span>
-              <span className="breakdown-value">{blockchainFee}π</span>
+            <div className={styles["breakdown-row"]}>
+              <span className={styles["breakdown-label"]}>Blockchain fee</span>
+              <span className={styles["breakdown-value"]}>
+                {blockchainFee}π
+              </span>
             </div>
-            <div className="breakdown-row total-row">
-              <span className="breakdown-label">Total</span>
-              <span className="breakdown-value">{total}π</span>
+            <div
+              className={`${styles["breakdown-row"]} ${styles["total-row"]}`}
+            >
+              <span className={styles["breakdown-label"]}>Total</span>
+              <span className={styles["breakdown-value"]}>{total}π</span>
             </div>
           </div>
 
           {/* Confirm Payment Button */}
-          <div className="payment-button-section">
+          <div className={styles["payment-button-section"]}>
             <p
-              className={`confirm-payment-button ${
-                isLoading || piLoading ? "loading" : ""
+              className={`${styles["confirm-payment-button"]} ${
+                isLoading || piLoading ? styles.loading : ""
               }`}
               onClick={
                 !(isLoading || piLoading) ? handleConfirmPayment : undefined
@@ -174,7 +184,7 @@ export default function PaymentPage() {
             >
               {isLoading || piLoading ? (
                 <>
-                  <div className="loading-spinner"></div>
+                  <div className={styles["loading-spinner"]}></div>
                   Processing...
                 </>
               ) : (

@@ -2,14 +2,16 @@
 
 import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
-import { useEventCreation } from "@/app/contexts/EventCreationContext";
-import "@/styles/create-event.css";
-import "@/styles/mobileview/create-event.css";
+import {useEventCreation} from "@/app/contexts/EventCreationContext";
+import styles from "@/styles/create-event.module.css";
+import "@/styles/mobileview/create-event.module.css";
 
 export default function TicketsPage() {
-  const { state, updateTickets, setStep } = useEventCreation();
+  const {state, updateTickets, setStep} = useEventCreation();
   const router = useRouter();
-  const [regularTickets, setRegularTickets] = useState(state.eventData.regularTickets);
+  const [regularTickets, setRegularTickets] = useState(
+    state.eventData.regularTickets
+  );
   const [ticketPrice, setTicketPrice] = useState(state.eventData.ticketPrice);
 
   useEffect(() => {
@@ -31,13 +33,13 @@ export default function TicketsPage() {
   };
 
   return (
-    <div className="create-event-container">
+    <div className={styles['create-event-container']}>
       {/* Header */}
-      <div className="header">
+      <div className={styles.header}>
         <button
           type="button"
           title="back-button"
-          className="back-button"
+          className={styles['back-button']}
           onClick={handleBack}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -50,34 +52,34 @@ export default function TicketsPage() {
             />
           </svg>
         </button>
-        <h1 className="page-title">Create Event</h1>
-        <div className="header-spacer"></div>
+        <h1 className={styles['page-title']}>Create Event</h1>
+        <div className={styles['header-spacer']}></div>
       </div>
 
       {/* Progress Section */}
-      <div className="progress-section">
-        <div className="section-info">
-          <h2 className="section-title">Ticket</h2>
-          <div className="step-indicator">3 / 4</div>
+      <div className={styles['progress-section']}>
+        <div className={styles['section-info']}>
+          <h2 className={styles['section-title']}>Ticket</h2>
+          <div className={styles['step-indicator']}>3 / 4</div>
         </div>
       </div>
 
       {/* Form Content */}
-      <div className="form-content">
+      <div className={styles['form-content']}>
         {/* Number of Tickets Section */}
-        <div className="form-section">
-          <div className="form-card">
-            <div className="field-header">
-              <h3 className="field-title">Number of Tickets</h3>
-              <p className="field-description">
+        <div className={styles['form-section']}>
+          <div className={styles['form-card']}>
+            <div className={styles['field-header']}>
+              <h3 className={styles['field-title']}>Number of Tickets</h3>
+              <p className={styles['field-description']}>
                 Total number of audience or people you will be expecting
               </p>
             </div>
 
-            <div className="ticket-input-group">
-              <div className="ticket-type">
+            <div className={styles['ticket-input-group']}>
+              <div className={styles['ticket-type']}>
                 <svg
-                  className="ticket-icon"
+                  className={styles['ticket-icon']}
                   width="20"
                   height="20"
                   viewBox="0 0 24 24"
@@ -118,7 +120,7 @@ export default function TicketsPage() {
                 type="number"
                 value={regularTickets}
                 onChange={(e) => setRegularTickets(Number(e.target.value))}
-                className="ticket-number-input"
+                className={styles['ticket-number-input']}
                 min="0"
                 placeholder="0"
               />
@@ -127,19 +129,19 @@ export default function TicketsPage() {
         </div>
 
         {/* Price Section */}
-        <div className="form-section">
-          <div className="form-card">
-            <div className="field-header">
-              <h3 className="field-title">Price</h3>
-              <p className="field-description">
+        <div className={styles['form-section']}>
+          <div className={styles['form-card']}>
+            <div className={styles['field-header']}>
+              <h3 className={styles['field-title']}>Price</h3>
+              <p className={styles['field-description']}>
                 Set a fair price for ticket in Pi
               </p>
             </div>
 
-            <div className="price-input-group">
-              <div className="price-type">
+            <div className={styles['price-input-group']}>
+              <div className={styles['price-type']}>
                 <svg
-                  className="price-icon"
+                  className={styles['price-icon']}
                   width="20"
                   height="20"
                   viewBox="0 0 24 24"
@@ -160,13 +162,13 @@ export default function TicketsPage() {
                 type="text"
                 value={ticketPrice}
                 onChange={(e) => setTicketPrice(e.target.value)}
-                className="price-input"
+                className={styles['price-input']}
                 placeholder="0.0π"
               />
             </div>
 
             {/* {/* Add More Guest Button */}
-            {/* <div className="add-guest-section">
+            {/* <div className={styles['add-guest-section']}>
              <input title="image" type="file" name="event_image" id="event-image" />
             </div>  */}
           </div>
@@ -174,11 +176,11 @@ export default function TicketsPage() {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="navigation-buttons">
-        <button type="button" className="back-nav-button" onClick={handleBack}>
+      <div className={styles['navigation-buttons']}>
+        <button type="button" className={styles['back-nav-button']} onClick={handleBack}>
           Back
         </button>
-        <button type="button" className="next-button" onClick={handleNext}>
+        <button type="button" className={styles['next-button']} onClick={handleNext}>
           Next
         </button>
       </div>

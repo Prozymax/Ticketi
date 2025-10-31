@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { apiService } from "../lib/api";
 import TicketModal from "./ticket/ticket";
 
-export default function BuyTicketPage() {
+function BuyTicketContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [eventData, setEventData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -112,5 +112,25 @@ export default function BuyTicketPage() {
         event={currentEvent}
       />
     </div>
+  );
+}
+
+export default function BuyTicketPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        padding: "40px", 
+        backgroundColor: "#0a0a0a", 
+        minHeight: "100vh",
+        color: "#ffffff",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}>
+        <p>Loading...</p>
+      </div>
+    }>
+      <BuyTicketContent />
+    </Suspense>
   );
 }

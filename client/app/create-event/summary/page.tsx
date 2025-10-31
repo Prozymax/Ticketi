@@ -2,14 +2,14 @@
 
 import {useEffect} from "react";
 import {useRouter} from "next/navigation";
-import { useEventCreation } from "@/app/contexts/EventCreationContext";
-import "@/styles/create-event.css";
-import "@/styles/mobileview/create-event.css";
+import {useEventCreation} from "@/app/contexts/EventCreationContext";
+import styles from "@/styles/create-event.module.css";
+import "@/styles/mobileview/create-event.module.css";
 
 export default function SummaryPage() {
-  const { state, setStep } = useEventCreation();
+  const {state, setStep} = useEventCreation();
   const router = useRouter();
-  const { eventData } = state;
+  const {eventData} = state;
 
   useEffect(() => {
     setStep(4);
@@ -21,7 +21,7 @@ export default function SummaryPage() {
 
   const handleCreateEvent = () => {
     // Navigate to payment page
-    router.push('/create-event/payment');
+    router.push("/create-event/payment");
   };
 
   const handleEdit = (section: string) => {
@@ -43,13 +43,13 @@ export default function SummaryPage() {
   };
 
   return (
-    <div className="create-event-container">
+    <div className={styles["create-event-container"]}>
       {/* Header */}
-      <div className="header">
+      <div className={styles.header}>
         <button
           type="button"
           title="back-button"
-          className="back-button"
+          className={styles["back-button"]}
           onClick={handleBack}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -62,39 +62,39 @@ export default function SummaryPage() {
             />
           </svg>
         </button>
-        <h1 className="page-title">Create Event</h1>
-        <div className="header-spacer"></div>
+        <h1 className={styles["page-title"]}>Create Event</h1>
+        <div className={styles["header-spacer"]}></div>
       </div>
 
       {/* Progress Section */}
-      <div className="progress-section">
-        <div className="section-info">
-          <h2 className="section-title">Summary of your Event</h2>
-          <div className="step-indicator">4 / 4</div>
+      <div className={styles["progress-section"]}>
+        <div className={styles["section-info"]}>
+          <h2 className={styles["section-title"]}>Summary of your Event</h2>
+          <div className={styles["step-indicator"]}>4 / 4</div>
         </div>
       </div>
 
       {/* Form Content */}
-      <div className="form-content">
+      <div className={styles["form-content"]}>
         {/* Tickets Summary */}
-        <div className="form-section">
-          <div className="summary-card">
-            <div className="summary-header">
-              <div className="summary-content">
-                <h3 className="summary-label">Ticket</h3>
-                <p className="summary-main-text">
+        <div className={styles["form-section"]}>
+          <div className={styles["summary-card"]}>
+            <div className={styles["summary-header"]}>
+              <div className={styles["summary-content"]}>
+                <h3 className={styles["summary-label"]}>Ticket</h3>
+                <p className={styles["summary-main-text"]}>
                   {eventData.regularTickets} Regular Tickets
                 </p>
-                <div className="summary-sub-info">
-                  <span className="summary-sub-label">Price</span>
-                  <span className="summary-sub-value">
+                <div className={styles["summary-sub-info"]}>
+                  <span className={styles["summary-sub-label"]}>Price</span>
+                  <span className={styles["summary-sub-value"]}>
                     {eventData.ticketPrice}
                   </span>
                 </div>
               </div>
               <button
                 type="button"
-                className="edit-button"
+                className={styles["edit-button"]}
                 onClick={() => handleEdit("tickets")}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -120,16 +120,16 @@ export default function SummaryPage() {
         </div>
 
         {/* Event Title Summary */}
-        <div className="form-section">
-          <div className="summary-card">
-            <div className="summary-header">
-              <div className="summary-content">
-                <h3 className="summary-label">Event Title</h3>
-                <p className="summary-main-text">{eventData.title}</p>
+        <div className={styles["form-section"]}>
+          <div className={styles["summary-card"]}>
+            <div className={styles["summary-header"]}>
+              <div className={styles["summary-content"]}>
+                <h3 className={styles["summary-label"]}>Event Title</h3>
+                <p className={styles["summary-main-text"]}>{eventData.title}</p>
               </div>
               <button
                 type="button"
-                className="edit-button"
+                className={styles["edit-button"]}
                 onClick={() => handleEdit("basic")}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -155,18 +155,20 @@ export default function SummaryPage() {
         </div>
 
         {/* Description Summary */}
-        <div className="form-section">
-          <div className="summary-card">
-            <div className="summary-header">
-              <div className="summary-content">
-                <h3 className="summary-label">Description of Event</h3>
-                <p className="summary-description-text">
+        <div className={styles["form-section"]}>
+          <div className={styles["summary-card"]}>
+            <div className={styles["summary-header"]}>
+              <div className={styles["summary-content"]}>
+                <h3 className={styles["summary-label"]}>
+                  Description of Event
+                </h3>
+                <p className={styles["summary-description-text"]}>
                   {eventData.description}
                 </p>
               </div>
               <button
                 type="button"
-                className="edit-button"
+                className={styles["edit-button"]}
                 onClick={() => handleEdit("basic")}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -192,16 +194,20 @@ export default function SummaryPage() {
         </div>
 
         {/* Schedule and Location Summary */}
-        <div className="form-section">
-          <div className="summary-card">
-            <div className="summary-header">
-              <div className="summary-content">
-                <h3 className="summary-label">Schedule and Location</h3>
-                <p className="summary-main-text">{eventData.location}</p>
+        <div className={styles["form-section"]}>
+          <div className={styles["summary-card"]}>
+            <div className={styles["summary-header"]}>
+              <div className={styles["summary-content"]}>
+                <h3 className={styles["summary-label"]}>
+                  Schedule and Location
+                </h3>
+                <p className={styles["summary-main-text"]}>
+                  {eventData.location}
+                </p>
               </div>
               <button
                 type="button"
-                className="edit-button"
+                className={styles["edit-button"]}
                 onClick={() => handleEdit("schedule")}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -227,19 +233,21 @@ export default function SummaryPage() {
         </div>
 
         {/* Start Date and Time Summary */}
-        <div className="form-section">
-          <div className="summary-card">
-            <div className="summary-header">
-              <div className="summary-content">
-                <div className="summary-datetime-header">
-                  <h3 className="summary-label">Start Date and Time</h3>
-                  <span className="duration-badge">3days</span>
+        <div className={styles["form-section"]}>
+          <div className={styles["summary-card"]}>
+            <div className={styles["summary-header"]}>
+              <div className={styles["summary-content"]}>
+                <div className={styles["summary-datetime-header"]}>
+                  <h3 className={styles["summary-label"]}>
+                    Start Date and Time
+                  </h3>
+                  <span className={styles["duration-badge"]}>3days</span>
                 </div>
 
-                <div className="datetime-summary">
-                  <div className="datetime-row">
+                <div className={styles["datetime-summary"]}>
+                  <div className={styles["datetime-row"]}>
                     <svg
-                      className="datetime-icon"
+                      className={styles["datetime-icon"]}
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
@@ -280,11 +288,11 @@ export default function SummaryPage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <span className="datetime-value">
+                    <span className={styles["datetime-value"]}>
                       {eventData.startDate}
                     </span>
                     <svg
-                      className="dropdown-icon"
+                      className={styles["dropdown-icon"]}
                       width="16"
                       height="16"
                       viewBox="0 0 24 24"
@@ -300,9 +308,9 @@ export default function SummaryPage() {
                     </svg>
                   </div>
 
-                  <div className="datetime-row">
+                  <div className={styles["datetime-row"]}>
                     <svg
-                      className="datetime-icon"
+                      className={styles["datetime-icon"]}
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
@@ -321,11 +329,11 @@ export default function SummaryPage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <span className="datetime-value">
+                    <span className={styles["datetime-value"]}>
                       {eventData.startTime}
                     </span>
                     <svg
-                      className="dropdown-icon"
+                      className={styles["dropdown-icon"]}
                       width="16"
                       height="16"
                       viewBox="0 0 24 24"
@@ -342,11 +350,13 @@ export default function SummaryPage() {
                   </div>
                 </div>
 
-                <h4 className="end-datetime-label">End Date and Time</h4>
-                <div className="datetime-summary">
-                  <div className="datetime-row">
+                <h4 className={styles["end-datetime-label"]}>
+                  End Date and Time
+                </h4>
+                <div className={styles["datetime-summary"]}>
+                  <div className={styles["datetime-row"]}>
                     <svg
-                      className="datetime-icon"
+                      className={styles["datetime-icon"]}
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
@@ -387,9 +397,11 @@ export default function SummaryPage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <span className="datetime-value">{eventData.endDate}</span>
+                    <span className={styles["datetime-value"]}>
+                      {eventData.endDate}
+                    </span>
                     <svg
-                      className="dropdown-icon"
+                      className={styles["dropdown-icon"]}
                       width="16"
                       height="16"
                       viewBox="0 0 24 24"
@@ -405,9 +417,9 @@ export default function SummaryPage() {
                     </svg>
                   </div>
 
-                  <div className="datetime-row">
+                  <div className={styles["datetime-row"]}>
                     <svg
-                      className="datetime-icon"
+                      className={styles["datetime-icon"]}
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
@@ -426,9 +438,11 @@ export default function SummaryPage() {
                         strokeWidth="2"
                       />
                     </svg>
-                    <span className="datetime-value">{eventData.endTime}</span>
+                    <span className={styles["datetime-value"]}>
+                      {eventData.endTime}
+                    </span>
                     <svg
-                      className="dropdown-icon"
+                      className={styles["dropdown-icon"]}
                       width="16"
                       height="16"
                       viewBox="0 0 24 24"
@@ -447,7 +461,7 @@ export default function SummaryPage() {
               </div>
               <button
                 type="button"
-                className="edit-button"
+                className={styles["edit-button"]}
                 onClick={() => handleEdit("schedule")}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -474,13 +488,17 @@ export default function SummaryPage() {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="navigation-buttons">
-        <button type="button" className="back-nav-button" onClick={handleBack}>
+      <div className={styles["navigation-buttons"]}>
+        <button
+          type="button"
+          className={styles["back-nav-button"]}
+          onClick={handleBack}
+        >
           Back
         </button>
         <button
           type="button"
-          className="create-event-button"
+          className={styles["create-event-button"]}
           onClick={handleCreateEvent}
         >
           Create Event

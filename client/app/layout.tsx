@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import type {Metadata} from "next";
 
-import { Fredoka, Nunito } from "next/font/google";
+import {Fredoka, Nunito} from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import BottomNavigation from "./components/BottomNavigation";
-import { EventCreationProvider } from "./contexts/EventCreationContext";
+import {EventCreationProvider} from "./contexts/EventCreationContext";
 const fredoka = Fredoka({
   variable: "--font-fredoka",
   subsets: ["latin"],
@@ -31,12 +31,11 @@ export default function RootLayout({
   // const handleMyEvents = () => {
   //   router.push("/my-events");
   // };
-  
+
   // const handleProfile = () => {
   //   router.push("/profile");
   // };
 
-  
   return (
     <html lang="en" className={`${fredoka.className} ${nunito.className}`}>
       <head>
@@ -44,13 +43,16 @@ export default function RootLayout({
           src="https://sdk.minepi.com/pi-sdk.js"
           strategy="beforeInteractive"
         />
-        <Script src="https://kit.fontawesome.com/1e3c5331c9.js" strategy="beforeInteractive"/>
+        <Script
+          src="https://kit.fontawesome.com/1e3c5331c9.js"
+          strategy="beforeInteractive"
+        />
       </head>
-      <body className={`${fredoka.variable} ${nunito.variable} antialiased pb-20`}>
+      <body
+        className={`${fredoka.variable} ${nunito.variable} antialiased pb-20`}
+      >
         <EventCreationProvider>
-          <div className="min-h-screen">
-            {children}
-          </div>
+          <div className="min-h-screen">{children}</div>
           <BottomNavigation />
         </EventCreationProvider>
       </body>

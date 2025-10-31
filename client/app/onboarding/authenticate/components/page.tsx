@@ -1,5 +1,5 @@
 "use client";
-import "@/styles/onboarding.css";
+import styles from "@/styles/onboarding.module.css";
 import Image from "next/image";
 
 interface OnboardingData {
@@ -12,19 +12,18 @@ interface OnboardingSlideProps {
   data: OnboardingData;
 }
 
-export default function OnboardingSlide({ data }: OnboardingSlideProps) {
-
+export default function OnboardingSlide({data}: OnboardingSlideProps) {
   return (
-    <div className="slide-content">
+    <div className={styles["slide-content"]}>
       <h1
-        className="headline"
+        className={styles.headline}
         dangerouslySetInnerHTML={{__html: data?.title}}
       ></h1>
-      <p className="description">{data?.description}</p>
-      <div className="vector_illustration">
+      <p className={styles.description}>{data?.description}</p>
+      <div className={styles.vector_illustration}>
         {data?.image && (
-          <Image 
-            src={data.image} 
+          <Image
+            src={data.image}
             alt="vector_illustration"
             width={300}
             height={300}

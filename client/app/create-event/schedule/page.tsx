@@ -2,22 +2,28 @@
 
 import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
-import { useEventCreation } from "@/app/contexts/EventCreationContext";
-import "@/styles/create-event.css";
-import "@/styles/mobileview/create-event.css";
+import {useEventCreation} from "@/app/contexts/EventCreationContext";
+import styles from "@/styles/create-event.module.css";
+import "@/styles/mobileview/create-event.module.css";
 
 export default function SchedulePage() {
-  const { state, updateSchedule, setStep } = useEventCreation();
+  const {state, updateSchedule, setStep} = useEventCreation();
   const [location, setLocation] = useState(state.eventData.location);
-  const [startDate, setStartDate] = useState(state.eventData.startDate || new Date().toISOString().split('T')[0]);
-  const [startTime, setStartTime] = useState(state.eventData.startTime || "09:00");
-  const [endDate, setEndDate] = useState(state.eventData.endDate || new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState(
+    state.eventData.startDate || new Date().toISOString().split("T")[0]
+  );
+  const [startTime, setStartTime] = useState(
+    state.eventData.startTime || "09:00"
+  );
+  const [endDate, setEndDate] = useState(
+    state.eventData.endDate || new Date().toISOString().split("T")[0]
+  );
   const [endTime, setEndTime] = useState(state.eventData.endTime || "17:00");
   const router = useRouter();
 
   useEffect(() => {
     setStep(2);
-  }, []); // Remove dependencies to prevent infinite loop
+  }, [setStep]); // Remove dependencies to prevent infinite loop
 
   const handleBack = () => {
     router.back();
@@ -31,13 +37,13 @@ export default function SchedulePage() {
   };
 
   return (
-    <div className="create-event-container">
+    <div className={styles['create-event-container']}>
       {/* Header */}
-      <div className="header">
+      <div className={styles.header}>
         <button
           type="button"
           title="back-button"
-          className="back-button"
+          className={styles['back-button']}
           onClick={handleBack}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -50,59 +56,59 @@ export default function SchedulePage() {
             />
           </svg>
         </button>
-        <h1 className="page-title">Create Event</h1>
-        <div className="header-spacer"></div>
+        <h1 className={styles['page-title']}>Create Event</h1>
+        <div className={styles['header-spacer']}></div>
       </div>
 
       {/* Progress Section */}
-      <div className="progress-section">
-        <div className="section-info">
-          <h2 className="section-title">Schedule and Location</h2>
-          <div className="step-indicator">2 / 4</div>
+      <div className={styles['progress-section']}>
+        <div className={styles['section-info']}>
+          <h2 className={styles['section-title']}>Schedule and Location</h2>
+          <div className={styles['step-indicator']}>2 / 4</div>
         </div>
       </div>
 
       {/* Form Content */}
-      <div className="form-content">
+      <div className={styles['form-content']}>
         {/* Location Section */}
-        <div className="form-section">
-          <div className="form-card">
-            <div className="field-header">
-              <h3 className="field-title">Location</h3>
-              <p className="field-description">
+        <div className={styles['form-section']}>
+          <div className={styles['form-card']}>
+            <div className={styles['field-header']}>
+              <h3 className={styles['field-title']}>Location</h3>
+              <p className={styles['field-description']}>
                 Country, Providence, City, Streets and Markland&apos;s
               </p>
             </div>
-            <div className="input-container">
+            <div className={styles['input-container']}>
               <input
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Give a detail address for events"
-                className="text-input"
+                className={styles['text-input']}
               />
             </div>
           </div>
         </div>
 
         {/* Date and Time Section */}
-        <div className="form-section">
-          <div className="form-card">
-            <div className="field-header">
-              <h3 className="field-title">Date and Time</h3>
-              <p className="field-description">
+        <div className={styles['form-section']}>
+          <div className={styles['form-card']}>
+            <div className={styles['field-header']}>
+              <h3 className={styles['field-title']}>Date and Time</h3>
+              <p className={styles['field-description']}>
                 Select the date and time for your event or conference
               </p>
             </div>
 
             {/* Start Date and Time */}
-            <div className="datetime-section">
-              <h4 className="datetime-label">Start Date and Time</h4>
-              <div className="datetime-inputs">
-                <div className="date-input-group">
-                  <div className="input-with-icon">
+            <div className={styles['datetime-section']}>
+              <h4 className={styles['datetime-label']}>Start Date and Time</h4>
+              <div className={styles['datetime-inputs']}>
+                <div className={styles['date-input-group']}>
+                  <div className={styles['input-with-icon']}>
                     <svg
-                      className="input-icon"
+                      className={styles['input-icon']}
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
@@ -148,15 +154,15 @@ export default function SchedulePage() {
                       title="start_date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="date-select"
-                      min={new Date().toISOString().split('T')[0]}
+                      className={styles['date-select']}
+                      min={new Date().toISOString().split("T")[0]}
                     />
                   </div>
                 </div>
-                <div className="time-input-group">
-                  <div className="input-with-icon">
+                <div className={styles['time-input-group']}>
+                  <div className={styles['input-with-icon']}>
                     <svg
-                      className="input-icon"
+                      className={styles['input-icon']}
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
@@ -180,7 +186,7 @@ export default function SchedulePage() {
                       title="start_time"
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
-                      className="time-select"
+                      className={styles['time-select']}
                     />
                   </div>
                 </div>
@@ -188,13 +194,13 @@ export default function SchedulePage() {
             </div>
 
             {/* End Date and Time */}
-            <div className="datetime-section">
-              <h4 className="datetime-label">End Date and Time</h4>
-              <div className="datetime-inputs">
-                <div className="date-input-group">
-                  <div className="input-with-icon">
+            <div className={styles['datetime-section']}>
+              <h4 className={styles['datetime-label']}>End Date and Time</h4>
+              <div className={styles['datetime-inputs']}>
+                <div className={styles['date-input-group']}>
+                  <div className={styles['input-with-icon']}>
                     <svg
-                      className="input-icon"
+                      className={styles['input-icon']}
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
@@ -240,15 +246,15 @@ export default function SchedulePage() {
                       title="end_date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="date-select"
-                      min={startDate || new Date().toISOString().split('T')[0]}
+                      className={styles['date-select']}
+                      min={startDate || new Date().toISOString().split("T")[0]}
                     />
                   </div>
                 </div>
-                <div className="time-input-group">
-                  <div className="input-with-icon">
+                <div className={styles['time-input-group']}>
+                  <div className={styles['input-with-icon']}>
                     <svg
-                      className="input-icon"
+                      className={styles['input-icon']}
                       width="20"
                       height="20"
                       viewBox="0 0 24 24"
@@ -272,7 +278,7 @@ export default function SchedulePage() {
                       title="end_time"
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
-                      className="time-select"
+                      className={styles['time-select']}
                     />
                   </div>
                 </div>
@@ -283,13 +289,13 @@ export default function SchedulePage() {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="navigation-buttons">
-        <button type="button" className="back-nav-button" onClick={handleBack}>
+      <div className={styles['navigation-buttons']}>
+        <button type="button" className={styles['back-nav-button']} onClick={handleBack}>
           Back
         </button>
         <button
           type="button"
-          className={`next-button ${!location.trim() ? "disabled" : ""}`}
+          className={`${styles['next-button']} ${!location.trim() ? styles.disabled : ""}`}
           onClick={handleNext}
           disabled={!location.trim()}
         >

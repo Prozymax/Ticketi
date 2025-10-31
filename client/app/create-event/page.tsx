@@ -3,8 +3,8 @@
 import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import {useEventCreation} from "@/app/contexts/EventCreationContext";
-import "@/styles/create-event.css";
-import "@/styles/mobileview/create-event.css";
+import styles from "@/styles/create-event.module.css";
+import "@/styles/mobileview/create-event.module.css";
 
 export default function CreateEventPage() {
   const {state, updateBasicInfo, setStep} = useEventCreation();
@@ -12,7 +12,9 @@ export default function CreateEventPage() {
   const [eventDescription, setEventDescription] = useState(
     state.eventData.description
   );
-  const [eventImage, setEventImage] = useState<File | null>(state.eventData.eventImage || null);
+  const [eventImage, setEventImage] = useState<File | null>(
+    state.eventData.eventImage || null
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -36,12 +38,12 @@ export default function CreateEventPage() {
   };
 
   return (
-    <div className="create-event-container">
+    <div className={styles["create-event-container"]}>
       {/* Header */}
-      <div className="header">
+      <div className={styles.header}>
         <button
           title="back-button"
-          className="back-button"
+          className={styles["back-button"]}
           onClick={handleBack}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -54,56 +56,56 @@ export default function CreateEventPage() {
             />
           </svg>
         </button>
-        <h1 className="page-title">Create Event</h1>
-        <div className="header-spacer"></div>
+        <h1 className={styles["page-title"]}>Create Event</h1>
+        <div className={styles["header-spacer"]}></div>
       </div>
 
       {/* Progress Section */}
-      <div className="progress-section">
-        <div className="section-info">
-          <h2 className="section-title">Basic Information</h2>
-          <div className="step-indicator">1 / 4</div>
+      <div className={styles["progress-section"]}>
+        <div className={styles["section-info"]}>
+          <h2 className={styles["section-title"]}>Basic Information</h2>
+          <div className={styles["step-indicator"]}>1 / 4</div>
         </div>
       </div>
 
       {/* Form Content */}
-      <div className="form-content">
+      <div className={styles["form-content"]}>
         {/* Event Title Section */}
-        <div className="form-section">
-          <div className="form-card">
-            <div className="field-header">
-              <h3 className="field-title">Event Title</h3>
-              <p className="field-description">
+        <div className={styles["form-section"]}>
+          <div className={styles["form-card"]}>
+            <div className={styles["field-header"]}>
+              <h3 className={styles["field-title"]}>Event Title</h3>
+              <p className={styles["field-description"]}>
                 Tell your audience what type of event you want to host
               </p>
             </div>
-            <div className="input-container">
+            <div className={styles["input-container"]}>
               <input
                 type="text"
                 value={eventTitle}
                 onChange={(e) => setEventTitle(e.target.value)}
                 placeholder="Conference title, Concert names, Events, etc..."
-                className="text-input"
+                className={styles["text-input"]}
               />
             </div>
           </div>
         </div>
 
         {/* Event Description Section */}
-        <div className="form-section">
-          <div className="form-card">
-            <div className="field-header">
-              <h3 className="field-title">Description of Event</h3>
-              <p className="field-description">
+        <div className={styles["form-section"]}>
+          <div className={styles["form-card"]}>
+            <div className={styles["field-header"]}>
+              <h3 className={styles["field-title"]}>Description of Event</h3>
+              <p className={styles["field-description"]}>
                 Explain what you want to host and be detailed about it
               </p>
             </div>
-            <div className="input-container">
+            <div className={styles["input-container"]}>
               <textarea
                 value={eventDescription}
                 onChange={(e) => setEventDescription(e.target.value)}
                 placeholder="Detailed description of your event..."
-                className="textarea-input"
+                className={styles["textarea-input"]}
                 rows={6}
               />
             </div>
@@ -111,26 +113,28 @@ export default function CreateEventPage() {
         </div>
 
         {/* Event Image Section */}
-        <div className="form-section">
-          <div className="form-card">
-            <div className="field-header">
-              <h3 className="field-title">Event Image</h3>
-              <p className="field-description">
+        <div className={styles["form-section"]}>
+          <div className={styles["form-card"]}>
+            <div className={styles["field-header"]}>
+              <h3 className={styles["field-title"]}>Event Image</h3>
+              <p className={styles["field-description"]}>
                 Upload an image that represents your event (optional)
               </p>
             </div>
-            <div className="input-container">
+            <div className={styles["input-container"]}>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="file-input"
+                className={styles["file-input"]}
                 title="Upload event image"
                 aria-label="Upload event image"
               />
               {eventImage && (
-                <div className="image-preview">
-                  <p className="selected-file">Selected: {eventImage.name}</p>
+                <div className={styles["image-preview"]}>
+                  <p className={styles["selected-file"]}>
+                    Selected: {eventImage.name}
+                  </p>
                 </div>
               )}
             </div>
@@ -138,10 +142,12 @@ export default function CreateEventPage() {
         </div>
 
         {/* Next Button */}
-        <div className="button-section">
+        <div className={styles["button-section"]}>
           <button
-            className={`next-button ${
-              !eventTitle.trim() || !eventDescription.trim() ? "disabled" : ""
+            className={`${styles["next-button"]} ${
+              !eventTitle.trim() || !eventDescription.trim()
+                ? styles.disabled
+                : ""
             }`}
             onClick={handleNext}
             disabled={!eventTitle.trim() || !eventDescription.trim()}

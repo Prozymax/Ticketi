@@ -1,0 +1,234 @@
+/* Modern Profile Page Styles */
+.profile-page {
+  background-color: #0a0a0a;
+  color: #ffffff;
+  min-height: 100vh;
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.profile-header {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 15px;
+}
+
+.profile-title {
+  font-size: 24px;
+  margin: 0;
+  color: #ffffff;
+}
+
+.user-profile-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+  gap: 15px;
+}
+
+.profile-avatar-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #333;
+}
+
+.profile-page-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.username {
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+  color: #ffffff;
+}
+
+.verification-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgb(194, 194, 194);
+}
+
+.verification-text {
+  font-size: 14px;
+}
+
+.follows-section {
+  text-align: right;
+}
+
+.follows-label {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 2px;
+}
+
+.follows-count {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.profile-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  width: 100%;
+  text-align: left;;
+  font-size: 16px;
+  margin: 0 0 20px 0;
+  color: #888;
+}
+
+.menu-item {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  cursor: pointer;
+  border-bottom: 1px solid #222;
+  transition: background-color 0.2s ease;
+}
+
+.menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  border-radius: 8px;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-icon {
+  margin-right: 15px;
+  color: #888;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.menu-arrow {
+  color: #888;
+}
+
+.leave-app-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  cursor: pointer;
+  color: #ef4444;
+  margin-top: 20px;
+  transition: background-color 0.2s ease;
+}
+
+.leave-app-item:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  border-radius: 8px;
+}
+
+.leave-icon {
+  margin-right: 15px;
+}
+
+.leave-text {
+  font-size: 16px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #333;
+  border-top: 3px solid #8b5cf6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 20px;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 16px;
+  text-align: center;
+}
+
+.retry-button {
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.retry-button:hover {
+  background-color: #7c3aed;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .profile-page {
+    padding: 15px;
+  }
+  
+  .user-profile-section {
+    gap: 12px;
+  }
+  
+  .profile-avatar-container {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .username {
+    font-size: 18px;
+  }
+  
+  .follows-count {
+    font-size: 16px;
+  }
+}

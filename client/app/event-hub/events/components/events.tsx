@@ -2,15 +2,15 @@
 
 import {useRouter} from "next/navigation";
 import {
-  Plus,
   MapPin,
   Calendar,
   Clock,
   Users,
   DollarSign,
   Eye,
+  Settings,
 } from "lucide-react";
-import "@/styles/event-hub.css";
+import styles from "@/styles/event-hub.module.css";
 
 interface DatabaseEvent {
   id: string;
@@ -37,23 +37,14 @@ const Events = ({events: propEvents}: EventsProps) => {
   const router = useRouter();
   const eventsData = propEvents || [];
 
-  const handleCreateEvent = () => {
-    router.push("/create-event");
-  };
-
-  //   const handleManageEvent = (eventId: string) => {
-  //     // Navigate to event management page
-  //     router.push(`/event-hub/events/${eventId}/manage`);
-  //   };
-
   const handleEventClick = (eventId: string) => {
     router.push(`/events/${eventId}`);
   };
 
   return (
-    <div className="events-content">
+    <div className={styles["events-content"]}>
       {/* Events List */}
-      <div className="events-list">
+      <div className={styles["events-list"]}>
         {eventsData.map((event) => {
           // Format dates
           const startDate = new Date(event.startDate);
@@ -81,11 +72,11 @@ const Events = ({events: propEvents}: EventsProps) => {
           return (
             <div
               key={event.id}
-              className="event-card"
+              className={styles["event-card"]}
               onClick={() => handleEventClick(event.id)}
             >
               {/* Event Image */}
-              <div className="event-image">
+              <div className={styles["event-image"]}>
                 <img
                   src={event.eventImage || "/events/events_sample.jpg"}
                   alt={event.title}
@@ -97,34 +88,44 @@ const Events = ({events: propEvents}: EventsProps) => {
               </div>
 
               {/* Event Content */}
-              <div className="event-content">
-                {/* Event Title and Status */}
-                <div className="event-header">
-                  <h3 className="event-title">{event.title}</h3>
-                  <span className={`status-badge ${event.status}`}>
-                    {event.status.charAt(0).toUpperCase() +
-                      event.status.slice(1)}
-                  </span>
+              <div className={styles["event-content"]}>
+                {/* Event Title and Manage Button */}
+                <div className={styles["event-header"]}>
+                  <h3 className={styles["event-title"]}>{event.title}</h3>
+                  <button
+                    type="button"
+                    disabled
+                    className={styles["manage-button"]}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/event-hub/events/${event.id}/manage`);
+                    }}
+                  >
+                    <Settings size={18} />
+                    Manage
+                  </button>
                 </div>
 
                 {/* Event Details */}
-                <div className="event-details">
-                  <div className="details-item">
-                    <MapPin size={16} className="detail-icon" />
-                    <span className="detail-text">{event.location}</span>
+                <div className={styles["event-details"]}>
+                  <div className={styles["details-item"]}>
+                    <MapPin size={16} className={styles["detail-icon"]} />
+                    <span className={styles["detail-text"]}>
+                      {event.location}
+                    </span>
                   </div>
-                  <div className="detail-row">
-                    <div className="detail-item">
-                      <Calendar size={16} className="detail-icon" />
-                      <span className="detail-text">
+                  <div className={styles["detail-row"]}>
+                    <div className={styles["detail-item"]}>
+                      <Calendar size={16} className={styles["detail-icon"]} />
+                      <span className={styles["detail-text"]}>
                         {formatDate(startDate)}
                         {startDate.toDateString() !== endDate.toDateString() &&
                           ` - ${formatDate(endDate)}`}
                       </span>
                     </div>
-                    <div className="detail-item">
-                      <Clock size={16} className="detail-icon" />
-                      <span className="detail-text">
+                    <div className={styles["detail-item"]}>
+                      <Clock size={16} className={styles["detail-icon"]} />
+                      <span className={styles["detail-text"]}>
                         {formatTime(startDate)}
                       </span>
                     </div>
@@ -132,28 +133,30 @@ const Events = ({events: propEvents}: EventsProps) => {
                 </div>
 
                 {/* Event Stats */}
-                <div className="event-stats">
-                  <div className="stat-item">
-                    <Users className="stat-icon" />
-                    <div className="stat-content">
-                      <span className="stat-label">Tickets Sold</span>
-                      <span className="stat-value">
-                        {event.ticketsSold} / {event.regularTickets}
+                <div className={styles["event-stats"]}>
+                  <div className={styles["stat-item"]}>
+                    <Users size={18} className={styles["stat-icon"]} />
+                    <div className={styles["stat-content"]}>
+                      <span className={styles["stat-label"]}>Tickets Sold</span>
+                      <span className={styles["stat-value"]}>
+                        {event.ticketsSold}
                       </span>
                     </div>
                   </div>
-                  <div className="stat-item">
-                    <DollarSign className="stat-icon" />
-                    <div className="stat-content">
-                      <span className="stat-label">Revenue</span>
-                      <span className="stat-value">{revenue}π</span>
+                  <div className={styles["stat-item"]}>
+                    <DollarSign size={18} className={styles["stat-icon"]} />
+                    <div className={styles["stat-content"]}>
+                      <span className={styles["stat-label"]}>Revenue</span>
+                      <span className={styles["stat-value"]}>{revenue}π</span>
                     </div>
                   </div>
-                  <div className="stat-item">
-                    <Eye className="stat-icon" />
-                    <div className="stat-content">
-                      <span className="stat-label">Price</span>
-                      <span className="stat-value">{event.ticketPrice}π</span>
+                  <div className={styles["stat-item"]}>
+                    <Eye size={18} className={styles["stat-icon"]} />
+                    <div className={styles["stat-content"]}>
+                      <span className={styles["stat-label"]}>Views</span>
+                      <span className={styles["stat-value"]}>
+                        {Math.floor(Math.random() * 10000)}
+                      </span>
                     </div>
                   </div>
                 </div>

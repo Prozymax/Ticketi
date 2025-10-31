@@ -4,8 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useEventCreation } from '@/app/contexts/EventCreationContext';
 import { UserStorage } from '@/app/utils/userStorage';
-import '@/styles/create-event.css'
-import '@/styles/mobileview/create-event.css'
+import styles from '@/styles/success.module.css'
 
 interface EventData {
   eventHost: string;
@@ -66,78 +65,78 @@ export default function SuccessPage() {
 
   if (!eventData) {
     return (
-      <div className="create-event-container">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
+      <div className={styles['create-event-container']}>
+        <div className={styles['loading-container']}>
+          <div className={styles['loading-spinner']}></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="create-event-container">
+    <div className={styles['create-event-container']}>
       {/* Header */}
-      <div className="success-header">
-        <div className="logo">
-          <span className="logo-text">Ticket</span>
-          <span className="logo-accent">i</span>
+      <div className={styles['success-header']}>
+        <div className={styles.logo}>
+          <span className={styles['logo-text']}>Ticket</span>
+          <span className={styles['logo-accent']}>i</span>
         </div>
       </div>
 
       {/* Success Content */}
-      <div className="success-content">
+      <div className={styles['success-content']}>
         {/* Congratulations Section */}
-        <div className="congratulations-section">
-          <div className="party-emojis">
-            <span className="party-emoji left">🎉</span>
-            <span className="party-emoji right">🎉</span>
+        <div className={styles['congratulations-section']}>
+          <div className={styles['party-emojis']}>
+            <span className={`${styles['party-emoji']} ${styles.left}`}>🎉</span>
+            <span className={`${styles['party-emoji']} ${styles.right}`}>🎉</span>
           </div>
-          <h1 className="congratulations-title">Congratulations!!!</h1>
-          <p className="congratulations-subtitle">
+          <h1 className={styles['congratulations-title']}>Congratulations!!!</h1>
+          <p className={styles['congratulations-subtitle']}>
             Your event ticket has been created
-            <span className="sparkles">✨</span>
+            <span className={styles.sparkles}>✨</span>
           </p>
         </div>
 
         {/* Event Details Card */}
-        <div className="event-details-card">
-          <div className="detail-row">
-            <span className="detail-label">Event Host</span>
-            <span className="detail-value">{eventData.eventHost}</span>
+        <div className={styles['event-details-card']}>
+          <div className={styles['detail-row']}>
+            <span className={styles['detail-label']}>Event Host</span>
+            <span className={styles['detail-value']}>{eventData.eventHost}</span>
           </div>
 
-          <div className="detail-row">
-            <span className="detail-label">Price</span>
-            <span className="detail-value">{eventData.price}</span>
+          <div className={styles['detail-row']}>
+            <span className={styles['detail-label']}>Price</span>
+            <span className={styles['detail-value']}>{eventData.price}</span>
           </div>
 
-          <div className="detail-row">
-            <span className="detail-label">Event Title</span>
-            <span className="detail-value">{eventData.eventTitle}</span>
+          <div className={styles['detail-row']}>
+            <span className={styles['detail-label']}>Event Title</span>
+            <span className={styles['detail-value']}>{eventData.eventTitle}</span>
           </div>
 
-          <div className="detail-row">
-            <span className="detail-label">Ticket</span>
-            <span className="detail-value">{eventData.tickets}</span>
+          <div className={styles['detail-row']}>
+            <span className={styles['detail-label']}>Ticket</span>
+            <span className={styles['detail-value']}>{eventData.tickets}</span>
           </div>
 
-          <div className="detail-row">
-            <span className="detail-label">Schedule and Location</span>
-            <span className="detail-value location-text">{eventData.location}</span>
+          <div className={styles['detail-row']}>
+            <span className={styles['detail-label']}>Schedule and Location</span>
+            <span className={`${styles['detail-value']} ${styles['location-text']}`}>{eventData.location}</span>
           </div>
 
-          <div className="detail-row">
-            <span className="detail-label">Creator Fee</span>
-            <span className="detail-value">{eventData.creatorFee}</span>
+          <div className={styles['detail-row']}>
+            <span className={styles['detail-label']}>Creator Fee</span>
+            <span className={styles['detail-value']}>{eventData.creatorFee}</span>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="success-actions">
-          <button className="complete-button" onClick={handleComplete}>
+        <div className={styles['success-actions']}>
+          <button className={styles['complete-button']} onClick={handleComplete}>
             Complete
           </button>
-          <button className="share-button" onClick={handleShare}>
+          <button className={styles['share-button']} onClick={handleShare}>
             Share
           </button>
         </div>

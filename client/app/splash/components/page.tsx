@@ -1,23 +1,29 @@
 import Link from "next/link";
-import '@/styles/terms.css'
-import "@/styles/mobileview/terms.css";
+import styles from "@/styles/terms.module.css";
+import "@/styles/mobileview/terms.module.css";
 
 interface LegalContent {
-    param: string;
-    title: string;
-    content: string;
+  param: string;
+  title: string;
+  content: string;
 }
 
-export default function TermsAndPrivacyPage({ content } : { content: LegalContent }) {
+export default function TermsAndPrivacyPage({
+  content,
+}: {
+  content: LegalContent;
+}) {
   return (
-    <div className="main-container">
-      <div className="main">
-        <h1 className="header">{content?.title}</h1>
+    <div className={styles['main-container']}>
+      <div className={styles.main}>
+        <h1 className={styles.header}>{content?.title}</h1>
         <p
-          className="text-content"
-          dangerouslySetInnerHTML={{__html: typeof content?.content === 'string' ? content.content : ""}}
+          className={styles['text-content']}
+          dangerouslySetInnerHTML={{
+            __html: typeof content?.content === "string" ? content.content : "",
+          }}
         ></p>
-        <p className="agreement flex items-center justify-center gap-3">
+        <p className={`${styles.agreement} ${styles.flex} ${styles['items-center']} ${styles['justify-center']} ${styles['gap-3']}`}>
           {content?.param == "terms" && (
             <>
               <input type="checkbox" name="agree" id="checkbox" />
@@ -27,17 +33,21 @@ export default function TermsAndPrivacyPage({ content } : { content: LegalConten
             </>
           )}
         </p>
-        <p className="submit_next flex items-center justify-center">
+        <p className={`${styles.submit_next} ${styles.flex} ${styles['items-center']} ${styles['justify-center']}`}>
           {content?.param === "terms" ? (
             <>
               <Link href={"/onboarding/authenticate"}>
-                <button type="button" title="next_btn">Next</button>
+                <button type="button" title="next_btn">
+                  Next
+                </button>
               </Link>
             </>
           ) : (
             <>
               <Link href={"/splash/terms"}>
-                <button type="button" title="next_btn">Next</button>
+                <button type="button" title="next_btn">
+                  Next
+                </button>
               </Link>
             </>
           )}
@@ -46,3 +56,4 @@ export default function TermsAndPrivacyPage({ content } : { content: LegalConten
     </div>
   );
 }
+

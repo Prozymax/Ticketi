@@ -1,0 +1,65 @@
+:global(body) {
+  background: var(--splash-background);
+}
+
+.nav-bottom {
+  display: none;
+}
+
+.main {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-main {
+  /* Additional styles for home main if needed */
+}
+
+.logo-container {
+  width: 280px;
+  height: 280px;
+  display: flex;
+  font-size: 28px;
+  font-weight: 600;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo_text {
+  /* Logo text styles */
+}
+
+.color-span {
+  color: var(--accent);
+}
+
+/* Loading indicator styles */
+.loading-indicator {
+  position: absolute;
+  bottom: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
-import '@/styles/empty-events.css';
+import styles from '@/styles/empty-events.module.css';
 
 const EmptyTickets = () => {
   const router = useRouter();
@@ -16,10 +16,10 @@ const EmptyTickets = () => {
   };
 
   return (
-    <div className="empty-tickets-content">
+    <div className={styles['empty-tickets-content']}>
       {/* Empty State */}
-      <div className="empty-state">
-        <div className="empty-icon">
+      <div className={styles['empty-state']}>
+        <div className={styles['empty-icon']}>
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
             <path
               d="M15 25C15 21.6863 17.6863 19 21 19H59C62.3137 19 65 21.6863 65 25V55C65 58.3137 62.3137 61 59 61H21C17.6863 61 15 58.3137 15 55V25Z"
@@ -69,12 +69,12 @@ const EmptyTickets = () => {
           </svg>
         </div>
 
-        <div className="empty-content">
-          <h2 className="empty-title">Here is empty</h2>
-          <p className="empty-description">You have not bought any tickets</p>
+        <div className={styles['empty-content']}>
+          <h2 className={styles['empty-title']}>Here is empty</h2>
+          <p className={styles['empty-description']}>You have not bought any tickets</p>
         </div>
 
-        <button className="create-myevent-button" onClick={handleBrowseEvents}>
+        <button className={styles['create-myevent-button']} onClick={handleBrowseEvents}>
           Buy Tickets
         </button>
       </div>
@@ -83,3 +83,4 @@ const EmptyTickets = () => {
 };
 
 export default EmptyTickets;
+

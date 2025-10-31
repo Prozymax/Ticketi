@@ -1,7 +1,9 @@
 #vscode workspace
 .vscode
 
-./server/uploads
+# Uploads folder (user uploaded files)
+uploads/
+**/uploads/
 
 # Logs
 logs

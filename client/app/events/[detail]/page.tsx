@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import {eventAPI, followAPI} from "@/app/utils/api";
 import TicketModal from "@/app/buy-ticket/ticket/ticket";
-import "@/styles/event-details.css";
-import "@/styles/mobileview/event-details.css";
+import styles from "@/styles/event-details.module.css";
+import "@/styles/mobileview/event-details.module.css";
 import Link from "next/link";
 
 interface DatabaseEvent {
@@ -53,9 +53,9 @@ export default function EventDetailsPage() {
 
   // Add class to body to hide bottom navigation
   useEffect(() => {
-    document.body.classList.add('hide-bottom-nav');
+    document.body.classList.add("hide-bottom-nav");
     return () => {
-      document.body.classList.remove('hide-bottom-nav');
+      document.body.classList.remove("hide-bottom-nav");
     };
   }, []);
 
@@ -98,7 +98,9 @@ export default function EventDetailsPage() {
     const checkFollowStatus = async () => {
       if (event?.organizer?.id) {
         try {
-          const response = await followAPI.checkFollowStatus(event.organizer.id);
+          const response = await followAPI.checkFollowStatus(
+            event.organizer.id
+          );
           if (response.success && response.data) {
             setIsFollowing(response.data.isFollowing);
           }
@@ -120,7 +122,7 @@ export default function EventDetailsPage() {
 
     try {
       setFollowLoading(true);
-      
+
       if (isFollowing) {
         // Unfollow
         const response = await followAPI.unfollowUser(event.organizer.id);
@@ -160,7 +162,8 @@ export default function EventDetailsPage() {
 
   // Check if tickets are available
   const availableTickets = event ? event.regularTickets - event.ticketsSold : 0;
-  const isTicketAvailable = availableTickets > 0 && event?.status === 'published';
+  const isTicketAvailable =
+    availableTickets > 0 && event?.status === "published";
 
   // Helper functions to format data
   const formatDate = (dateStr: string) => {
@@ -191,16 +194,16 @@ export default function EventDetailsPage() {
 
   if (loading) {
     return (
-      <div className="event-details-container loading">
-        <div className="loading-spinner"></div>
+      <div className={`${styles["event-details-container"]} ${styles.loading}`}>
+        <div className={styles["loading-spinner"]}></div>
       </div>
     );
   }
 
   if (error || !event) {
     return (
-      <div className="event-details-container error">
-        <div className="error-message">
+      <div className={`${styles["event-details-container"]} ${styles.error}`}>
+        <div className={styles["error-message"]}>
           <h3>Error Loading Event</h3>
           <p>{error || "Event not found"}</p>
           <button type="button" onClick={() => router.back()}>
@@ -212,19 +215,23 @@ export default function EventDetailsPage() {
   }
 
   return (
-    <div className="event-details-container">
+    <div className={styles["event-details-container"]}>
       {/* Header */}
-      <header className="event-header">
-        <button title="back" className="back-button" onClick={handleBack}>
+      <header className={styles["event-header"]}>
+        <button
+          title="back"
+          className={styles["back-button"]}
+          onClick={handleBack}
+        >
           <ArrowLeft size={24} />
         </button>
-        <h1 className="header-title">Event Details</h1>
-        <div className="header-spacer"></div>
+        <h1 className={styles["header-title"]}>Event Details</h1>
+        <div className={styles["header-spacer"]}></div>
       </header>
 
       {/* Event Image */}
-      <div className="event-image-container">
-        <div className="event-image">
+      <div className={styles["event-image-container"]}>
+        <div className={styles["event-image"]}>
           <img
             src={event.eventImage || "/events/events_sample.jpg"}
             alt={event.title}
@@ -232,9 +239,9 @@ export default function EventDetailsPage() {
               (e.target as HTMLImageElement).src = "/events/events_sample.jpg";
             }}
           />
-          <div className="event-badge">
-            <span className="badge-icon">📅</span>
-            <span className="badge-text">
+          <div className={styles["event-badge"]}>
+            <span className={styles["badge-icon"]}>📅</span>
+            <span className={styles["badge-text"]}>
               in {calculateDaysUntil(event.startDate)} days
             </span>
           </div>
@@ -242,25 +249,28 @@ export default function EventDetailsPage() {
       </div>
 
       {/* Event Content */}
-      <div className="event-content">
+      <div className={styles["event-content"]}>
         {/* Host Section */}
         {event.organizer && (
-          <div className="host-section">
-            <div className="host-info">
-              <a href={`https://profiles.pinet.com/profiles/${event.organizer.username}`}>
-              <div className="host-avatar">
-                <img
-                  src={event.organizer.profileImage || "/Avatar.png"}
-                  alt={event.organizer.username}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/Avatar.png";
-                  }}
-                />
-                <div className="verified-badge">✓</div>
-              </div></a>
-              <div className="host-details">
-                <span className="host-label">Event Organizer</span>
-                <span className="host-name">
+          <div className={styles["host-section"]}>
+            <div className={styles["host-info"]}>
+              <a
+                href={`https://profiles.pinet.com/profiles/${event.organizer.username}`}
+              >
+                <div className={styles["host-avatar"]}>
+                  <img
+                    src={event.organizer.profileImage || "/Avatar.png"}
+                    alt={event.organizer.username}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/Avatar.png";
+                    }}
+                  />
+                  <div className={styles["verified-badge"]}>✓</div>
+                </div>
+              </a>
+              <div className={styles["host-details"]}>
+                <span className={styles["host-label"]}>Event Organizer</span>
+                <span className={styles["host-name"]}>
                   {event.organizer.firstName && event.organizer.lastName
                     ? `${event.organizer.firstName} ${event.organizer.lastName}`
                     : event.organizer.username}
@@ -269,7 +279,9 @@ export default function EventDetailsPage() {
             </div>
             <button
               type="button"
-              className={`follow-button ${isFollowing ? "following" : ""} ${followLoading ? "loading" : ""}`}
+              className={`follow-button ${isFollowing ? "following" : ""} ${
+                followLoading ? "loading" : ""
+              }`}
               onClick={handleFollow}
               disabled={followLoading}
             >
@@ -279,54 +291,52 @@ export default function EventDetailsPage() {
         )}
 
         {/* Event Title */}
-        <h2 className="event-detail-title">{event.title}</h2>
+        <h2 className={styles["event-detail-title"]}>{event.title}</h2>
 
         {/* Event Info */}
-        <div className="event-info">
-          <div className="info-item">
-            <MapPin size={20} className="info-icon" />
-            <span className="info-text">{event.location}</span>
+        <div className={styles["event-info"]}>
+          <div className={styles["info-item"]}>
+            <MapPin size={20} className={styles["info-icon"]} />
+            <span className={styles["info-text"]}>{event.location}</span>
           </div>
-          <div className="info-item">
-            <Calendar size={20} className="info-icon" />
-            <span className="info-text">
+          <div className={styles["info-item"]}>
+            <Calendar size={20} className={styles["info-icon"]} />
+            <span className={styles["info-text"]}>
               {formatDate(event.startDate)}
               {new Date(event.startDate).toDateString() !==
                 new Date(event.endDate).toDateString() &&
                 ` - ${formatDate(event.endDate)}`}
             </span>
           </div>
-          <div className="info-item">
-            <Clock size={20} className="info-icon" />
-            <span className="info-text">
+          <div className={styles["info-item"]}>
+            <Clock size={20} className={styles["info-icon"]} />
+            <span className={styles["info-text"]}>
               {formatTime(event.startDate)} - {formatTime(event.endDate)}
             </span>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="event-stats">
-          <div className="stat-item">
-            <Users className="stat-icon" />
-            <div className="stat-content">
-              <span className="stat-label">Tickets Sold</span>
-              <span className="stat-value">
-                {event.ticketsSold}
-              </span>
+        <div className={styles["event-stats"]}>
+          <div className={styles["stat-item"]}>
+            <Users className={styles["stat-icon"]} />
+            <div className={styles["stat-content"]}>
+              <span className={styles["stat-label"]}>Tickets Sold</span>
+              <span className={styles["stat-value"]}>{event.ticketsSold}</span>
             </div>
           </div>
-          <div className="stat-item">
-            <DollarSign className="stat-icon" />
-            <div className="stat-content">
-              <span className="stat-label">Price</span>
-              <span className="stat-value">{event.ticketPrice}π</span>
+          <div className={styles["stat-item"]}>
+            <DollarSign className={styles["stat-icon"]} />
+            <div className={styles["stat-content"]}>
+              <span className={styles["stat-label"]}>Price</span>
+              <span className={styles["stat-value"]}>{event.ticketPrice}π</span>
             </div>
           </div>
-          <div className="stat-item">
-            <Eye className="stat-icon" />
-            <div className="stat-content">
-              <span className="stat-label">Available</span>
-              <span className="stat-value">
+          <div className={styles["stat-item"]}>
+            <Eye className={styles["stat-icon"]} />
+            <div className={styles["stat-content"]}>
+              <span className={styles["stat-label"]}>Available</span>
+              <span className={styles["stat-value"]}>
                 {event.regularTickets - event.ticketsSold}
               </span>
             </div>
@@ -334,21 +344,25 @@ export default function EventDetailsPage() {
         </div>
 
         {/* About Event */}
-        <div className="about-section">
-          <h3 className="about-title">About Event</h3>
-          <p className="about-text">{event.description}</p>
+        <div className={styles["about-section"]}>
+          <h3 className={styles["about-title"]}>About Event</h3>
+          <p className={styles["about-text"]}>{event.description}</p>
         </div>
       </div>
       {/* Buy Ticket Button */}
-      <div className="buy-ticket-container">
-        <button 
-          disabled={!isTicketAvailable} 
-          className={`buy-ticket-button ${!isTicketAvailable ? 'disabled' : ''}`} 
+      <div className={styles["buy-ticket-container"]}>
+        <button
+          disabled={!isTicketAvailable}
+          className={`buy-ticket-button ${
+            !isTicketAvailable ? "disabled" : ""
+          }`}
           onClick={handleBuyTicket}
         >
-          {availableTickets === 0 ? 'Sold Out' : 
-           event?.status !== 'published' ? 'Not Available' : 
-           'Buy Ticket'}
+          {availableTickets === 0
+            ? "Sold Out"
+            : event?.status !== "published"
+            ? "Not Available"
+            : "Buy Ticket"}
         </button>
       </div>
 
@@ -361,7 +375,9 @@ export default function EventDetailsPage() {
             id: event.id,
             title: event.title,
             image: event.eventImage || "/events/events_sample.jpg",
-            ticketPrice: parseFloat(event.ticketPrice.toString().replace(/[^\d.]/g, '')),
+            ticketPrice: parseFloat(
+              event.ticketPrice.toString().replace(/[^\d.]/g, "")
+            ),
             availableTickets: availableTickets,
           }}
         />

@@ -1,6 +1,6 @@
 "use client";
-import "@/styles/splash.css";
-import "@/styles/mobileview/splash.css";
+import styles from "@/styles/splash.module.css";
+import "@/styles/mobileview/splash.module.css";
 import {useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 
@@ -15,9 +15,9 @@ export default function LandingPage() {
         // Import the utility (dynamic import for client-side only)
         import("./utils/userStorage").then(({UserStorage}) => {
           // Check for authentication tokens (both UserStorage and pioneer-key)
-          const userToken = UserStorage.getUserToken();
-          const pioneerKey = localStorage.getItem("pioneer-key");
-          const isLoggedIn = UserStorage.isLoggedIn() || !!pioneerKey;
+          // const userToken = UserStorage.getUserToken();
+          // const pioneerKey = localStorage.getItem("pioneer-key");
+          // const isLoggedIn = UserStorage.isLoggedIn() || !!pioneerKey;
 
           // If user is already logged in and has a valid token, go to events
           // if (isLoggedIn && (userToken || pioneerKey)) {
@@ -51,15 +51,15 @@ export default function LandingPage() {
   }, [router]);
 
   return (
-    <main className="flex flex-col items-center main home-main">
-      <div className="logo-container">
-        <p className="logo_text">
-          Ticket<span className="color-span">i</span>
+    <main className={`${styles.main} ${styles["home-main"]}`}>
+      <div className={styles["logo-container"]}>
+        <p className={styles.logo_text}>
+          Ticket<span className={styles["color-span"]}>i</span>
         </p>
       </div>
       {isLoading && (
-        <div className="loading-indicator">
-          <div className="loading-spinner"></div>
+        <div className={styles["loading-indicator"]}>
+          <div className={styles["loading-spinner"]}></div>
         </div>
       )}
     </main>

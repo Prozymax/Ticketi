@@ -7,8 +7,8 @@ import {apiService} from "../lib/api";
 import {formatError, logError} from "../utils/errorHandler";
 import ErrorDisplay from "../components/ErrorDisplay";
 import Image from "next/image";
-import "@/styles/login.css";
-import "@/styles/mobileview/login.css";
+import styles from "@/styles/login.module.css";
+import "@/styles/mobileview/login.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,46 +37,48 @@ export default function LoginPage() {
       }
 
       // If not authenticated, check for stored username (client-side only)
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const storedUsername = localStorage.getItem("pi_username");
-      if (storedUsername) {
-        console.log("Found stored username:", storedUsername);
-        setUsername(storedUsername);
+        if (storedUsername) {
+          console.log("Found stored username:", storedUsername);
+          setUsername(storedUsername);
 
-        // Automatically verify the stored username
-        try {
-          setIsCheckingUser(true);
-          const response = await apiService.confirmUserVerification(
-            storedUsername
-          );
+          // Automatically verify the stored username
+          try {
+            setIsCheckingUser(true);
+            const response = await apiService.confirmUserVerification(
+              storedUsername
+            );
 
-          if (!response.error && response.verified) {
-            // User exists and is verified
-            setUserVerificationStatus({
-              isVerified: response.user.is_verified,
-              username: response.user.username,
-            });
-            setShowUsernameInput(false);
-            console.log("Stored username verified successfully");
-          } else {
-            // User doesn't exist or is not verified - clear stored username and show input
-            console.log("Stored username not verified, clearing and showing input");
-            localStorage.removeItem("pi_username");
+            if (!response.error && response.verified) {
+              // User exists and is verified
+              setUserVerificationStatus({
+                isVerified: response.user.is_verified,
+                username: response.user.username,
+              });
+              setShowUsernameInput(false);
+              console.log("Stored username verified successfully");
+            } else {
+              // User doesn't exist or is not verified - clear stored username and show input
+              console.log(
+                "Stored username not verified, clearing and showing input"
+              );
+              localStorage.removeItem("pi_username");
+              setShowUsernameInput(true);
+              setUserVerificationStatus(null);
+            }
+          } catch (error) {
+            logError("Username Verification", error);
+            // On error, show input for manual entry
             setShowUsernameInput(true);
             setUserVerificationStatus(null);
+          } finally {
+            setIsCheckingUser(false);
           }
-        } catch (error) {
-          logError("Username Verification", error);
-          // On error, show input for manual entry
+        } else {
+          // No stored username, show input
           setShowUsernameInput(true);
-          setUserVerificationStatus(null);
-        } finally {
-          setIsCheckingUser(false);
         }
-      } else {
-        // No stored username, show input
-        setShowUsernameInput(true);
-      }
       } else {
         // Server-side rendering, show input
         setShowUsernameInput(true);
@@ -88,7 +90,11 @@ export default function LoginPage() {
 
   // Store username when user data becomes available after authentication
   useEffect(() => {
-    if (typeof window !== 'undefined' && user?.username && !localStorage.getItem("pi_username")) {
+    if (
+      typeof window !== "undefined" &&
+      user?.username &&
+      !localStorage.getItem("pi_username")
+    ) {
       localStorage.setItem("pi_username", user.username);
       console.log(
         "Username stored in localStorage after login:",
@@ -133,17 +139,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-container">
+    <div className={styles["login-container"]}>
       {/* Header with back button */}
 
       {/* Main content */}
-      <div className="content">
+      <div className={styles.content}>
         {/* Profile section */}
-        <div className="profile-section">
-          <div className="avatar-container">
-            <img src="/Avatar.png" alt="Profile avatar" className="avatar" />
+        <div className={styles["profile-section"]}>
+          <div className={styles["avatar-container"]}>
+            <img
+              src="/Avatar.png"
+              alt="Profile avatar"
+              className={styles.avatar}
+            />
             {user?.isVerified && (
-              <div className="verified-badge">
+              <div className={styles["verified-badge"]}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M9 12L11 14L15 10"
@@ -157,25 +167,27 @@ export default function LoginPage() {
             )}
           </div>
 
-          <h1 className="welcome-title">
+          <h1 className={styles["welcome-title"]}>
             {user ? `Welcome Back, ${user.username}!` : "Welcome Back!"}
           </h1>
-          {user && <div className="username-display">{user.username}</div>}
+          {user && (
+            <div className={styles["username-display"]}>{user.username}</div>
+          )}
         </div>
 
         {/* Authentication section */}
-        <div className="auth-section">
-          <div className="auth-card">
+        <div className={styles["auth-section"]}>
+          <div className={styles["auth-card"]}>
             <button
-              className={`pi-auth-button ${isLoading ? "loading" : ""} ${
-                !isSDKReady ? "disabled" : ""
-              }`}
+              className={`${styles["pi-auth-button"]} ${
+                isLoading ? styles.loading : ""
+              } ${!isSDKReady ? styles.disabled : ""}`}
               onClick={handlePiNetworkAuth}
               disabled={isLoading || !isSDKReady}
             >
               {isLoading ? (
                 <>
-                  <div className="loading-spinner"></div>
+                  <div className={styles["loading-spinner"]}></div>
                   Authenticating...
                 </>
               ) : !isSDKReady ? (

@@ -1,0 +1,290 @@
+/* Empty Events Styles */
+.empty-events-container {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.empty-events-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-title {
+  font-family: var(--font-fredoka);
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--foreground);
+}
+
+.add-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--foreground);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  padding: 0 1.5rem;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  padding: 1rem 0;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.tab-button.active {
+  color: var(--secondary);
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--secondary);
+  border-radius: 1px;
+}
+
+.tab-button:hover:not(.active) {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Empty State */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  min-height: 60vh;
+}
+
+.empty-icon {
+  margin-bottom: 2rem;
+  color: rgba(255, 255, 255, 0.4);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.empty-content {
+  margin-bottom: 3rem;
+}
+
+.empty-title {
+  font-family: var(--font-fredoka);
+  font-size: 1.75rem;
+  margin: 0 0 1rem 0;
+  color: var(--foreground);
+}
+
+.empty-description {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Create Event Button */
+.create-myevent-button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: .6rem;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 800px;
+}
+
+.create-myevent-button:hover {
+  background: var(--secondary);
+  transform: translateY(-2px);
+}
+
+.create-myevent-button:active {
+  transform: translateY(0);
+}
+
+@media screen and (max-width: 768px) {
+  .create-myevent-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    min-width: 400px;
+    margin-block: 3rem;
+  }
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .empty-events-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .empty-events-header {
+    padding: 2rem 2rem 1.5rem 2rem;
+  }
+
+  .header-title {
+    font-size: 1.75rem;
+  }
+
+  .tab-navigation {
+    padding: 0 2rem;
+    gap: 3rem;
+  }
+
+  .tab-button {
+    font-size: 1.125rem;
+  }
+
+  .empty-state {
+    padding: 3rem 2rem;
+  }
+
+  .empty-icon {
+    margin-bottom: 2.5rem;
+  }
+
+  .empty-title {
+    font-size: 2rem;
+  }
+
+  .empty-description {
+    font-size: 1.125rem;
+  }
+
+  .create-myevent-button {
+    padding: 1.25rem 2.5rem;
+    font-size: 1.25rem;
+    min-width: 500px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .empty-events-container {
+    max-width: 800px;
+  }
+
+  .empty-state {
+    min-height: 70vh;
+  }
+
+  .empty-icon {
+    margin-bottom: 3rem;
+  }
+
+  .empty-icon svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  .empty-title {
+    font-size: 2.25rem;
+  }
+
+  .empty-content {
+    margin-bottom: 4rem;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+  .empty-events-header {
+    padding: 1rem;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+  }
+
+  .add-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tab-navigation {
+    padding: 0 1rem;
+    gap: 1.5rem;
+  }
+
+  .tab-button {
+    font-size: 0.95rem;
+  }
+
+  .empty-state {
+    padding: 1.5rem 1rem;
+    min-height: 50vh;
+  }
+
+  .empty-icon {
+    margin-bottom: 1.5rem;
+  }
+
+  .empty-icon svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+  }
+
+  .empty-description {
+    font-size: 0.95rem;
+  }
+
+  .empty-content {
+    margin-bottom: 2rem;
+  }
+
+  .create-myevent-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    min-width: 350px;
+    margin-block: 3rem;
+  }
+}

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import Ticket from '@/app/ticketProp/component/ticket';
-import '@/styles/event-hub.css';
+import styles from '@/styles/event-hub.module.css';
 
 interface TicketsProps {
   tickets?: unknown[];
@@ -69,11 +69,11 @@ const Tickets = ({ tickets: propTickets }: TicketsProps) => {
   };
 
   return (
-    <div className="tickets-content">
+    <div className={styles['tickets-content']}>
       {/* Tickets List */}
-      <div className="tickets-list">
+      <div className={styles['tickets-list']}>
         {ticketsData.map((ticket, index) => (
-          <div key={ticket.id} className="ticket-item">
+          <div key={ticket.id} className={styles['ticket-item']}>
             <Ticket
               ticketData={ticket}
               onDownload={() => handleDownloadTicket(ticket.id)}
@@ -87,3 +87,4 @@ const Tickets = ({ tickets: propTickets }: TicketsProps) => {
 };
 
 export default Tickets;
+

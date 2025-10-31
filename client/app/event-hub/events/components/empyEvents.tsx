@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
-import '@/styles/empty-events.css';
+import styles from '@/styles/empty-events.module.css';
 
 const EmptyEvents = () => {
   const router = useRouter();
@@ -12,10 +12,10 @@ const EmptyEvents = () => {
   };
 
   return (
-    <div className="empty-events-content">
+    <div className={styles['empty-events-content']}>
       {/* Empty State */}
-      <div className="empty-state">
-        <div className="empty-icon">
+      <div className={styles['empty-state']}>
+        <div className={styles['empty-icon']}>
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
             <path
               d="M20 15C18.3431 15 17 16.3431 17 18V62C17 63.6569 18.3431 65 20 65H60C61.6569 65 63 63.6569 63 62V18C63 16.3431 61.6569 15 60 15H20Z"
@@ -61,12 +61,12 @@ const EmptyEvents = () => {
           </svg>
         </div>
 
-        <div className="empty-content">
-          <h2 className="empty-title">Here is empty</h2>
-          <p className="empty-description">You have not created an event</p>
+        <div className={styles['empty-content']}>
+          <h2 className={styles['empty-title']}>Here is empty</h2>
+          <p className={styles['empty-description']}>You have not created an event</p>
         </div>
 
-        <button className="create-myevent-button" onClick={handleCreateEvent}>
+        <button className={styles['create-myevent-button']} onClick={handleCreateEvent}>
           Create Event Ticket
         </button>
       </div>
@@ -75,3 +75,4 @@ const EmptyEvents = () => {
 };
 
 export default EmptyEvents;
+

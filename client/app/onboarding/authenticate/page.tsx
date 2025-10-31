@@ -1,7 +1,7 @@
 "use client";
 import {useState, useEffect} from "react";
 import {slides} from "@/onboarding_data";
-import "@/styles/onboarding.css";
+import styles from "@/styles/onboarding.module.css";
 import OnboardingSlide from "./components/page";
 import {usePiNetwork} from "@/app/hooks/usePiNetwork";
 import {useRouter} from "next/navigation";
@@ -114,15 +114,15 @@ export default function OnboardingCarousel() {
   };
 
   return (
-    <div className="onboarding-container">
+    <div className={styles["onboarding-container"]}>
       <div
-        className="slides-wrapper"
+        className={styles["slides-wrapper"]}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         {/* Slides */}
-        <div className="slides-content">
+        <div className={styles["slides-content"]}>
           {slides.map((data, idx) => (
             <div
               key={idx}
@@ -134,7 +134,7 @@ export default function OnboardingCarousel() {
         </div>
 
         {/* Navigation Dots */}
-        <div className="nav-dots">
+        <div className={styles["nav-dots"]}>
           {slides.map((_, idx) => (
             <button
               type="button"
@@ -148,7 +148,7 @@ export default function OnboardingCarousel() {
       </div>
 
       {/* Static Authentication Button */}
-      <div className="auth-section">
+      <div className={styles["auth-section"]}>
         <button
           type="button"
           title="Authenticate with Pi Network"
@@ -160,7 +160,7 @@ export default function OnboardingCarousel() {
         >
           {isLoading ? (
             <>
-              <div className="loading-spinner"></div>
+              <div className={styles["loading-spinner"]}></div>
               Authenticating...
             </>
           ) : !isSDKReady ? (

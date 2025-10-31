@@ -1,0 +1,227 @@
+:global(body) {
+  background: var(--splash-background)
+}
+
+.finalizing-profile-container {
+  min-height: 100vh;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 400px;
+  padding: 40px 24px;
+}
+
+/* Spinner */
+.spinner-container {
+  margin-bottom: 60px;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: inline-block;
+}
+
+.spinner-segment {
+  position: absolute;
+  width: 4px;
+  height: 16px;
+  background: #FF6B9D;
+  border-radius: 2px;
+  animation: spinner-fade 1.2s linear infinite;
+}
+
+.spinner-segment:nth-child(1) {
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 0s;
+}
+
+.spinner-segment:nth-child(2) {
+  top: 6px;
+  right: 6px;
+  transform: rotate(45deg);
+  animation-delay: -0.15s;
+}
+
+.spinner-segment:nth-child(3) {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%) rotate(90deg);
+  animation-delay: -0.3s;
+}
+
+.spinner-segment:nth-child(4) {
+  bottom: 3px;
+  right: 6px;
+  transform: rotate(135deg);
+  animation-delay: -0.45s;
+}
+
+.spinner-segment:nth-child(5) {
+  bottom: -10%;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+  animation-delay: -0.6s;
+}
+
+.spinner-segment:nth-child(6) {
+  bottom: 3px;
+  left: 6px;
+  transform: rotate(225deg);
+  animation-delay: -0.75s;
+}
+
+.spinner-segment:nth-child(7) {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%) rotate(270deg);
+  animation-delay: -0.9s;
+}
+
+.spinner-segment:nth-child(8) {
+  top: 6px;
+  left: 6px;
+  transform: rotate(315deg);
+  animation-delay: -1.05s;
+}
+
+@keyframes spinner-fade {
+  0%, 39%, 100% {
+    opacity: 0.3;
+    transform-origin: center;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* Text content */
+.text-content {
+  margin-bottom: 40px;
+}
+
+.title {
+  font-size: 28px;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+  color: white;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Progress indicator (optional) */
+.progress-indicator {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF6B9D 0%, #B794F6 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* Responsive design for larger screens */
+@media (min-width: 768px) {
+  .content {
+    max-width: 480px;
+    padding: 60px 40px;
+  }
+  
+  .spinner {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .spinner-segment {
+    width: 5px;
+    height: 20px;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+  
+  .subtitle {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content {
+    max-width: 520px;
+    padding: 80px 60px;
+  }
+  
+  .spinner {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .spinner-segment {
+    width: 6px;
+    height: 24px;
+  }
+  
+  .title {
+    font-size: 36px;
+  }
+  
+  .subtitle {
+    font-size: 20px;
+  }
+}
+
+/* Animation for smooth entrance */
+.content {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -6,7 +6,7 @@ import Image from "next/image";
 import {useTicketPurchase} from "../../hooks/useTicketPurchase";
 import {apiService} from "../../lib/api";
 import ErrorDisplay from "../../components/ErrorDisplay";
-import "@/styles/ticket-modal.css";
+import styles from "@/styles/ticket-modal.module.css";
 
 interface Ticket {
   id: string;
@@ -54,7 +54,8 @@ export default function TicketModal({
   const blockchainFee = 0.1;
   const subtotal = ticketPrice * quantity;
   const total = subtotal + platformFee + blockchainFee;
-  const maxQuantity = selectedTicket?.availableQuantity || event.availableTickets || 0;
+  const maxQuantity =
+    selectedTicket?.availableQuantity || event.availableTickets || 0;
 
   // Load tickets when modal opens
   useEffect(() => {
@@ -86,54 +87,63 @@ export default function TicketModal({
     try {
       setLoadingTickets(true);
       setTicketError(null);
-      
+
       console.log("Loading tickets for event:", event.id);
       const response = await apiService.getEventTickets(event.id);
       console.log("Tickets API response:", response);
-      
-      if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
+
+      if (
+        response.success &&
+        response.data &&
+        Array.isArray(response.data) &&
+        response.data.length > 0
+      ) {
         const ticketList = response.data;
         setTickets(ticketList);
         console.log("Loaded tickets from API:", ticketList);
-        
+
         // Auto-select first available ticket
-        const availableTicket = ticketList.find((t: Ticket) => t.isActive && t.availableQuantity > 0);
+        const availableTicket = ticketList.find(
+          (t: Ticket) => t.isActive && t.availableQuantity > 0
+        );
         if (availableTicket) {
           setSelectedTicket(availableTicket);
           console.log("Auto-selected ticket:", availableTicket);
         }
       } else {
         // Fallback: Create a ticket from event data if no tickets exist
-        console.log("No tickets found in API, creating fallback ticket from event data");
+        console.log(
+          "No tickets found in API, creating fallback ticket from event data"
+        );
         const fallbackTicket: Ticket = {
           id: `fallback-${event.id}`,
-          ticketType: 'regular',
+          ticketType: "regular",
           price: event.ticketPrice || 0,
           totalQuantity: event.availableTickets || 0,
           availableQuantity: event.availableTickets || 0,
           soldQuantity: 0,
-          isActive: true
+          isActive: true,
         };
-        
+
         setTickets([fallbackTicket]);
         setSelectedTicket(fallbackTicket);
         console.log("Created fallback ticket:", fallbackTicket);
       }
     } catch (error) {
       console.error("Error loading tickets:", error);
-      
+
       // Fallback: Create a ticket from event data on error
       console.log("API error, creating fallback ticket from event data");
       const fallbackTicket: Ticket = {
         id: `fallback-${event.id}`,
-        ticketType: 'regular',
+        ticketType: "regular",
         price: event.ticketPrice || 0,
         totalQuantity: event.availableTickets || 0,
         availableQuantity: event.availableTickets || 0,
         soldQuantity: 0,
-        isActive: true
+        isActive: true,
       };
-      
+
       setTickets([fallbackTicket]);
       setSelectedTicket(fallbackTicket);
       setTicketError(null); // Clear error since we have fallback
@@ -151,7 +161,7 @@ export default function TicketModal({
 
   const handleTicketTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const ticketId = e.target.value;
-    const ticket = tickets.find(t => t.id === ticketId);
+    const ticket = tickets.find((t) => t.id === ticketId);
     if (ticket) {
       setSelectedTicket(ticket);
       // Reset quantity if current quantity exceeds new ticket's availability
@@ -173,12 +183,17 @@ export default function TicketModal({
     console.log("Confirming payment for ticket:", selectedTicket);
 
     // For fallback tickets, skip API availability check
-    if (!selectedTicket.id.startsWith('fallback-')) {
+    if (!selectedTicket.id.startsWith("fallback-")) {
       try {
-        const availabilityResponse = await apiService.checkTicketAvailability(selectedTicket.id, quantity);
-        
+        const availabilityResponse = await apiService.checkTicketAvailability(
+          selectedTicket.id,
+          quantity
+        );
+
         if (!availabilityResponse.success) {
-          setTicketError(availabilityResponse.message || "Ticket not available");
+          setTicketError(
+            availabilityResponse.message || "Ticket not available"
+          );
           return;
         }
       } catch (error) {
@@ -189,7 +204,7 @@ export default function TicketModal({
     }
 
     // For fallback tickets, navigate directly to payment without creating purchase record
-    if (selectedTicket.id.startsWith('fallback-')) {
+    if (selectedTicket.id.startsWith("fallback-")) {
       console.log("Using fallback ticket, navigating directly to payment");
       router.push(
         `/buy-ticket/payment?eventId=${event.id}&quantity=${quantity}&total=${total}&ticketType=${selectedTicket.ticketType}&fallback=true`
@@ -219,14 +234,17 @@ export default function TicketModal({
   if (!isOpen) return null;
 
   return (
-    <div className="ticket-modal-overlay" onClick={onClose}>
-      <div className="ticket-modal" onClick={(e) => e.stopPropagation()}>
+    <div className={styles["ticket-modal-overlay"]} onClick={onClose}>
+      <div
+        className={styles["ticket-modal"]}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="ticket-modal-header">
+        <div className={styles["ticket-modal-header"]}>
           <button
             title="Back"
             type="button"
-            className="back-button"
+            className={styles["back-button"]}
             onClick={onClose}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -239,35 +257,35 @@ export default function TicketModal({
               />
             </svg>
           </button>
-          <h1 className="modal-title">Event Details</h1>
-          <div className="header-spacer"></div>
+          <h1 className={styles["modal-title"]}>Event Details</h1>
+          <div className={styles["header-spacer"]}></div>
         </div>
 
         {/* Progress Bar */}
-        <div className="progress-container">
-          <div className="progress-bar">
-            <div className="progress-fill"></div>
+        <div className={styles["progress-container"]}>
+          <div className={styles["progress-bar"]}>
+            <div className={styles["progress-fill"]}></div>
           </div>
-          <div className="progress-step active">
+          <div className={`${styles["progress-step"]} ${styles.active}`}>
             <span>Select Tickets</span>
           </div>
         </div>
 
         {/* Event Image */}
-        <div className="event-image-container">
+        <div className={styles["event-image-container"]}>
           <Image
             src={event.image || "/event-placeholder.jpg"}
             alt={event.title}
             width={400}
             height={200}
-            className="event-image"
+            className={styles["event-image"]}
           />
         </div>
 
         {/* Available Tickets */}
-        <div className="available-tickets">
-          <span className="available-label">Available Tickets</span>
-          <div className="ticket-count">
+        <div className={styles["available-tickets"]}>
+          <span className={styles["available-label"]}>Available Tickets</span>
+          <div className={styles["ticket-count"]}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path
                 d="M15 5v2M15 11v2M15 17v2M5 5h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4V7a2 2 0 0 1 2-2z"
@@ -280,11 +298,13 @@ export default function TicketModal({
         </div>
 
         {/* Ticket Selection */}
-        <div className="ticket-selection">
-          <div className="form-group">
-            <label className="form-label">Ticket Type</label>
+        <div className={styles["ticket-selection"]}>
+          <div className={styles["form-group"]}>
+            <label className={styles["form-label"]}>Ticket Type</label>
             {loadingTickets ? (
-              <div className="loading-placeholder">Loading tickets...</div>
+              <div className={styles["loading-placeholder"]}>
+                Loading tickets...
+              </div>
             ) : tickets.length > 0 ? (
               <select
                 title="ticket-type"
@@ -293,28 +313,33 @@ export default function TicketModal({
                   console.log("Ticket selection changed:", e.target.value);
                   handleTicketTypeChange(e);
                 }}
-                className="ticket-type-select"
+                className={styles["ticket-type-select"]}
               >
                 <option value="">Select ticket type</option>
                 {tickets
-                  .filter(ticket => ticket.isActive && ticket.availableQuantity > 0)
-                  .map(ticket => (
+                  .filter(
+                    (ticket) => ticket.isActive && ticket.availableQuantity > 0
+                  )
+                  .map((ticket) => (
                     <option key={ticket.id} value={ticket.id}>
-                      {ticket.ticketType} - {ticket.price}π ({ticket.availableQuantity} available)
+                      {ticket.ticketType} - {ticket.price}π (
+                      {ticket.availableQuantity} available)
                     </option>
-                  ))
-                }
+                  ))}
               </select>
             ) : (
-              <div className="no-tickets" style={{ color: "#ef4444", padding: "10px", textAlign: "center" }}>
+              <div
+                className={styles["no-tickets"]}
+                style={{color: "#ef4444", padding: "10px", textAlign: "center"}}
+              >
                 No tickets available - Check event status
               </div>
             )}
           </div>
 
           {selectedTicket && (
-            <div className="form-group">
-              <label className="form-label">
+            <div className={styles["form-group"]}>
+              <label className={styles["form-label"]}>
                 How many tickets you want to buy?
               </label>
               <input
@@ -324,7 +349,7 @@ export default function TicketModal({
                 max={maxQuantity}
                 value={quantity}
                 onChange={handleQuantityChange}
-                className="quantity-input"
+                className={styles["quantity-input"]}
                 disabled={maxQuantity === 0}
               />
             </div>
@@ -332,28 +357,36 @@ export default function TicketModal({
         </div>
 
         {/* Price Breakdown */}
-        <div className="price-breakdown">
-          <div className="price-row">
-            <span className="price-label">{quantity} Ticket Price</span>
-            <span className="price-value">{subtotal.toFixed(2)}π</span>
+        <div className={styles["price-breakdown"]}>
+          <div className={styles["price-row"]}>
+            <span className={styles["price-label"]}>
+              {quantity} Ticket Price
+            </span>
+            <span className={styles["price-value"]}>
+              {subtotal.toFixed(2)}π
+            </span>
           </div>
-          <div className="price-row">
-            <span className="price-label">Platform fee</span>
-            <span className="price-value">{platformFee.toFixed(1)}π</span>
+          <div className={styles["price-row"]}>
+            <span className={styles["price-label"]}>Platform fee</span>
+            <span className={styles["price-value"]}>
+              {platformFee.toFixed(1)}π
+            </span>
           </div>
-          <div className="price-row">
-            <span className="price-label">Blockchain fee</span>
-            <span className="price-value">{blockchainFee.toFixed(1)}π</span>
+          <div className={styles["price-row"]}>
+            <span className={styles["price-label"]}>Blockchain fee</span>
+            <span className={styles["price-value"]}>
+              {blockchainFee.toFixed(1)}π
+            </span>
           </div>
-          <div className="price-row total-row">
-            <span className="price-label">Total</span>
-            <span className="price-value">{total.toFixed(1)}π</span>
+          <div className={`${styles["price-row"]} ${styles["total-row"]}`}>
+            <span className={styles["price-label"]}>Total</span>
+            <span className={styles["price-value"]}>{total.toFixed(1)}π</span>
           </div>
         </div>
 
         {/* Error Message */}
         {(purchaseError || ticketError) && (
-          <div style={{ padding: "0 20px" }}>
+          <div style={{padding: "0 20px"}}>
             <ErrorDisplay
               error={purchaseError || ticketError}
               title="Purchase Error"
@@ -379,25 +412,32 @@ export default function TicketModal({
         </div> */}
 
         {/* Confirm Button */}
-        <div className="confirm-section">
+        <div className={styles["confirm-section"]}>
           <button
-            className={`confirm-button ${isLoading || loadingTickets || !selectedTicket ? "loading" : ""}`}
+            className={`confirm-button ${
+              isLoading || loadingTickets || !selectedTicket ? "loading" : ""
+            }`}
             onClick={() => {
               console.log("Confirm button clicked!");
               console.log("Selected ticket:", selectedTicket);
               console.log("Quantity:", quantity);
               handleConfirmPayment();
             }}
-            disabled={isLoading || loadingTickets || !selectedTicket || maxQuantity === 0}
+            disabled={
+              isLoading ||
+              loadingTickets ||
+              !selectedTicket ||
+              maxQuantity === 0
+            }
           >
             {isLoading ? (
               <>
-                <div className="loading-spinner"></div>
+                <div className={styles["loading-spinner"]}></div>
                 Processing...
               </>
             ) : loadingTickets ? (
               <>
-                <div className="loading-spinner"></div>
+                <div className={styles["loading-spinner"]}></div>
                 Loading...
               </>
             ) : !selectedTicket ? (

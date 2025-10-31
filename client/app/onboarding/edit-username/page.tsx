@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import '@/styles/edit-username.css';
-import '@/styles/mobileview/edit-username.css';
+import {useState, useEffect} from "react";
+import {useRouter} from "next/navigation";
+import Image from "next/image";
+import styles from "@/styles/edit-username.module.css";
+import "@/styles/mobileview/edit-username.module.css";
 
 export default function EditUsernamePage() {
-  const [username, setUsername] = useState('pioneer');
+  const [username, setUsername] = useState("pioneer");
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -23,8 +23,8 @@ export default function EditUsernamePage() {
   const handleContinue = () => {
     // Save username to localStorage
     localStorage.setItem("pi_username", username);
-    console.log('Username updated:', username);
-    router.push('/onboarding/finalizing-profile');
+    console.log("Username updated:", username);
+    router.push("/onboarding/finalizing-profile");
   };
 
   const handleBack = () => {
@@ -34,9 +34,9 @@ export default function EditUsernamePage() {
   // Show loading state while checking localStorage
   if (isLoading) {
     return (
-      <div className="edit-username-container">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
+      <div className={styles["edit-username-container"]}>
+        <div className={styles["loading-container"]}>
+          <div className={styles["loading-spinner"]}></div>
           <p>Loading...</p>
         </div>
       </div>
@@ -44,13 +44,13 @@ export default function EditUsernamePage() {
   }
 
   return (
-    <div className="edit-username-container">
+    <div className={styles["edit-username-container"]}>
       {/* Header with back button and progress indicator */}
-      <div className="header">
+      <div className={styles.header}>
         <button
           type="button"
           title="back-button"
-          className="back-button"
+          className={styles["back-button"]}
           onClick={handleBack}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -66,23 +66,23 @@ export default function EditUsernamePage() {
       </div>
 
       <main>
-        <div className="progress-indicator">
-          <div className="progress-bar"></div>
-          <div className="progress-dot"></div>
+        <div className={styles["progress-indicator"]}>
+          <div className={styles["progress-bar"]}></div>
+          <div className={styles["progress-dot"]}></div>
         </div>
 
         {/* Main content */}
-        <div className="content">
+        <div className={styles.content}>
           {/* Profile section */}
-          <div className="profile-section">
-            <div className="avatar-container">
+          <div className={styles["profile-section"]}>
+            <div className={styles["avatar-container"]}>
               <Image
                 width={90}
                 height={90}
                 src="/Avatar.png"
                 alt="user-male-circle--v2"
               />
-              <div className="verified-badge">
+              <div className={styles["verified-badge"]}>
                 <Image
                   width={80}
                   height={80}
@@ -91,44 +91,51 @@ export default function EditUsernamePage() {
                 />
               </div>
             </div>
-            <div className="username-display">{username}</div>
+            <div className={styles["username-display"]}>{username}</div>
           </div>
 
           {/* Title and description */}
-          <div className="title-section">
-            <h1 className="title">Personalize with Brand Name</h1>
-            <p className="description">
+          <div className={styles["title-section"]}>
+            <h1 className={styles.title}>Personalize with Brand Name</h1>
+            <p className={styles.description}>
               This is what your event ticket will be recognized with whenever
               you create a ticket a
             </p>
           </div>
 
           {/* Username input */}
-          <div className="input-section">
+          <div className={styles["input-section"]}>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="username-input"
+              className={styles["username-input"]}
               placeholder="Enter username"
             />
           </div>
 
           {/* Continue button */}
-          <button type="button" className="continue-button" onClick={handleContinue}>
+          <button
+            type="button"
+            className={styles["continue-button"]}
+            onClick={handleContinue}
+          >
             Continue
           </button>
 
           {/* Footer links */}
-          <div className="footer-links">
+          <div className={styles["footer-links"]}>
             <p>
-              <span className="footer-text">
+              <span className={styles["footer-text"]}>
                 Don&apos;t know a brandname? Create with{" "}
               </span>
-              <span className="pi-link">Pi Domain</span>
-              <span className="footer-text"> and secure your brand.</span>
+              <span className={styles["pi-link"]}>Pi Domain</span>
+              <span className={styles["footer-text"]}>
+                {" "}
+                and secure your brand.
+              </span>
             </p>
-            <div className="mint-link">Mint with Pi Domain</div>
+            <div className={styles["mint-link"]}>Mint with Pi Domain</div>
           </div>
         </div>
       </main>

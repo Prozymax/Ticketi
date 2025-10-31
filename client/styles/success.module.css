@@ -1,0 +1,66 @@
+/* Success Page Styles */
+.success-container {
+  min-height: 100vh;
+  background: var(--splash-background);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Logo Section */
+.success-logo {
+  margin-bottom: 60px;
+}
+
+.logo-text {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}
+
+.logo-accent {
+  color: var(--accent);
+}
+
+/* Congratulations Section */
+.congratulations-section {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.celebration-icons {
+  position: relative;
+  margin-bottom: 20px;
+  height: 60px;
+}
+
+.celebration-icon {
+  font-size: 32px;
+  position: absolute;
+  animation: bounce 2s infinite;
+}
+
+.celebration-icon.left {
+  left: -40px;
+  top: 0;
+  animation-delay: 0.2s;
+}
+
+.celebration-icon.right {
+  right: -40px;
+  top: 0;
+  animation-delay: 0.4s;
+}
+
+.confetti {
+  position: absolute;
+  font-size: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+

@@ -1,0 +1,235 @@
+:global(body) {
+  background: var(--splash-background)
+}
+
+.completed-container {
+  min-height: 100vh;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 100%;
+  padding: 40px 24px;
+  width: 100%;
+}
+
+/* Success icon */
+.success-icon-container {
+  margin-bottom: 60px;
+  animation: successBounce 0.8s ease-out;
+}
+
+.success-icon {
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+  position: relative;
+}
+
+.success-icon::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.3;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes successBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(30px);
+  }
+  50% {
+    transform: scale(1.1) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.1;
+  }
+}
+
+/* Text content */
+.text-content {
+  margin-bottom: 80px;
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+  color: white;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.4;
+  max-width: 320px;
+}
+
+/* Explore button */
+.explore-button {
+  width: 100%;
+  max-width: 320px;
+  background: linear-gradient(135deg, #B794F6 0%, #9F7AEA 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+.explore-button:hover {
+  transform: translateY(-2px);
+  background: var(--secondary)
+}
+
+.explore-button:active {
+  transform: translateY(0);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design for larger screens */
+@media (min-width: 768px) {
+  .content {
+    max-width: 480px;
+    padding: 60px 40px;
+  }
+  
+  .success-icon {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .success-icon svg {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .title {
+    font-size: 32px;
+  }
+  
+  .subtitle {
+    font-size: 18px;
+    max-width: 380px;
+  }
+  
+  .explore-button {
+    max-width: 360px;
+    padding: 18px 28px;
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content {
+    max-width: 520px;
+    padding: 80px 60px;
+  }
+  
+  .success-icon {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .success-icon svg {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .title {
+    font-size: 36px;
+  }
+  
+  .subtitle {
+    font-size: 20px;
+    max-width: 420px;
+  }
+  
+  .explore-button {
+    max-width: 400px;
+    padding: 20px 32px;
+    font-size: 18px;
+  }
+}
+
+/* Additional visual enhancements */
+.completed-container::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.completed-container::after {
+  content: '';
+  position: absolute;
+  bottom: 20%;
+  right: 15%;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(183, 148, 246, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}

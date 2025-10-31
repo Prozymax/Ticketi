@@ -1,9 +1,9 @@
 "use client";
 
 import {useRouter} from "next/navigation";
-import "@/styles/home.css";
+import styles from "@/styles/home.module.css";
 import Image from "next/image";
-import "@/styles/mobileview/home.css";
+import "@/styles/mobileview/home.module.css";
 
 export default function EmptyEventsComponent() {
   const router = useRouter();
@@ -17,18 +17,18 @@ export default function EmptyEventsComponent() {
   };
 
   return (
-    <div className="home-container">
+    <div className={styles["home-container"]}>
       {/* Main Content */}
-      <div className="main-content">
+      <div className={styles["main-content"]}>
         {/* Welcome Section */}
-        <div className="welcome-section">
-          <h1 className="welcome-title">Welcome, Creator!</h1>
+        <div className={styles["welcome-section"]}>
+          <h1 className={styles["welcome-title"]}>Welcome, Creator!</h1>
         </div>
 
         {/* Create Event Card */}
-        <div className="create-event-card">
-          <div className="card-icon">
-            <div className="plus-icon">
+        <div className={styles["create-event-card"]}>
+          <div className={styles["card-icon"]}>
+            <div className={styles["plus-icon"]}>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M12 5V19M5 12H19"
@@ -40,19 +40,24 @@ export default function EmptyEventsComponent() {
               </svg>
             </div>
           </div>
-          <h2 className="card-title">Create Event</h2>
-          <p className="card-description">
+          <h2 className={styles["card-title"]}>Create Event</h2>
+          <p className={styles["card-description"]}>
             There seems to be no event near you or in your region. Start
             creating your next successful events in a few steps
           </p>
-          <button className="create-event-button" onClick={handleCreateEvent}>
+          <button
+            className={styles["create-event-button"]}
+            onClick={handleCreateEvent}
+          >
             Create Event Ticket
           </button>
         </div>
 
         {/* Explore Events Section */}
-        <div className="explore-section">
-          <div className="explore-icon flex justify-center">
+        <div className={styles["explore-section"]}>
+          <div
+            className={`${styles["explore-icon"]} ${styles.flex} ${styles["justify-center"]}`}
+          >
             <Image
               src="/icons/search.png"
               alt="search_icon"
@@ -60,12 +65,15 @@ export default function EmptyEventsComponent() {
               height={74}
             />
           </div>
-          <h2 className="explore-title">Explore Events</h2>
-          <p className="explore-description">
+          <h2 className={styles["explore-title"]}>Explore Events</h2>
+          <p className={styles["explore-description"]}>
             Find out the next event around you before tickets are sold out
           </p>
-          <button className="explore-button" onClick={handleExploreEvents}>
-            Find out what&apos;s Happening
+          <button
+            className={styles["explore-button"]}
+            onClick={handleExploreEvents}
+          >
+            Find out what&apos;s happening
           </button>
         </div>
       </div>

@@ -11,8 +11,8 @@ import Events from "./events/components/events";
 import EmptyTickets from "./tickets/components/emptyTickets";
 import Tickets from "./tickets/components/tickets";
 
-import "@/styles/event-hub.css";
-import "@/styles/empty-events.css";
+import styles from "@/styles/event-hub.module.css";
+import "@/styles/empty-events.module.css";
 
 type TabType = "events" | "tickets";
 
@@ -40,11 +40,15 @@ export default function EventHubPage() {
           setError(eventsResponse.error || "Failed to fetch events");
           setEvents([]);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError(error instanceof Error ? error.message : "An unexpected error occurred");
+        setError(
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred"
+        );
         setEvents([]);
         setTickets([]);
         setLoading(false);
@@ -64,8 +68,8 @@ export default function EventHubPage() {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
+      <div className={styles["loading-container"]}>
+        <div className={styles["loading-spinner"]}></div>
         <p>Loading your events...</p>
       </div>
     );
@@ -73,12 +77,12 @@ export default function EventHubPage() {
 
   if (error) {
     return (
-      <div className="error-container">
-        <div className="error-message">
+      <div className={styles["error-container"]}>
+        <div className={styles["error-message"]}>
           <h3>Error Loading Events</h3>
           <p>{error}</p>
-          <button 
-            className="retry-button" 
+          <button
+            className={styles["retry-button"]}
             onClick={() => window.location.reload()}
           >
             Try Again
@@ -107,13 +111,13 @@ export default function EventHubPage() {
   };
 
   return (
-    <div className="event-hub-container">
+    <div className={styles["event-hub-container"]}>
       {/* Centralized Header */}
-      <div className="event-hub-header">
-        <h1 className="header-title">Event Hub</h1>
+      <div className={styles["event-hub-header"]}>
+        <h1 className={styles["header-title"]}>Event Hub</h1>
         <button
           title="create-event"
-          className="add-button"
+          className={styles["add-button"]}
           onClick={handleCreateEvent}
         >
           <Plus size={24} />
@@ -121,7 +125,7 @@ export default function EventHubPage() {
       </div>
 
       {/* Centralized Tab Navigation */}
-      <div className="tab-navigation">
+      <div className={styles["tab-navigation"]}>
         <button
           className={`tab-button ${activeTab === "events" ? "active" : ""}`}
           onClick={() => handleTabSwitch("events")}
@@ -137,7 +141,7 @@ export default function EventHubPage() {
       </div>
 
       {/* Dynamic Content */}
-      <div className="tab-content">{renderContent()}</div>
+      <div className={styles["tab-content"]}>{renderContent()}</div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import {useRouter, usePathname} from "next/navigation";
-import "@/styles/bottom-navigation.css";
+import styles from "@/styles/bottom-navigation.module.css";
 
 const BottomNavigation = () => {
   const router = useRouter();
@@ -108,20 +108,28 @@ const BottomNavigation = () => {
   // Define which pages should show navigation
   const shouldShowNavigation = () => {
     // Always hide on these pages
-    if (pathname === '/' || pathname.startsWith('/onboarding') || pathname.startsWith('/create-event')) {
+    if (
+      pathname === "/" ||
+      pathname.startsWith("/onboarding") ||
+      pathname.startsWith("/create-event")
+    ) {
       return false;
     }
-    
+
     // Hide on event details pages (but not main events page)
-    if (pathname.startsWith('/events/') && pathname !== '/events') {
+    if (pathname.startsWith("/events/") && pathname !== "/events") {
       return false;
     }
-    
+
     // Show on these main pages
-    if (pathname === '/events' || pathname.startsWith('/event-hub') || pathname.startsWith('/profile')) {
+    if (
+      pathname === "/events" ||
+      pathname.startsWith("/event-hub") ||
+      pathname.startsWith("/profile")
+    ) {
       return true;
     }
-    
+
     // Hide on all other pages
     return false;
   };
@@ -133,7 +141,7 @@ const BottomNavigation = () => {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-black/80 backdrop-blur-lg border-t border-gray-800/50 px-6 pt-6 pb-4 z-50 bottom-navigation">
+    <nav className={`fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-black/80 backdrop-blur-lg border-t border-gray-800/50 px-6 pt-6 pb-4 z-50 ${styles['bottom-navigation']}`}>
       <div className="flex justify-center gap-20 items-center max-w-[100%] mx-auto">
         {navItems.map((item) => {
           const active = isActive(item.path);
@@ -141,6 +149,7 @@ const BottomNavigation = () => {
           return (
             <button
               key={item.id}
+              type="button"
               onClick={() => router.push(item.path)}
               className={`flex flex-col gap-3 items-center justify-center py-3 px-4 transition-all duration-300 transform ${
                 active
@@ -171,3 +180,4 @@ const BottomNavigation = () => {
 };
 
 export default BottomNavigation;
+

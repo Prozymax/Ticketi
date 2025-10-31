@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import EventCard from "./EventCard";
-import "@/styles/event-card.css";
+import styles from "@/styles/event-card.module.css";
 import {useRouter} from "next/navigation";
 
 interface DatabaseEvent {
@@ -45,7 +45,7 @@ export default function EventCatalogue({
   // Convert database event to EventCard format
   const convertEventFormat = (dbEvent: DatabaseEvent) => {
     const startDate = new Date(dbEvent.startDate);
-    console.log(dbEvent)
+    console.log(dbEvent);
     return {
       id: dbEvent.id,
       image: dbEvent.eventImage || "/events/events_sample.jpg",
@@ -74,23 +74,24 @@ export default function EventCatalogue({
       eventsData.aroundWorld.length === 0)
   ) {
     return (
-      <div className="event-catalogue">
-        <div className="no-events">
+      <div className={styles["event-catalogue"]}>
+        <div className={styles["no-events"]}>
           <p>No events available at the moment.</p>
         </div>
-        <p className="create-event" onClick={handleCreateEvent}>
-          <i className="fa-solid fa-plus"></i>&nbsp;&nbsp;Create Event
+        <p className={styles["create-event"]} onClick={handleCreateEvent}>
+          <i className={`${styles["fa-solid"]} ${styles["fa-plus"]}`}></i>
+          &nbsp;&nbsp;Create Event
         </p>
       </div>
     );
   }
 
   return (
-    <div className="event-catalogue">
+    <div className={styles["event-catalogue"]}>
       {/* Events Near You */}
       {eventsData.nearYou.length > 0 && (
-        <div className="events-grid">
-          <p className="near_user flex items-center py-8">
+        <div className={styles["events-grid"]}>
+          <p className={`${styles.near_user} flex items-center py-8`}>
             <Image
               src="/icons/united-kingdom.png"
               width={25}
@@ -107,8 +108,8 @@ export default function EventCatalogue({
 
       {/* Trending Events */}
       {eventsData.trending.length > 0 && (
-        <div className="events-grid">
-          <p className="near_user flex items-center py-8">
+        <div className={styles["events-grid"]}>
+          <p className={`${styles.near_user} flex items-center py-8`}>
             <Image
               src="/icons/fire.png"
               width={25}
@@ -125,8 +126,8 @@ export default function EventCatalogue({
 
       {/* Events Around the World */}
       {eventsData.aroundWorld.length > 0 && (
-        <div className="events-grid">
-          <p className="near_user flex items-center py-8">
+        <div className={styles["events-grid"]}>
+          <p className={`${styles.near_user} flex items-center py-8`}>
             <Image
               src="/icons/globe.png"
               width={25}
@@ -141,8 +142,9 @@ export default function EventCatalogue({
         </div>
       )}
 
-      <p className="create-event" onClick={handleCreateEvent}>
-        <i className="fa-solid fa-plus"></i>&nbsp;&nbsp;Create Event
+      <p className={styles["create-event"]} onClick={handleCreateEvent}>
+        <i className={`${styles["fa-solid"]} ${styles["fa-plus"]}`}></i>
+        &nbsp;&nbsp;Create Event
       </p>
     </div>
   );
