@@ -279,8 +279,8 @@ export default function EventDetailsPage() {
             </div>
             <button
               type="button"
-              className={`follow-button ${isFollowing ? "following" : ""} ${
-                followLoading ? "loading" : ""
+              className={`${styles["follow-button"]} ${isFollowing ? styles.following : ""} ${
+                followLoading ? styles.loading : ""
               }`}
               onClick={handleFollow}
               disabled={followLoading}
@@ -353,8 +353,8 @@ export default function EventDetailsPage() {
       <div className={styles["buy-ticket-container"]}>
         <button
           disabled={!isTicketAvailable}
-          className={`buy-ticket-button ${
-            !isTicketAvailable ? "disabled" : ""
+          className={`${styles["buy-ticket-button"]} ${
+            !isTicketAvailable ? styles.disabled : ""
           }`}
           onClick={handleBuyTicket}
         >

@@ -251,7 +251,7 @@
 .confirm-button {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  background: var(--accent-bold);
   border: none;
   border-radius: 12px;
   color: #ffffff;
@@ -266,7 +266,7 @@
 }
 
 .confirm-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  background: var(--secondary);
   transform: translateY(-1px);
 }
 

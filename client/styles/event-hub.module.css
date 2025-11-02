@@ -277,7 +277,7 @@
 }
 
 .stat-icon {
-  color: var(--secondary);
+  color: white;
   flex-shrink: 0;
 }
 

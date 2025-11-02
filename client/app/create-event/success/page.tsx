@@ -65,41 +65,40 @@ export default function SuccessPage() {
 
   if (!eventData) {
     return (
-      <div className={styles['create-event-container']}>
-        <div className={styles['loading-container']}>
-          <div className={styles['loading-spinner']}></div>
+      <div className={styles['success-container']}>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={styles['create-event-container']}>
+    <div className={styles['success-container']}>
       {/* Header */}
-      <div className={styles['success-header']}>
-        <div className={styles.logo}>
-          <span className={styles['logo-text']}>Ticket</span>
-          <span className={styles['logo-accent']}>i</span>
-        </div>
+      <div className={styles['success-logo']}>
+        <h1 className={styles['logo-text']}>
+          Ticket<span className={styles['logo-accent']}>i</span>
+        </h1>
       </div>
 
       {/* Success Content */}
       <div className={styles['success-content']}>
         {/* Congratulations Section */}
         <div className={styles['congratulations-section']}>
-          <div className={styles['party-emojis']}>
-            <span className={`${styles['party-emoji']} ${styles.left}`}>🎉</span>
-            <span className={`${styles['party-emoji']} ${styles.right}`}>🎉</span>
+          <div className={styles['celebration-icons']}>
+            <span className={`${styles['celebration-icon']} ${styles.left}`}>🎉</span>
+            <span className={`${styles['celebration-icon']} ${styles.right}`}>🎉</span>
           </div>
           <h1 className={styles['congratulations-title']}>Congratulations!!!</h1>
-          <p className={styles['congratulations-subtitle']}>
+          <p className={styles['congratulations-text']}>
             Your event ticket has been created
-            <span className={styles.sparkles}>✨</span>
+            <span className={styles.sparkles}> ✨</span>
           </p>
         </div>
 
         {/* Event Details Card */}
-        <div className={styles['event-details-card']}>
+        <div className={styles['details-card']}>
           <div className={styles['detail-row']}>
             <span className={styles['detail-label']}>Event Host</span>
             <span className={styles['detail-value']}>{eventData.eventHost}</span>
@@ -122,7 +121,7 @@ export default function SuccessPage() {
 
           <div className={styles['detail-row']}>
             <span className={styles['detail-label']}>Schedule and Location</span>
-            <span className={`${styles['detail-value']} ${styles['location-text']}`}>{eventData.location}</span>
+            <span className={styles['detail-value']}>{eventData.location}</span>
           </div>
 
           <div className={styles['detail-row']}>
@@ -132,7 +131,7 @@ export default function SuccessPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className={styles['success-actions']}>
+        <div className={styles['action-buttons']}>
           <button className={styles['complete-button']} onClick={handleComplete}>
             Complete
           </button>

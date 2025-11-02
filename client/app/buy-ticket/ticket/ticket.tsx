@@ -414,8 +414,8 @@ export default function TicketModal({
         {/* Confirm Button */}
         <div className={styles["confirm-section"]}>
           <button
-            className={`confirm-button ${
-              isLoading || loadingTickets || !selectedTicket ? "loading" : ""
+            className={`${styles["confirm-button"]} ${
+              isLoading || loadingTickets || !selectedTicket ? styles.loading : ""
             }`}
             onClick={() => {
               console.log("Confirm button clicked!");
