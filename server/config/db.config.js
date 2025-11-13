@@ -45,7 +45,8 @@ class DatabaseManager {
                     connectTimeout: 10000, // 10 seconds connection timeout
                     // SSL options for secure connections
                     ssl: process.env.NODE_ENV === 'production' ? {
-                        rejectUnauthorized: true
+                        require: true,
+                        rejectUnauthorized: false,
                     } : false
                 },
 
