@@ -3,6 +3,10 @@
   padding: 0;
 }
 
+.color-span {
+  color: var(--secondary);
+}
+
 .home-container {
   min-height: 100vh;
   color: white;

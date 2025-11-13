@@ -340,9 +340,14 @@ class ApiService {
     return response;
   }
 
-  async checkTicketAvailability(ticketId: string, quantity = 1): Promise<ApiResponse> {
+  async checkTicketAvailability(
+    ticketId: string,
+    quantity = 1
+  ): Promise<ApiResponse> {
     console.log("API: Checking ticket availability:", ticketId, quantity);
-    const response = await this.makeRequest(`/api/events/tickets/${ticketId}/availability?quantity=${quantity}`);
+    const response = await this.makeRequest(
+      `/api/events/tickets/${ticketId}/availability?quantity=${quantity}`
+    );
     console.log("API: Ticket availability response:", response);
     return response;
   }
@@ -354,10 +359,13 @@ class ApiService {
     quantity: number;
   }): Promise<ApiResponse> {
     console.log("API: Creating purchase:", purchaseData);
-    const response = await this.makeRequest(`/api/events/tickets/${purchaseData.ticketId}/purchase`, {
-      method: "POST",
-      body: JSON.stringify(purchaseData),
-    });
+    const response = await this.makeRequest(
+      `/api/events/tickets/${purchaseData.ticketId}/purchase`,
+      {
+        method: "POST",
+        body: JSON.stringify(purchaseData),
+      }
+    );
     console.log("API: Purchase creation response:", response);
     return response;
   }
@@ -395,11 +403,17 @@ class ApiService {
     return response;
   }
 
-  async getEventsNearLocation(location: string, page = 1, limit = 10): Promise<ApiResponse> {
+  async getEventsNearLocation(
+    location: string,
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse> {
     console.log("API: Getting events near location:", location);
     console.log("API: Encoded location:", encodeURIComponent(location));
     const response = await this.makeRequest(
-      `/api/events/near?location=${encodeURIComponent(location)}&page=${page}&limit=${limit}`
+      `/api/events/near?location=${encodeURIComponent(
+        location
+      )}&page=${page}&limit=${limit}`
     );
     console.log("API: Events near location response:", response);
     return response;
@@ -584,6 +598,14 @@ class ApiService {
     return response;
   }
 
+    // Profile API methods
+  async getUserProfileImage(): Promise<ApiResponse<UserProfile>> {
+    console.log("API: Getting user profile image");
+    const response = await this.makeRequest<UserProfile>("/api/profile/image");
+    console.log("API: Profile Image response:", response);
+    return response;
+  }
+
   async updateUserProfile(
     profileData: ProfileUpdateData
   ): Promise<ApiResponse<UserProfile>> {
@@ -594,6 +616,38 @@ class ApiService {
     });
     console.log("API: Profile update response:", response);
     return response;
+  }
+
+  async uploadProfileImage(imageFile: File): Promise<ApiResponse<UserProfile>> {
+    console.log(
+      "API: Uploading profile image:",
+      imageFile.name,
+      imageFile.size
+    );
+
+    const formData = new FormData();
+    formData.append("profileImage", imageFile);
+
+    const url = `${this.baseUrl}/api/profile/upload-image`;
+    const accessToken = getAccessToken();
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "x-access-token": accessToken || "",
+        // Don't set Content-Type for FormData
+      },
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || data.error || "Image upload failed");
+    }
+
+    console.log("API: Profile image upload response:", data);
+    return data;
   }
 
   async getUserStats(): Promise<ApiResponse<UserStats>> {
@@ -618,7 +672,7 @@ class ApiService {
     console.log("API: Following user:", followingId);
     const response = await this.makeRequest("/api/follow/follow", {
       method: "POST",
-      body: JSON.stringify({ followingId }),
+      body: JSON.stringify({followingId}),
     });
     console.log("API: Follow user response:", response);
     return response;
@@ -626,9 +680,12 @@ class ApiService {
 
   async unfollowUser(followingId: string): Promise<ApiResponse> {
     console.log("API: Unfollowing user:", followingId);
-    const response = await this.makeRequest(`/api/follow/unfollow/${followingId}`, {
-      method: "DELETE",
-    });
+    const response = await this.makeRequest(
+      `/api/follow/unfollow/${followingId}`,
+      {
+        method: "DELETE",
+      }
+    );
     console.log("API: Unfollow user response:", response);
     return response;
   }

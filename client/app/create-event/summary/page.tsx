@@ -15,6 +15,20 @@ export default function SummaryPage() {
     setStep(4);
   }, []); // Remove setStep from dependencies to prevent infinite loop
 
+  // Calculate duration in days
+  const calculateDuration = () => {
+    if (!eventData.startDate || !eventData.endDate) return "1 day";
+    
+    const start = new Date(eventData.startDate);
+    const end = new Date(eventData.endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return "1 day";
+    if (diffDays === 1) return "1 day";
+    return `${diffDays} days`;
+  };
+
   const handleBack = () => {
     router.back();
   };
@@ -241,7 +255,7 @@ export default function SummaryPage() {
                   <h3 className={styles["summary-label"]}>
                     Start Date and Time
                   </h3>
-                  <span className={styles["duration-badge"]}>3days</span>
+                  <span className={styles["duration-badge"]}>{calculateDuration()}</span>
                 </div>
 
                 <div className={styles["datetime-summary"]}>

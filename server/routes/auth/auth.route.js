@@ -38,6 +38,8 @@ authRouter.post('/authenticate', async (request, response) => {
     try {
         const userVerified = await AuthService.confirmUser(username);
         // TODO: Not everytime user gets a new token fix
+        // TODO: The event completion time should cross check time not just the day by 12am to mar completed but the exct time
+        // TODO: create a timer that ensures it marks all tickets as used for events that are already held
         if (userVerified.error) {
             console.log(userVerified.message)
             // User doesn't exist, create new user

@@ -11,7 +11,7 @@ import styles from "@/styles/profile-new.module.css";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const {profile, stats, isLoading, error, fetchStats} = useProfile();
+  const {profile, stats, isLoading, error, fetchStats, uploadProfileImage} = useProfile();
   const {logout} = usePiNetwork();
 
   // Fetch stats when profile is loaded
@@ -51,6 +51,33 @@ export default function ProfilePage() {
 
   const handleFollowers = () => {
     router.push("/profile/followers");
+  };
+
+  const handleProfileImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+
+    try {
+      const success = await uploadProfileImage(file);
+      if (success) {
+        console.log('Profile image uploaded successfully');
+      }
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      alert('Failed to upload profile image. Please try again.');
+    }
   };
 
   const handleLeaveApp = async () => {
@@ -117,6 +144,31 @@ export default function ProfilePage() {
             width={60}
             height={60}
             className={styles["profile-page-avatar"]}
+          />
+          <label htmlFor="profile-image-upload" className={styles["avatar-edit-icon"]}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </label>
+          <input
+            id="profile-image-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleProfileImageUpload}
+            style={{ display: 'none' }}
           />
         </div>
 

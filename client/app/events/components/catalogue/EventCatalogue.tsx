@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import EventCard from "./EventCard";
+import TrendingEventCard from "./TrendingEventCard";
 import styles from "@/styles/event-card.module.css";
 import {useRouter} from "next/navigation";
 
@@ -19,6 +20,11 @@ interface DatabaseEvent {
   status: "draft" | "published" | "cancelled" | "completed";
   createdAt: string;
   updatedAt: string;
+  organizer: {
+    id: number;
+    username: string;
+    profileImage: string;
+  }
 }
 
 interface EventsData {
@@ -66,6 +72,19 @@ export default function EventCatalogue({
     };
   };
 
+  // Convert database event to TrendingEventCard format
+  const convertTrendingFormat = (dbEvent: DatabaseEvent) => {
+    return {
+      id: dbEvent.id,
+      image: dbEvent.eventImage || "/events/events_sample.jpg",
+      title: dbEvent.title,
+      organizer: {
+        name: dbEvent.organizer.username, // You can add organizer data to the database event if available
+        profileImage: dbEvent.organizer.profileImage,
+      },
+    };
+  };
+
   // Safety check for events data
   if (
     !eventsData ||
@@ -106,9 +125,9 @@ export default function EventCatalogue({
         </div>
       )}
 
-      {/* Trending Events */}
+      {/* Trending Events - Horizontal Carousel */}
       {eventsData.trending.length > 0 && (
-        <div className={styles["events-grid"]}>
+        <div className={styles["trending-section"]}>
           <p className={`${styles.near_user} flex items-center py-8`}>
             <Image
               src="/icons/fire.png"
@@ -118,9 +137,15 @@ export default function EventCatalogue({
             />
             &nbsp;&nbsp; Trending Events
           </p>
-          {eventsData.trending.map((event) => (
-            <EventCard key={event.id} event={convertEventFormat(event)} />
-          ))}
+          <div className={styles["trending-carousel"]}>
+            <div className={styles["trending-carousel-track"]}>
+              {eventsData.trending.map((event) => (
+                <div key={event.id} className={styles["trending-card-wrapper"]}>
+                  <TrendingEventCard event={convertTrendingFormat(event)} />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

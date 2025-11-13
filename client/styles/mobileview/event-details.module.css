@@ -22,6 +22,8 @@
 
   .event-detail-title {
     font-size: 2.25rem;
+    width: 70%;
+    line-height: 1.4;
   }
 
   .event-info {
@@ -31,7 +33,7 @@
   }
 
   .event-stats {
-    gap: 1rem;
+    gap: 2rem;
   }
 
   .stat-value {

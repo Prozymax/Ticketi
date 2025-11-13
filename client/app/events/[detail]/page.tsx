@@ -39,6 +39,10 @@ interface DatabaseEvent {
     lastName?: string;
     profileImage?: string;
   };
+  tickets: [{
+    soldQuantity: number;
+  }],
+  views: number;
 }
 
 export default function EventDetailsPage() {
@@ -51,11 +55,14 @@ export default function EventDetailsPage() {
   const [followLoading, setFollowLoading] = useState(false);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
 
-  // Add class to body to hide bottom navigation
+  // Add class to body to hide bottom navigation and handle cleanup
   useEffect(() => {
     document.body.classList.add("hide-bottom-nav");
+    
     return () => {
       document.body.classList.remove("hide-bottom-nav");
+      // Close modal when component unmounts (navigating away)
+      setIsTicketModalOpen(false);
     };
   }, []);
 
@@ -255,7 +262,7 @@ export default function EventDetailsPage() {
           <div className={styles["host-section"]}>
             <div className={styles["host-info"]}>
               <a
-                href={`https://profiles.pinet.com/profiles/${event.organizer.username}`}
+                href={`profiles.pinet.com/profiles/${event.organizer.username}`}
               >
                 <div className={styles["host-avatar"]}>
                   <img
@@ -322,7 +329,7 @@ export default function EventDetailsPage() {
             <Users className={styles["stat-icon"]} />
             <div className={styles["stat-content"]}>
               <span className={styles["stat-label"]}>Tickets Sold</span>
-              <span className={styles["stat-value"]}>{event.ticketsSold}</span>
+              <span className={styles["stat-value"]}>{event.tickets[0].soldQuantity}</span>
             </div>
           </div>
           <div className={styles["stat-item"]}>
@@ -335,9 +342,9 @@ export default function EventDetailsPage() {
           <div className={styles["stat-item"]}>
             <Eye className={styles["stat-icon"]} />
             <div className={styles["stat-content"]}>
-              <span className={styles["stat-label"]}>Available</span>
+              <span className={styles["stat-label"]}>Views</span>
               <span className={styles["stat-value"]}>
-                {event.regularTickets - event.ticketsSold}
+                {event?.views}
               </span>
             </div>
           </div>

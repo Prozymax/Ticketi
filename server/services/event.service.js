@@ -203,6 +203,11 @@ class EventService {
                 };
             }
 
+            let currentView = event.dataValues.views == 'string' ? Number(event.dataValues.views) : event.dataValues.views || 0;
+            let views = currentView + 1
+            console.log('currentView', currentView)
+            await event.update({ views })
+
             return {
                 error: false,
                 message: 'Event retrieved successfully',
@@ -607,9 +612,9 @@ class EventService {
                 include: [{
                     model: User,
                     as: 'organizer',
-                    attributes: ['id', 'username', 'firstName', 'lastName', 'profileImage']
+                    attributes: ['id', 'profileImage', 'username']
                 }],
-                order: [['ticketsSold', 'DESC'], ['createdAt', 'DESC']],
+                order: [['views', 'DESC']],
                 limit: parseInt(limit),
                 offset: parseInt(offset)
             });

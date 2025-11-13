@@ -1,15 +1,34 @@
 "use client";
-import Image from "next/image";
 import styles from "@/styles/home.module.css";
 import "@/styles/mobileview/home.module.css";
 import {useRouter} from "next/navigation";
+import {useState, useEffect} from "react";
+import {apiService} from "@/app/lib/api";
 
 export default function BrandNav({eventsExist}: {eventsExist: boolean}) {
   const router = useRouter();
+  const [profileImage, setProfileImage] = useState<string>("/Avatar.png");
+
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      try {
+        const response = await apiService.getUserProfileImage();
+        if (response.success && response.data?.profileImage) {
+          setProfileImage(response.data.profileImage);
+        }
+      } catch (error) {
+        console.error("Error fetching profile image:", error);
+        // Keep default avatar on error
+      }
+    };
+
+    fetchProfileImage();
+  }, []);
 
   const visitProfile = () => {
     router.push("/profile");
   };
+  
   return (
     <div className={styles.nav}>
       <div className={styles.header}>
@@ -32,9 +51,12 @@ export default function BrandNav({eventsExist}: {eventsExist: boolean}) {
         )}
         <div className={styles["profile-avatar"]} onClick={visitProfile}>
           <img
-            src="/Avatar.png"
+            src={profileImage}
             alt="Profile"
             className={styles["avatar-small"]}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/Avatar.png";
+            }}
           />
         </div>
       </div>

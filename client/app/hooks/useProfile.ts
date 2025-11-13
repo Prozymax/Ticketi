@@ -1,7 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { apiService, UserProfile, UserStats, ProfileUpdateData } from "../lib/api";
+import {useState, useEffect, useCallback} from "react";
+import {
+  apiService,
+  UserProfile,
+  UserStats,
+  ProfileUpdateData,
+} from "../lib/api";
 
 interface UseProfileReturn {
   profile: UserProfile | null;
@@ -10,6 +15,7 @@ interface UseProfileReturn {
   error: string | null;
   fetchProfile: () => Promise<void>;
   updateProfile: (data: ProfileUpdateData) => Promise<boolean>;
+  uploadProfileImage: (imageFile: File) => Promise<boolean>;
   fetchStats: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -28,7 +34,8 @@ export const useProfile = (): UseProfileReturn => {
       const response = await apiService.getUserProfile();
       setProfile(response.data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch profile";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch profile";
       setError(errorMessage);
       console.error("Profile fetch error:", err);
     } finally {
@@ -36,23 +43,49 @@ export const useProfile = (): UseProfileReturn => {
     }
   }, []);
 
-  const updateProfile = useCallback(async (data: ProfileUpdateData): Promise<boolean> => {
-    setIsLoading(true);
-    setError(null);
+  const updateProfile = useCallback(
+    async (data: ProfileUpdateData): Promise<boolean> => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const response = await apiService.updateUserProfile(data);
-      setProfile(response.data);
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update profile";
-      setError(errorMessage);
-      console.error("Profile update error:", err);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      try {
+        const response = await apiService.updateUserProfile(data);
+        setProfile(response.data);
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to update profile";
+        setError(errorMessage);
+        console.error("Profile update error:", err);
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
+  const uploadProfileImage = useCallback(
+    async (imageFile: File): Promise<boolean> => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await apiService.uploadProfileImage(imageFile);
+        setProfile(response.data);
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to upload profile image";
+        setError(errorMessage);
+        console.error("Profile image upload error:", err);
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   const fetchStats = useCallback(async () => {
     setError(null);
@@ -61,7 +94,8 @@ export const useProfile = (): UseProfileReturn => {
       const response = await apiService.getUserStats();
       setStats(response.data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch stats";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch stats";
       setError(errorMessage);
       console.error("Stats fetch error:", err);
     }
@@ -83,6 +117,7 @@ export const useProfile = (): UseProfileReturn => {
     error,
     fetchProfile,
     updateProfile,
+    uploadProfileImage,
     fetchStats,
     refreshProfile,
   };

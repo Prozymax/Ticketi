@@ -1,4 +1,4 @@
-const { Purchase, Event, Ticket, User } = require('../models/index.model');
+const { Purchase, Event, Ticket, User, NFTTicket } = require('../models/index.model');
 const { logger } = require('../utils/logger');
 const { Op } = require('sequelize');
 const { sequelize } = require('../config/db.config');
@@ -95,12 +95,24 @@ class PurchaseService {
                     {
                         model: Event,
                         as: 'event',
-                        attributes: ['id', 'title', 'description', 'eventDate', 'location']
+                        attributes: ['id', 'title', 'description', 'startDate', 'endDate', 'location', 'eventImage', 'organizerId'],
+                        include: [
+                            {
+                                model: User,
+                                as: 'organizer',
+                                attributes: ['id', 'username', 'firstName', 'lastName', 'profileImage']
+                            }
+                        ]
                     },
                     {
                         model: Ticket,
                         as: 'ticket',
                         attributes: ['id', 'ticketType', 'price']
+                    },
+                    {
+                        model: NFTTicket,
+                        as: 'nftTickets',
+                        attributes: ['id', 'tokenId', 'qrCode', 'isUsed', 'metadata', 'createdAt']
                     }
                 ],
                 limit,
@@ -140,7 +152,7 @@ class PurchaseService {
                     {
                         model: Event,
                         as: 'event',
-                        attributes: ['id', 'title', 'description', 'eventDate', 'location']
+                        attributes: ['id', 'title', 'description', 'eventDate', 'location', 'eventImage']
                     },
                     {
                         model: Ticket,
@@ -151,6 +163,11 @@ class PurchaseService {
                         model: User,
                         as: 'buyer',
                         attributes: ['id', 'username', 'email']
+                    },
+                    {
+                        model: NFTTicket,
+                        as: 'nftTickets',
+                        attributes: ['id', 'tokenId', 'qrCode', 'isUsed', 'metadata', 'createdAt']
                     }
                 ]
             });

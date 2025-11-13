@@ -12,7 +12,7 @@ interface PaymentPageProps {
   eventData?: {
     id: string;
     title: string;
-    image: string;
+    eventImage: string;
     ticketPrice: number;
   };
 }
@@ -30,39 +30,64 @@ function PaymentContent({eventData}: PaymentPageProps) {
   const total = parseFloat(searchParams.get("total") || "13.2");
   const ticketType = searchParams.get("ticketType") || "regular";
   const isFallback = searchParams.get("fallback") === "true";
+  
+  // Get event data from URL params to avoid API call
+  const eventTitle = searchParams.get("eventTitle");
+  const eventImage = searchParams.get("eventImage");
+  const urlTicketPrice = searchParams.get("ticketPrice");
 
   const [isLoading, setIsLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
-  const [event, setEvent] = useState(eventData || null);
-  const [loadingEvent, setLoadingEvent] = useState(!eventData);
+  
+  // Initialize event from URL params if available, otherwise from props
+  const [event, setEvent] = useState(
+    eventTitle && eventImage && urlTicketPrice
+      ? {
+          id: eventId,
+          title: eventTitle,
+          eventImage: eventImage,
+          ticketPrice: parseFloat(urlTicketPrice),
+        }
+      : eventData || null
+  );
+  const [loadingEvent, setLoadingEvent] = useState(
+    !event && !eventData
+  );
 
-  // Load event data if not provided
+  // Load event data only if not provided via URL params or props
   useEffect(() => {
-    if (!eventData && eventId) {
-      loadEventData();
-    }
-  }, [eventId, eventData]);
-
-  const loadEventData = async () => {
-    try {
-      setLoadingEvent(true);
-      const response = await apiService.getEventById(eventId);
-      
-      if (response.success && response.data) {
-        setEvent(response.data);
-      } else {
-        setPaymentError("Failed to load event details");
+    const loadEventData = async () => {
+      // Skip if we already have event data from URL params
+      if (event) {
+        setLoadingEvent(false);
+        return;
       }
-    } catch (error) {
-      console.error("Error loading event:", error);
-      setPaymentError("Failed to load event details");
-    } finally {
-      setLoadingEvent(false);
-    }
-  };
+
+      try {
+        setLoadingEvent(true);
+        const response = await apiService.getEventById(eventId);
+        console.log("Fetching event data from API:", response.data);
+        
+        if (response.success && response.data) {
+          setEvent(response.data as unknown);
+        } else {
+          setPaymentError("Failed to load event details");
+        }
+      } catch (error) {
+        console.error("Error loading event:", error);
+        setPaymentError("Failed to load event details");
+      } finally {
+        setLoadingEvent(false);
+      }
+    };
+
+    loadEventData();
+  }, [eventId, event]);
 
   // Fees calculation
-  const ticketPrice = event?.ticketPrice || 0;
+  const ticketPrice = typeof event?.ticketPrice === 'string' 
+    ? parseFloat(event.ticketPrice) 
+    : (event?.ticketPrice || 0);
   const platformFee = 0.5;
   const blockchainFee = 0.1;
   const subtotal = ticketPrice * quantity;
@@ -79,7 +104,8 @@ function PaymentContent({eventData}: PaymentPageProps) {
     }
 
     // For fallback tickets, we don't need ticketId or purchaseId
-    if (!isFallback && (!ticketId || !purchaseId)) {
+    console.log(isFallback, ticketId, purchaseId);
+    if (!isFallback && (!ticketId)) {
       setPaymentError("Missing payment information");
       return;
     }
@@ -89,8 +115,15 @@ function PaymentContent({eventData}: PaymentPageProps) {
 
     try {
       console.log("Creating payment with fallback:", isFallback);
+      console.log("Payment details:", {
+        amount: calculatedTotal,
+        eventId: event.id,
+        ticketId,
+        purchaseId,
+        quantity
+      });
       
-      // Create Pi Network payment
+      // Create Pi Network payment with completion callback
       const paymentId = await createPayment(
         calculatedTotal,
         `Ticket purchase for ${event.title}`,
@@ -103,26 +136,42 @@ function PaymentContent({eventData}: PaymentPageProps) {
           ticketCount: quantity,
           paymentType: "ticket_purchase",
           isFallback: isFallback,
+        },
+        // onApproval callback - payment approved by user
+        async (approvedPaymentId: string) => {
+          console.log("✅ Payment approved by user:", approvedPaymentId);
+        },
+        // onCompletion callback - payment verified and completed on blockchain
+        async (completedPaymentId: string, txid: string) => {
+          console.log("✅ Payment completed and verified!");
+          console.log("Payment ID:", completedPaymentId);
+          console.log("Transaction ID:", txid);
+          
+          // Backend has already created the ticket in the completion handler
+          // Now navigate to success page with payment and event details
+          console.log("🎉 Ticket created! Navigating to success page...");
+          router.push(`/buy-ticket/success?paymentId=${completedPaymentId}&eventId=${event.id}&purchaseId=${purchaseId || ''}&quantity=${quantity}&ticketType=${ticketType}`);
         }
       );
 
-      console.log("Payment created successfully:", paymentId);
-
-      // Navigate to success page
-      router.push(
-        `/buy-ticket/success?paymentId=${paymentId}&eventId=${event.id}${purchaseId ? `&purchaseId=${purchaseId}` : ''}`
-      );
+      console.log("Payment initiated successfully:", paymentId);
+      console.log("⏳ Waiting for payment completion...");
     } catch (error: unknown) {
+      console.error("Payment creation failed:", error);
       const errorMessage = formatError(error);
       logError("Payment", error);
       setPaymentError(errorMessage);
 
-      if (
-        errorMessage.includes(
-          'Cannot create a payment without "payments" scope'
-        )
-      ) {
-        router.push("/login");
+      // Only show error if it's not a cancellation
+      if (!errorMessage.includes("cancelled")) {
+        if (
+          errorMessage.includes(
+            'Cannot create a payment without "payments" scope'
+          )
+        ) {
+          console.log("Authentication error, redirecting to login");
+          router.push("/login");
+        }
       }
     } finally {
       setIsLoading(false);
@@ -185,7 +234,7 @@ function PaymentContent({eventData}: PaymentPageProps) {
           background-color: #0a0a0a;
           color: #ffffff;
           min-height: 100vh;
-          padding: 0;
+          padding: 0 5%;
           font-family: system-ui, -apple-system, sans-serif;
           display: flex;
           flex-direction: column;
@@ -229,18 +278,24 @@ function PaymentContent({eventData}: PaymentPageProps) {
         }
 
         .event-image-section {
-          padding: 30px 20px;
           display: flex;
+          width: 100%;
+          border-radius: 10px;
+          margin: 2% auto;
+          height: 200px;
           justify-content: center;
+          align-items: center;
+          overflow: hidden;
         }
 
         .event-image {
           width: 100%;
-          max-width: 400px;
-          height: 200px;
+          height: 100%;
           object-fit: cover;
-          border-radius: 16px;
+          object-position: center;
+          border-radius: 12px;
           background-color: #333;
+          display: block;
         }
 
         .event-title-section {
@@ -279,7 +334,7 @@ function PaymentContent({eventData}: PaymentPageProps) {
         }
 
         .payment-details {
-          padding: 0 20px 30px 20px;
+          padding: 0 10px 30px 10px;
           border-bottom: 1px solid #333;
         }
 
@@ -306,7 +361,7 @@ function PaymentContent({eventData}: PaymentPageProps) {
         }
 
         .cost-breakdown {
-          padding: 30px 20px;
+          padding: 30px 10px;
           border-bottom: 1px solid #333;
         }
 
@@ -540,11 +595,12 @@ function PaymentContent({eventData}: PaymentPageProps) {
         {/* Event Image */}
         <div className="event-image-section">
           <Image
-            src={event.image}
+            src={event.eventImage || "/events/events_sample.jpg"}
             alt={event.title}
-            width={400}
+            width={800}
             height={200}
             className="event-image"
+            unoptimized
           />
         </div>
 

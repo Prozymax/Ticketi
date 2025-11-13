@@ -143,7 +143,7 @@
 
 .pi-auth-button:hover:not(.disabled):not(.loading) {
   transform: translateY(-2px);
-  background: var(--secondary);
+  background: var(--accent-mid);
 }
 
 .pi-auth-button:active:not(.disabled):not(.loading) {
@@ -151,7 +151,7 @@
 }
 
 .pi-auth-button.loading {
-  background: var(--accent-mid);
+  background: var(--secondary);
   cursor: not-allowed;
 }
 

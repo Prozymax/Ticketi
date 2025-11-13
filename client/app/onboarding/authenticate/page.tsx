@@ -126,7 +126,7 @@ export default function OnboardingCarousel() {
           {slides.map((data, idx) => (
             <div
               key={idx}
-              className={`slide ${idx === currentIndex ? "active" : ""}`}
+              className={`${styles.slide} ${idx === currentIndex ? styles.active : ""}`}
             >
               <OnboardingSlide data={data} />
             </div>
@@ -141,7 +141,7 @@ export default function OnboardingCarousel() {
               title="slide_nav"
               key={idx}
               onClick={() => goToSlide(idx)}
-              className={`nav-dot ${idx === currentIndex ? "active" : ""}`}
+              className={`${styles["nav-dot"]} ${idx === currentIndex ? styles.active : ""}`}
             />
           ))}
         </div>
@@ -154,8 +154,8 @@ export default function OnboardingCarousel() {
           title="Authenticate with Pi Network"
           onClick={handlePiAuthentication}
           disabled={isLoading}
-          className={`auth-button ${isLoading ? "loading" : ""} ${
-            !isSDKReady ? "not-ready" : ""
+          className={`${styles["auth-button"]} ${isLoading ? styles.loading : ""} ${
+            !isSDKReady ? styles["not-ready"] : ""
           }`}
         >
           {isLoading ? (

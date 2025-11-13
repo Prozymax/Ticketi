@@ -66,6 +66,11 @@ const Event = sequelize.define('Event', {
         defaultValue: 0,
         field: 'tickets_sold'
     },
+    views: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        defaultValue: 0
+    },
     status: {
         type: DataTypes.ENUM('draft', 'published', 'cancelled', 'completed'),
         defaultValue: 'draft'

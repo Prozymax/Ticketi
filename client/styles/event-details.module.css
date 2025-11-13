@@ -4,6 +4,7 @@
   background: var(--background);
   color: var(--foreground);
   padding-bottom: 100px;
+  padding-inline: 5%;
 }
 
 /* Loading States */
@@ -29,8 +30,9 @@
 .event-header {
   display: flex;
   align-items: center;
+  gap: 1rem;
   /* justify-content: space-between; */
-  padding: 1rem 1.5rem;
+  padding: 1rem 0;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -53,7 +55,7 @@
 
 .header-title {
   font-family: var(--font-fredoka);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   margin: 0;
 }
 
@@ -71,6 +73,8 @@
 .event-image {
   position: relative;
   width: 100%;
+  margin: 0 auto;
+  border-radius: 10px;
   height: 250px;
   overflow: hidden;
 }
@@ -98,7 +102,9 @@
 
 /* Event Content */
 .event-content {
-  padding: 1.5rem;
+  padding: 1.5rem 0;
+  width: 95%;
+  margin: 0 auto;
 }
 
 /* Host Section */
@@ -156,7 +162,7 @@
 }
 
 .host-name {
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: var(--foreground);
 }
 
@@ -184,7 +190,8 @@
 /* Event Title */
 .event-detail-title {
   font-family: var(--font-fredoka);
-  font-size: 1.75rem;
+  font-size: 1.3rem;
+  font-weight: 500;
   margin-bottom: 1.5rem;
   line-height: 1.3;
 }
@@ -217,18 +224,18 @@
 .event-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  /* gap: 1rem; */
+  gap: 2rem;
   margin-bottom: 2rem;
   border-radius: 1rem;
 }
 
 .stat-item {
   display: flex;
-  background: rgba(255, 255, 255, 0.092);
+  background: rgba(255, 255, 255, 0.064);
   flex-direction: column;
   align-items: center;
   padding: .9rem;
-  border-radius: 15px;
+  border-radius: 10px;
   text-align: center;
   gap: 0.7rem;
 }
@@ -240,6 +247,7 @@
 .stat-content {
   display: flex;
   text-align: center;
+  font-weight: bold;
   flex-direction: column;
   /* gap: 0.25rem; */
 }

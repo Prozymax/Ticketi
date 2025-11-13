@@ -57,13 +57,6 @@ export default function TicketModal({
   const maxQuantity =
     selectedTicket?.availableQuantity || event.availableTickets || 0;
 
-  // Load tickets when modal opens
-  useEffect(() => {
-    if (isOpen && event.id) {
-      loadEventTickets();
-    }
-  }, [isOpen, event.id]);
-
   // Close modal on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -152,6 +145,14 @@ export default function TicketModal({
     }
   };
 
+  // Load tickets when modal opens
+  useEffect(() => {
+    if (isOpen && event.id) {
+      loadEventTickets();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, event.id]);
+
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 1;
     if (value >= 1 && value <= maxQuantity) {
@@ -203,32 +204,14 @@ export default function TicketModal({
       }
     }
 
-    // For fallback tickets, navigate directly to payment without creating purchase record
-    if (selectedTicket.id.startsWith("fallback-")) {
-      console.log("Using fallback ticket, navigating directly to payment");
-      router.push(
-        `/buy-ticket/payment?eventId=${event.id}&quantity=${quantity}&total=${total}&ticketType=${selectedTicket.ticketType}&fallback=true`
-      );
-      onClose();
-      return;
-    }
-
-    // For real tickets, use the normal purchase flow
-    const result = await purchaseTickets({
-      eventId: event.id,
-      ticketId: selectedTicket.id,
-      ticketType: selectedTicket.ticketType,
-      quantity,
-      totalAmount: total,
-    });
-
-    if (result.success) {
-      // Navigate to payment confirmation page
-      router.push(
-        `/buy-ticket/payment?eventId=${event.id}&ticketId=${selectedTicket.id}&quantity=${quantity}&total=${total}&purchaseId=${result.purchaseId}`
-      );
-      onClose();
-    }
+    // Close modal immediately before navigation
+    onClose();
+    
+    // Navigate to payment page with ticket details including event data to avoid API call
+    const paymentUrl = `/buy-ticket/payment?eventId=${event.id}&ticketId=${selectedTicket.id}&quantity=${quantity}&total=${total}&ticketType=${selectedTicket.ticketType}&eventTitle=${encodeURIComponent(event.title)}&eventImage=${encodeURIComponent(event.image)}&ticketPrice=${selectedTicket.price}${selectedTicket.id.startsWith("fallback-") ? '&fallback=true' : ''}`;
+    
+    console.log("Navigating to payment page:", paymentUrl);
+    router.push(paymentUrl);
   };
 
   if (!isOpen) return null;

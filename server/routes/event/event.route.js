@@ -3,7 +3,7 @@ const router = express.Router();
 const EventController = require('../../controllers/event.controller');
 const TicketController = require('../../controllers/ticket.controller');
 const PurchaseController = require('../../controllers/purchase.controller');
-const { authenticateToken, optionalAuth } = require('../../middleware/auth.middleware');
+const { authenticateToken } = require('../../middleware/auth.middleware');
 const { uploadSingle } = require('../../middleware/upload.middleware');
 
 // Event routes
@@ -21,8 +21,8 @@ router.post('/admin/check-completions', authenticateToken, EventController.check
 
 // Ticket routes
 router.post('/:eventId/tickets', authenticateToken, TicketController.createTickets);
-router.get('/:eventId/tickets', optionalAuth, TicketController.getEventTickets);
-router.get('/tickets/:ticketId/availability', optionalAuth, TicketController.checkAvailability);
+router.get('/:eventId/tickets', authenticateToken, TicketController.getEventTickets);
+router.get('/tickets/:ticketId/availability', authenticateToken, TicketController.checkAvailability);
 
 // Purchase routes
 router.post('/tickets/:ticketId/purchase', authenticateToken, PurchaseController.createPurchase);

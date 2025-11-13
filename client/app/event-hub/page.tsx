@@ -4,6 +4,7 @@ import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import {Plus} from "lucide-react";
 import {eventAPI} from "@/app/utils/api";
+import {apiService} from "@/app/lib/api";
 
 // Import components
 import EmptyEvents from "./events/components/empyEvents";
@@ -39,6 +40,21 @@ export default function EventHubPage() {
           console.error("Failed to fetch events:", eventsResponse.error);
           setError(eventsResponse.error || "Failed to fetch events");
           setEvents([]);
+        }
+
+        // Fetch user purchases (tickets bought)
+        try {
+          const purchasesResponse = await apiService.getUserPurchases(1, 50);
+          console.log("Purchases response:", purchasesResponse);
+          if (purchasesResponse.success && purchasesResponse.data) {
+            setTickets(purchasesResponse.data);
+          } else {
+            console.error("Failed to fetch purchases:", purchasesResponse.error);
+            setTickets([]);
+          }
+        } catch (purchaseError) {
+          console.error("Error fetching purchases:", purchaseError);
+          setTickets([]);
         }
 
         setLoading(false);

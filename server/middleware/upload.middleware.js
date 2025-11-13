@@ -2,22 +2,46 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../uploads/events');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+// Ensure uploads directories exist
+const eventsDir = path.join(__dirname, '../uploads/events');
+const profilesDir = path.join(__dirname, '../uploads/profiles');
+
+if (!fs.existsSync(eventsDir)) {
+    fs.mkdirSync(eventsDir, { recursive: true });
+}
+if (!fs.existsSync(profilesDir)) {
+    fs.mkdirSync(profilesDir, { recursive: true });
 }
 
 // Configure multer storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, uploadsDir);
+        // Determine upload directory based on field name
+        let uploadDir = eventsDir; // default
+        
+        if (file.fieldname === 'profileImage') {
+            uploadDir = profilesDir;
+        } else if (file.fieldname === 'eventImage') {
+            uploadDir = eventsDir;
+        }
+        
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        // Generate unique filename with timestamp and random string
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        // Generate filename based on field type
         const extension = path.extname(file.originalname);
-        const filename = `event-${uniqueSuffix}${extension}`;
+        let filename;
+        
+        if (file.fieldname === 'profileImage') {
+            // For profile images, use userId to replace existing file
+            const userId = req.user?.id || 'unknown';
+            filename = `profile-${userId}${extension}`;
+        } else {
+            // For event images, use unique timestamp
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            filename = `event-${uniqueSuffix}${extension}`;
+        }
+        
         cb(null, filename);
     }
 });

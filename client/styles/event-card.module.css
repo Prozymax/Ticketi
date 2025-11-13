@@ -112,8 +112,8 @@ p.near_user {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
+  color: rgb(189, 188, 188);
+  font-size: 15px;
   line-height: 1.4;
 }
 
@@ -122,9 +122,9 @@ p.near_user {
 }
 
 .detail-icon {
-  color: rgba(255, 255, 255, 0.7);
   flex-shrink: 0;
   display: flex;
+  color: rgb(189, 188, 188);
   align-items: center;
   justify-content: center;
 }
@@ -140,12 +140,12 @@ p.near_user {
 }
 
 .tickets-count {
-  color: white;
+  color: rgb(189, 188, 188);
 }
 
 .ticket-type {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgb(189, 188, 188);
 }
 
 /* Details Button */
@@ -346,4 +346,68 @@ Loading Spinner */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+
+/* Trending Events Carousel Styles */
+.trending-section {
+  margin-bottom: 40px;
+}
+
+.trending-carousel {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.trending-carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.trending-carousel-track {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 16px;
+}
+
+.trending-card-wrapper {
+  flex: 0 0 auto;
+  width: 320px;
+  max-width: 85vw;
+}
+
+.trending-card-wrapper .event-card {
+  margin-bottom: 0;
+  height: 100%;
+}
+
+/* Smooth scrolling */
+.trending-carousel {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+}
+
+.trending-card-wrapper {
+  scroll-snap-align: start;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .trending-card-wrapper {
+    width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trending-card-wrapper {
+    width: 250px;
+  }
+  
+  .trending-carousel-track {
+    gap: 12px;
+  }
 }

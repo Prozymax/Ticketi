@@ -60,37 +60,7 @@ const authenticateToken = async (req, res, next) => {
     }
 };
 
-/**
- * Optional authentication middleware - doesn't fail if no token
- */
-const optionalAuth = async (req, res, next) => {
-    try {
-        
-        if (!token) {
-            const authHeader = req.headers['authorization'];
-            token = authHeader && authHeader.split(' ')[1];
-        }
-
-        if (token) {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-            const user = await User.findByPk(decoded.userId, {
-                attributes: { exclude: ['password'] }
-            });
-
-            if (user) {
-                req.user = user;
-            }
-        }
-
-        next();
-    } catch (error) {
-        // Continue without authentication for optional auth
-        logger.warn('Optional auth failed:', error.message);
-        next();
-    }
-};
 
 module.exports = {
     authenticateToken,
-    optionalAuth
 };

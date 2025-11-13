@@ -37,7 +37,7 @@ export default function SuccessPage() {
       });
     } else {
       // Fallback if no event data
-      router.push('/');
+      router.push('/events');
     }
   }, [state.eventData, router]);
 
@@ -87,44 +87,43 @@ export default function SuccessPage() {
         {/* Congratulations Section */}
         <div className={styles['congratulations-section']}>
           <div className={styles['celebration-icons']}>
-            <span className={`${styles['celebration-icon']} ${styles.left}`}>🎉</span>
-            <span className={`${styles['celebration-icon']} ${styles.right}`}>🎉</span>
+            {/* <span className={`${styles['celebration-icon']} ${styles.left}`}>🎉</span>
+            <span className={`${styles['celebration-icon']} ${styles.right}`}>🎉</span> */}
           </div>
           <h1 className={styles['congratulations-title']}>Congratulations!!!</h1>
           <p className={styles['congratulations-text']}>
             Your event ticket has been created
-            <span className={styles.sparkles}> ✨</span>
           </p>
         </div>
 
         {/* Event Details Card */}
         <div className={styles['details-card']}>
-          <div className={styles['detail-row']}>
+          <div className={styles['detail-item']}>
             <span className={styles['detail-label']}>Event Host</span>
             <span className={styles['detail-value']}>{eventData.eventHost}</span>
           </div>
 
-          <div className={styles['detail-row']}>
+          <div className={styles['detail-item']}>
             <span className={styles['detail-label']}>Price</span>
             <span className={styles['detail-value']}>{eventData.price}</span>
           </div>
 
-          <div className={styles['detail-row']}>
+          <div className={styles['detail-item']}>
             <span className={styles['detail-label']}>Event Title</span>
             <span className={styles['detail-value']}>{eventData.eventTitle}</span>
           </div>
 
-          <div className={styles['detail-row']}>
+          <div className={styles['detail-item']}>
             <span className={styles['detail-label']}>Ticket</span>
             <span className={styles['detail-value']}>{eventData.tickets}</span>
           </div>
 
-          <div className={styles['detail-row']}>
+          <div className={styles['detail-item']}>
             <span className={styles['detail-label']}>Schedule and Location</span>
             <span className={styles['detail-value']}>{eventData.location}</span>
           </div>
 
-          <div className={styles['detail-row']}>
+          <div className={styles['detail-item']}>
             <span className={styles['detail-label']}>Creator Fee</span>
             <span className={styles['detail-value']}>{eventData.creatorFee}</span>
           </div>
@@ -132,10 +131,10 @@ export default function SuccessPage() {
 
         {/* Action Buttons */}
         <div className={styles['action-buttons']}>
-          <button className={styles['complete-button']} onClick={handleComplete}>
+          <button type="button" className={styles['complete-button']} onClick={handleComplete}>
             Complete
           </button>
-          <button className={styles['share-button']} onClick={handleShare}>
+          <button type="button" className={styles['share-button']} onClick={handleShare}>
             Share
           </button>
         </div>

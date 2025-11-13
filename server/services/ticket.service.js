@@ -148,6 +148,7 @@ class TicketService {
                     as: 'event'
                 }]
             });
+            console.log(ticket.event.dataValues)
 
             if (!ticket) {
                 return { success: false, error: 'Ticket not found' };
@@ -157,7 +158,7 @@ class TicketService {
                 return { success: false, error: 'Ticket is not available for sale' };
             }
 
-            if (ticket.event.status !== 'published') {
+            if (ticket.event.dataValues.status !== 'published') {
                 return { success: false, error: 'Event is not published' };
             }
 

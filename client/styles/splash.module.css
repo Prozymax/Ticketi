@@ -34,7 +34,7 @@
 }
 
 .color-span {
-  color: var(--accent);
+  color: var(--secondary);
 }
 
 /* Loading indicator styles */

@@ -4,6 +4,7 @@ import {useState, useCallback} from "react";
 import {apiService} from "../lib/api";
 import {formatError, logError} from "../utils/errorHandler";
 import {useAuthenticatedAction} from "./useAuthenticatedAction";
+import {usePiNetwork} from "./usePiNetwork";
 
 interface TicketPurchaseData {
   eventId: string;
@@ -11,6 +12,7 @@ interface TicketPurchaseData {
   ticketType: string;
   quantity: number;
   totalAmount: number;
+  eventTitle?: string;
 }
 
 interface UseTicketPurchaseReturn {
@@ -24,6 +26,8 @@ interface UseTicketPurchaseReturn {
 }
 
 export const useTicketPurchase = (): UseTicketPurchaseReturn => {
+  const {createPayment} = usePiNetwork();
+
   // Define the actual purchase action
   const purchaseAction = useCallback(async (data: TicketPurchaseData) => {
     // Step 1: Check ticket availability first
@@ -52,34 +56,26 @@ export const useTicketPurchase = (): UseTicketPurchaseReturn => {
       throw new Error("Purchase created but no ID returned");
     }
 
-    // Step 3: Create payment request
-    const paymentResponse = await apiService.createPayment({
-      ticketId: data.ticketId,
-      quantity: data.quantity,
-      eventId: data.eventId,
-      amount: data.totalAmount,
-      memo: `Ticket purchase for event ${data.eventId}`,
-      metadata: {
+    // Step 3: Create payment using Pi SDK (not backend endpoint)
+    const paymentId = await createPayment(
+      data.totalAmount,
+      `Ticket purchase for ${data.eventTitle || 'event'}`,
+      {
         ticketType: data.ticketType,
         purchaseId: purchaseId,
         eventId: data.eventId,
         ticketId: data.ticketId,
         quantity: data.quantity,
         paymentType: "ticket_purchase",
-      },
-    });
+      }
+    );
 
-    if (!paymentResponse.success) {
-      throw new Error(paymentResponse.message || "Failed to create payment");
-    }
-
-    const paymentId = paymentResponse.data?.id;
     return {
       success: true,
       purchaseId,
       paymentId,
     };
-  }, []);
+  }, [createPayment]);
 
   // Use the authenticated action hook
   const {execute, isLoading, error, clearError, isAuthenticating} =

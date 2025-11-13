@@ -7,16 +7,12 @@ class ProfileService {
      * @returns {Object} user profile data
      */
     getUserProfile = async (userId) => {
-        console.log('userid', userId)
         try {
             const user = await User.findByPk(userId, {
                 attributes: [
                     'id',
                     'username',
                     'email',
-                    'firstName',
-                    'lastName',
-                    'piWalletAddress',
                     'profileImage',
                     'isVerified',
                     'lastLogin',
@@ -59,6 +55,31 @@ class ProfileService {
                 error: false,
                 message: 'Profile retrieved successfully',
                 user: userWithStats
+            };
+        } catch (error) {
+            console.error('Error fetching user profile:', error);
+            return {
+                error: true,
+                message: 'Failed to fetch profile',
+                user: null
+            };
+        }
+    }
+
+    getProfileImage = async (userId) => {
+        try {
+            if(!userId) return { error: true, message: 'User not found', user: [] }
+            const user = await User.findByPk(userId, {
+                attributes: ['profileImage']
+            });
+            if (!user) {
+                return { error: true, message: 'User not found', user: [] };
+            }
+            console.log(user)
+            return {
+                error: false,
+                message: 'Profile retrieved successfully',
+                user: user
             };
         } catch (error) {
             console.error('Error fetching user profile:', error);
@@ -167,6 +188,104 @@ class ProfileService {
                 error: true,
                 message: 'Failed to fetch stats',
                 stats: null
+            };
+        }
+    }
+
+    /**
+     * Upload profile image
+     * @param {string} userId 
+     * @param {string} filename 
+     * @returns {Object} updated user profile
+     */
+    uploadProfileImage = async (userId, filename) => {
+        try {
+            const { serverUrl } = require('../config/url.config');
+            const fs = require('fs');
+            const path = require('path');
+
+            // Get current user to check for existing profile image
+            const user = await User.findByPk(userId);
+            
+            if (!user) {
+                return { error: true, message: 'User not found', user: null };
+            }
+
+            // Delete old profile image if it exists
+            if (user.profileImage) {
+                try {
+                    // Extract filename from URL
+                    const oldFilename = user.profileImage.split('/').pop();
+                    const oldFilePath = path.join(__dirname, '../uploads/profiles', oldFilename);
+                    
+                    if (fs.existsSync(oldFilePath)) {
+                        fs.unlinkSync(oldFilePath);
+                        console.log('Deleted old profile image:', oldFilename);
+                    }
+                } catch (deleteError) {
+                    console.error('Error deleting old profile image:', deleteError);
+                    // Continue even if deletion fails
+                }
+            }
+
+            // Update user with new profile image URL
+            const profileImageUrl = `${serverUrl}/uploads/profiles/${filename}`;
+            
+            await user.update({
+                profileImage: profileImageUrl
+            });
+
+            // Fetch updated user with all profile data
+            const updatedUser = await User.findByPk(userId, {
+                attributes: [
+                    'id',
+                    'username',
+                    'email',
+                    'firstName',
+                    'lastName',
+                    'piWalletAddress',
+                    'profileImage',
+                    'isVerified',
+                    'lastLogin',
+                    'createdAt'
+                ],
+                include: [
+                    {
+                        association: 'followers',
+                        attributes: ['id'],
+                        required: false
+                    },
+                    {
+                        association: 'following',
+                        attributes: ['id'],
+                        required: false
+                    }
+                ]
+            });
+
+            const followersCount = updatedUser.followers ? updatedUser.followers.length : 0;
+            const followingCount = updatedUser.following ? updatedUser.following.length : 0;
+
+            const userWithStats = {
+                ...updatedUser.toJSON(),
+                followersCount,
+                followingCount
+            };
+
+            delete userWithStats.followers;
+            delete userWithStats.following;
+
+            return {
+                error: false,
+                message: 'Profile image uploaded successfully',
+                user: userWithStats
+            };
+        } catch (error) {
+            console.error('Error uploading profile image:', error);
+            return {
+                error: true,
+                message: 'Failed to upload profile image',
+                user: null
             };
         }
     }

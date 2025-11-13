@@ -135,7 +135,11 @@ export default function EditUsernamePage() {
                 and secure your brand.
               </span>
             </p>
-            <div className={styles["mint-link"]}>Mint with Pi Domain</div>
+            <div className={styles["mint-link"]}>
+              <a href="domains.pinet.com">
+              Mint with Pi Domain
+              </a>
+            </div>
           </div>
         </div>
       </main>

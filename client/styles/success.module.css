@@ -1,7 +1,7 @@
 /* Success Page Styles */
 .success-container {
   min-height: 100vh;
-  background: var(--splash-background);
+  background: var(--background);
   color: white;
   display: flex;
   flex-direction: column;
@@ -13,54 +13,279 @@
 
 /* Logo Section */
 .success-logo {
-  margin-bottom: 60px;
+  margin-bottom: 6px;
+  margin-top: 20px;
 }
 
 .logo-text {
   font-size: 32px;
-  font-weight: 600;
   margin: 0;
   text-align: center;
+  color: white;
 }
 
 .logo-accent {
-  color: var(--accent);
+  color: var(--secondary);
+}
+
+/* Success Content */
+.success-content {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
 }
 
 /* Congratulations Section */
 .congratulations-section {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   position: relative;
+  width: 100%;
 }
 
 .celebration-icons {
   position: relative;
   margin-bottom: 20px;
-  height: 60px;
+  height: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0 5px;
 }
 
 .celebration-icon {
-  font-size: 32px;
-  position: absolute;
-  animation: bounce 2s infinite;
+  font-size: 48px;
+  position: relative;
+  z-index: 2;
 }
 
 .celebration-icon.left {
-  left: -40px;
-  top: 0;
-  animation-delay: 0.2s;
+  animation: rotate-left 2s ease-in-out infinite;
 }
 
 .celebration-icon.right {
-  right: -40px;
-  top: 0;
+  animation: rotate-right 2s ease-in-out infinite;
+}
+
+/* Confetti Animation - Multiple particles */
+.celebration-icons::before,
+.celebration-icons::after {
+  /* content: '🎊'; */
+  position: absolute;
+  font-size: 16px;
+  animation: confetti-fall 2.5s ease-in infinite;
+  pointer-events: none;
+}
+
+.celebration-icons::before {
+  left: 15%;
+  animation-delay: 0.5s;
+}
+
+.celebration-icons::after {
+  right: 15%;
+  animation-delay: 0.8s;
+}
+
+.celebration-icon::before,
+.celebration-icon::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: confetti-fall 2s ease-in infinite;
+  pointer-events: none;
+}
+
+.celebration-icon.left::before {
+  background: #fbbf24;
+  left: 15px;
+  top: 30px;
+  animation-delay: 0.1s;
+}
+
+.celebration-icon.left::after {
+  background: #a855f7;
+  left: 25px;
+  top: 35px;
+  animation-delay: 0.3s;
+}
+
+.celebration-icon.right::before {
+  background: #ec4899;
+  right: 15px;
+  top: 30px;
+  animation-delay: 0.2s;
+}
+
+.celebration-icon.right::after {
+  background: #3b82f6;
+  right: 25px;
+  top: 35px;
   animation-delay: 0.4s;
 }
 
-.confetti {
-  position: absolute;
-  font-size: 20px;
-  animation: float 3s ease-in-out infinite;
+.congratulations-title {
+  font-size: 28px;
+  margin: 0 0 12px 0;
+  color: white;
 }
 
+.congratulations-text {
+  font-size: 16px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* Event Details Card */
+.details-card {
+  width: 100%;
+  background: #10091A;
+  border-radius: 16px;
+  padding: 0;
+  margin-bottom: 40px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 24px;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.detail-value {
+  font-size: 18px;
+  color: white;
+  word-break: break-word;
+}
+
+/* Action Buttons */
+.action-buttons {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.complete-button,
+.share-button {
+  flex: 1;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.complete-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.complete-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.share-button {
+  background: #a855f7;
+  color: white;
+}
+
+.share-button:hover {
+  background: #9333ea;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+}
+
+/* Animations */
+@keyframes rotate-left {
+  0%, 100% {
+    transform: rotate(-15deg);
+  }
+  50% {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes rotate-right {
+  0%, 100% {
+    transform: rotate(15deg);
+  }
+  50% {
+    transform: rotate(25deg);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(200px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .success-container {
+    padding: 32px 20px 24px;
+  }
+
+  .success-logo {
+    margin-bottom: 20px;
+  }
+
+  .logo-text {
+    font-size: 28px;
+  }
+
+  .congratulations-title {
+    font-size: 24px;
+  }
+
+  .congratulations-text {
+    font-size: 15px;
+  }
+
+  .celebration-icon {
+    font-size: 40px;
+  }
+
+  .detail-item {
+    padding: 16px 20px;
+  }
+
+  .detail-label {
+    font-size: 13px;
+  }
+
+  .detail-value {
+    font-size: 18px;
+  }
+
+  .complete-button,
+  .share-button {
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+}

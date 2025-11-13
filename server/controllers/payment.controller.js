@@ -4,79 +4,16 @@ const { logger } = require('../utils/logger');
 
 class PaymentController {
     /**
-     * Create a new payment for ticket purchase
+     * DEPRECATED: This method is not used anymore
+     * Payments are created directly on the frontend using Pi SDK (via usePiNetwork hook)
+     * The frontend calls createPayment() which uses Pi.createPayment() directly
+     * Backend only handles the payment callbacks (approval, completion, cancellation)
+     * 
+     * This approach is consistent with event creation payments and avoids duplicate payment creation
      */
-    static async createPayment(req, res) {
-        try {
-            const userId = req.user.id;
-            const { ticketId, quantity, eventId, amount, memo, metadata } = req.body;
-
-            if (!ticketId || !quantity || !eventId || !amount) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Ticket ID, quantity, event ID, and amount are required'
-                });
-            }
-
-            // Create purchase first
-            const purchaseResult = await PurchaseService.createPurchase({
-                userId,
-                ticketId,
-                quantity,
-                eventId
-            });
-
-            if (!purchaseResult.success) {
-                return res.status(400).json({
-                    success: false,
-                    message: purchaseResult.error
-                });
-            }
-
-            const purchase = purchaseResult.purchase;
-
-            // Submit payment to Pi Network
-            const paymentResult = await piNetworkService.submitPayment({
-                amount,
-                memo: memo || `Ticket purchase for ${quantity} ticket(s)`,
-                metadata: {
-                    ...metadata,
-                    purchaseId: purchase.id,
-                    userId,
-                    eventId,
-                    ticketId,
-                    quantity
-                },
-                userId,
-                purchaseId: purchase.id
-            });
-
-            if (!paymentResult.success) {
-                return res.status(400).json({
-                    success: false,
-                    message: paymentResult.error
-                });
-            }
-
-            res.status(201).json({
-                success: true,
-                data: {
-                    id: paymentResult.payment.id,
-                    amount: paymentResult.payment.amount,
-                    status: paymentResult.payment.status,
-                    purchaseId: purchase.id,
-                    createdAt: new Date().toISOString()
-                },
-                message: 'Payment created successfully'
-            });
-        } catch (error) {
-            logger.error('Error in createPayment controller:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error'
-            });
-        }
-    }
+    // static async createPayment(req, res) {
+    //     // NOT USED - Frontend creates payments directly via Pi SDK
+    // }
 
     /**
      * Handle server approval callback from Pi Network
@@ -184,7 +121,7 @@ class PaymentController {
                     logger.info('Purchase status updated to completed:', { purchaseId: result.payment.purchaseId });
 
                     // Create NFT tickets for the purchase
-                    await this.createNFTTickets(result.payment.purchaseId, userId, result.payment.txid || transactionHash);
+                    await PaymentController.createNFTTickets(result.payment.purchaseId, userId, result.payment.txid || transactionHash);
 
                 } else if (paymentType === 'event_creation' && result.payment.eventId) {
                     console.log('=== Processing Event Creation Payment ===');
@@ -385,7 +322,7 @@ class PaymentController {
                     logger.info('Purchase status updated to completed:', { purchaseId: result.payment.purchaseId });
 
                     // Create NFT tickets for the purchase
-                    await this.createNFTTickets(result.payment.purchaseId, userId, transactionHash);
+                    await PaymentController.createNFTTickets(result.payment.purchaseId, userId, transactionHash);
                 } else if (result.payment.metadata && result.payment.metadata.paymentType === 'event_creation' && result.payment.eventId) {
                     console.log('=== Processing Event Creation Payment ===');
                     console.log('EventId:', result.payment.eventId);

@@ -29,6 +29,27 @@ class ProfileController {
         }
     }
 
+    async getProfileImage(req, res) {
+        try {
+            if (!req.user || !req.user.id) {
+                return ApiResponse.error(res, 'User not authenticated', 401, 'Authentication required');
+            }
+
+            const userId = req.user.id; // From auth middleware
+
+            const result = await profileService.getProfileImage(userId);
+
+            if (result.error) {
+                return ApiResponse.error(res, result.message, 404, result.message);
+            }
+
+            return ApiResponse.success(res, result.user, result.message, 200);
+        } catch (error) {
+            console.error('Profile fetch error:', error);
+            return ApiResponse.error(res, 'Failed to fetch profile', 500, 'Internal server error');
+        }
+    }
+
     /**
      * Update current user's profile
      */
@@ -75,6 +96,39 @@ class ProfileController {
         } catch (error) {
             console.error('Error: ', error)
             return ApiResponse.error(res, 'Failed to fetch stats', 500, 'Internal server error');
+        }
+    }
+
+    /**
+     * Upload profile image
+     */
+    async uploadProfileImage(req, res) {
+        try {
+            console.log('Upload profile image - Request received');
+            console.log('Uploaded file:', req.uploadedFile);
+            console.log('File object:', req.file);
+
+            if (!req.user || !req.user.id) {
+                return ApiResponse.error(res, 'User not authenticated', 401, 'Authentication required');
+            }
+
+            if (!req.uploadedFile) {
+                return ApiResponse.error(res, 'No image file provided', 400, 'Image file is required');
+            }
+
+            const userId = req.user.id;
+            const filename = req.uploadedFile;
+
+            const result = await profileService.uploadProfileImage(userId, filename);
+
+            if (result.error) {
+                return ApiResponse.error(res, result.message, 400, result.message);
+            }
+
+            return ApiResponse.success(res, result.user, result.message, 200);
+        } catch (error) {
+            console.error('Profile image upload error:', error);
+            return ApiResponse.error(res, 'Failed to upload profile image', 500, 'Internal server error');
         }
     }
 }

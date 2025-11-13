@@ -42,10 +42,10 @@
 }
 
 .slide-content {
-  padding: 20px 0;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   min-height: 60vh;
 }
@@ -67,8 +67,8 @@
 }
 
 .vector_illustration {
-  width: 450px;
-  height: 450px;
+  width: 400px;
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,7 +114,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 56px;
+  min-height: 65px;
 }
 
 .auth-button:hover:not(.loading):not(.not-ready) {

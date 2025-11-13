@@ -15,7 +15,9 @@ interface UsePiNetworkReturn {
   createPayment: (
     amount: number,
     memo: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
+    onApproval?: (paymentId: string) => Promise<void>,
+    onCompletion?: (paymentId: string, txid: string) => Promise<void>
   ) => Promise<string>;
   createPaymentWithBackend: (
     ticketId: string,
@@ -24,7 +26,7 @@ interface UsePiNetworkReturn {
     amount: number,
     memo?: string,
     metadata?: Record<string, unknown>
-  ) => Promise<{ paymentId: string; backendPaymentId: string }>;
+  ) => Promise<{paymentId: string; backendPaymentId: string}>;
   shareContent: (title: string, message: string) => void;
   isSDKReady: boolean;
   logout: () => void;
@@ -45,10 +47,10 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
 
     const checkSDKReady = () => {
       if (service.isSDKAvailable()) {
-        console.log('Pi SDK is ready');
+        console.log("Pi SDK is ready");
         setIsSDKReady(true);
       } else {
-        console.log('Pi SDK not ready, retrying...');
+        console.log("Pi SDK not ready, retrying...");
         setTimeout(checkSDKReady, 500);
       }
     };
@@ -73,7 +75,7 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
 
     try {
       console.log("Starting Pi Network authentication...");
-      
+
       // Step 1: Authenticate with Pi Network SDK
       const piAuthResult = await piService.authenticateUser();
       console.log("Pi Network auth result:", piAuthResult);
@@ -83,10 +85,11 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       }
 
       // Step 2: Send access token to backend for verification and user creation/update
-      const backendAuthResult: AuthResponseData = await apiService.authenticateUser(
-        piAuthResult.accessToken,
-        piAuthResult.user.username,
-      );
+      const backendAuthResult: AuthResponseData =
+        await apiService.authenticateUser(
+          piAuthResult.accessToken,
+          piAuthResult.user.username
+        );
       console.log("Backend auth result:", backendAuthResult);
 
       // Step 3: Store user data and set authenticated state
@@ -94,8 +97,8 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       setUser(backendAuthResult.user);
 
       // Store token in localStorage as pioneer-key
-      localStorage.setItem('pioneer-key', backendAuthResult.user.token);
-      
+      localStorage.setItem("pioneer-key", backendAuthResult.user.token);
+
       // Store minimal user data for UI purposes
       const userInfo = {
         username: backendAuthResult.user.username,
@@ -106,14 +109,13 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       localStorage.setItem("pi_user_info", JSON.stringify(userInfo));
 
       // Also update UserStorage for compatibility with other parts of the app
-      const { UserStorage } = await import("../utils/userStorage");
+      const {UserStorage} = await import("../utils/userStorage");
       UserStorage.setUserToken(backendAuthResult.user.token);
       UserStorage.setUserData(backendAuthResult.user);
       UserStorage.setOnboardingCompleted();
 
       console.log("Authentication successful");
       return backendAuthResult.user;
-
     } catch (err) {
       const errorMessage = formatError(err);
       logError("Authentication", err);
@@ -122,15 +124,15 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       setUser(null);
 
       // Clear any stored auth data on error
-      localStorage.removeItem('pioneer-key');
-      localStorage.removeItem('pi_user_info');
-      
+      localStorage.removeItem("pioneer-key");
+      localStorage.removeItem("pi_user_info");
+
       // Also clear UserStorage
       try {
-        const { UserStorage } = await import("../utils/userStorage");
+        const {UserStorage} = await import("../utils/userStorage");
         UserStorage.clearUserData();
       } catch (error) {
-        console.error('Failed to clear UserStorage:', error);
+        console.error("Failed to clear UserStorage:", error);
       }
     } finally {
       setIsLoading(false);
@@ -141,32 +143,41 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
     async (
       amount: number,
       memo: string,
-      metadata: Record<string, unknown> = {}
+      metadata: Record<string, unknown> = {},
+      onApproval?: (paymentId: string) => Promise<void>,
+      onCompletion?: (paymentId: string, txid: string) => Promise<void>
     ): Promise<string> => {
       if (!piService) {
         throw new Error("Pi Network service not initialized");
       }
 
       if (!isAuthenticated) {
-        throw new Error("User not authenticated. Please authenticate with Pi Network to create payments.");
+        throw new Error(
+          "User not authenticated. Please authenticate with Pi Network to create payments."
+        );
       }
 
       setIsLoading(true);
       setError(null);
 
       try {
-        const paymentId = await piService.createPayment(amount, memo, metadata);
+        const paymentId = await piService.createPayment(amount, memo, metadata, onApproval, onCompletion);
         return paymentId;
       } catch (err) {
         const errorMessage = formatError(err);
         logError("Payment Creation", err);
         setError(errorMessage);
-        
+
         // Check if it's a scope-related error and provide better error message
-        if (errorMessage.includes("payments") && errorMessage.includes("scope")) {
-          throw new Error("Payment authorization required. Please authenticate with Pi Network to enable payments.");
+        if (
+          errorMessage.includes("payments") &&
+          errorMessage.includes("scope")
+        ) {
+          throw new Error(
+            "Payment authorization required. Please authenticate with Pi Network to enable payments."
+          );
         }
-        
+
         throw err;
       } finally {
         setIsLoading(false);
@@ -183,13 +194,15 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       amount: number,
       memo?: string,
       metadata?: Record<string, unknown>
-    ): Promise<{ paymentId: string; backendPaymentId: string }> => {
+    ): Promise<{paymentId: string; backendPaymentId: string}> => {
       if (!piService) {
         throw new Error("Pi Network service not initialized");
       }
 
       if (!isAuthenticated) {
-        throw new Error("User not authenticated. Please authenticate with Pi Network to create payments.");
+        throw new Error(
+          "User not authenticated. Please authenticate with Pi Network to create payments."
+        );
       }
 
       setIsLoading(true);
@@ -209,12 +222,17 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
         const errorMessage = formatError(err);
         logError("Payment Creation with Backend", err);
         setError(errorMessage);
-        
+
         // Check if it's a scope-related error and provide better error message
-        if (errorMessage.includes("payments") && errorMessage.includes("scope")) {
-          throw new Error("Payment authorization required. Please authenticate with Pi Network to enable payments.");
+        if (
+          errorMessage.includes("payments") &&
+          errorMessage.includes("scope")
+        ) {
+          throw new Error(
+            "Payment authorization required. Please authenticate with Pi Network to enable payments."
+          );
         }
-        
+
         throw err;
       } finally {
         setIsLoading(false);
@@ -252,15 +270,15 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
       setIsAuthenticated(false);
       setUser(null);
       setError(null);
-      localStorage.removeItem('pioneer-key');
-      localStorage.removeItem('pi_user_info');
-      
+      localStorage.removeItem("pioneer-key");
+      localStorage.removeItem("pi_user_info");
+
       // Also clear UserStorage
       try {
-        const { UserStorage } = await import("../utils/userStorage");
+        const {UserStorage} = await import("../utils/userStorage");
         UserStorage.clearUserData();
       } catch (error) {
-        console.error('Failed to clear UserStorage:', error);
+        console.error("Failed to clear UserStorage:", error);
       }
     }
   }, []);
@@ -268,18 +286,19 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
   // Check for stored user data on mount and verify with server
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const pioneerKey = localStorage.getItem('pioneer-key');
-      const userInfoStr = localStorage.getItem('pi_user_info');
-      
+      const pioneerKey = localStorage.getItem("pioneer-key");
+      const userInfoStr = localStorage.getItem("pi_user_info");
+
       if (pioneerKey && userInfoStr) {
         try {
           const userData = JSON.parse(userInfoStr);
-          
+
           // Check if data is not too old (24 hours)
-          const isExpired = Date.now() - userData.timestamp > 24 * 60 * 60 * 1000;
+          const isExpired =
+            Date.now() - userData.timestamp > 24 * 60 * 60 * 1000;
           if (isExpired) {
-            localStorage.removeItem('pioneer-key');
-            localStorage.removeItem('pi_user_info');
+            localStorage.removeItem("pioneer-key");
+            localStorage.removeItem("pi_user_info");
             return;
           }
 
@@ -293,21 +312,21 @@ export const usePiNetwork = (): UsePiNetworkReturn => {
               username: userData.username,
               isVerified: userData.isVerified,
               token: pioneerKey,
-              piWalletAddress: '', // Will be populated by server if needed
-              piData: {} // Will be populated by server if needed
+              piWalletAddress: "", // Will be populated by server if needed
+              piData: {}, // Will be populated by server if needed
             } as BackendUser);
           }
         } catch (error) {
           logError("Auth Verification", error);
           // Clear invalid auth data
-          localStorage.removeItem('pioneer-key');
-          localStorage.removeItem('pi_user_info');
+          localStorage.removeItem("pioneer-key");
+          localStorage.removeItem("pi_user_info");
         }
       }
     };
 
     checkAuthStatus();
-  }, []); 
+  }, []);
 
   return {
     piService,

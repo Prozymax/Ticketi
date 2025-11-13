@@ -3,8 +3,17 @@ const router = express.Router();
 const PaymentController = require('../../controllers/payment.controller');
 const { authenticateToken } = require('../../middleware/auth.middleware');
 
-// Payment routes
-router.post('/create', authenticateToken, PaymentController.createPayment);
+/**
+ * Payment Flow:
+ * 1. Frontend creates payment directly using Pi SDK (Pi.createPayment)
+ * 2. Pi Network sends callbacks to backend for approval/completion/cancellation
+ * 3. Backend processes the callbacks and updates database accordingly
+ * 
+ * This is the same flow used for both event creation and ticket purchase payments
+ */
+
+// Payment routes - payments are created on frontend via Pi SDK
+// router.post('/create', authenticateToken, PaymentController.createPayment); // REMOVED: Frontend creates payments directly
 router.post('/approve/:paymentId', authenticateToken, PaymentController.approvePayment);
 router.post('/complete/:paymentId', authenticateToken, PaymentController.completePayment);
 router.post('/cancel/:paymentId', authenticateToken, PaymentController.cancelPayment);
