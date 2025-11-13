@@ -30,6 +30,16 @@ const nextConfig: NextConfig = {
         hostname: "testnet.ticketi.xyz",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "backend.mainnet.ticketi.xyz",
+        pathname: "/uploads/**",
+      },
+      {
+        protocol: "https",
+        hostname: "backend.testnet.ticketi.xyz",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };
