@@ -13,38 +13,8 @@ if (!fs.existsSync(profilesDir)) {
     fs.mkdirSync(profilesDir, { recursive: true });
 }
 
-// Configure multer storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        // Determine upload directory based on field name
-        let uploadDir = eventsDir; // default
-        
-        if (file.fieldname === 'profileImage') {
-            uploadDir = profilesDir;
-        } else if (file.fieldname === 'eventImage') {
-            uploadDir = eventsDir;
-        }
-        
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        // Generate filename based on field type
-        const extension = path.extname(file.originalname);
-        let filename;
-        
-        if (file.fieldname === 'profileImage') {
-            // For profile images, use userId to replace existing file
-            const userId = req.user?.id || 'unknown';
-            filename = `profile-${userId}${extension}`;
-        } else {
-            // For event images, use unique timestamp
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            filename = `event-${uniqueSuffix}${extension}`;
-        }
-        
-        cb(null, filename);
-    }
-});
+// Configure multer storage - using memory storage for Filestack upload
+const storage = multer.memoryStorage();
 
 // File filter for images only
 const fileFilter = (req, file, cb) => {

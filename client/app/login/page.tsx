@@ -21,6 +21,11 @@ export default function LoginPage() {
     isVerified: boolean;
     username: string;
   } | null>(null);
+  const [confirmedUser, setConfirmedUser] = useState<{
+    username: string;
+    isVerified: boolean;
+    profileImage?: string;
+  } | null>(null);
 
   // Load stored username and check verification status on mount
   useEffect(() => {
@@ -49,15 +54,28 @@ export default function LoginPage() {
             const response = await apiService.confirmUserVerification(
               storedUsername
             );
+            console.log('Hello response; ', response);
 
-            if (!response.error && response.verified) {
+            if (!response.error && response.is_verified) {
               // User exists and is verified
               setUserVerificationStatus({
-                isVerified: response.user.is_verified,
-                username: response.user.username,
+                isVerified: response.is_verified,
+                username: response.username,
               });
+              
+              // Store the confirmed user data including profile image
+              setConfirmedUser({
+                username: response.username,
+                isVerified: response.is_verified,
+                profileImage: response.profileImage,
+              });
+              
               setShowUsernameInput(false);
               console.log("Stored username verified successfully");
+              console.log(
+                "Profile image from confirm user:",
+                response.profileImage
+              );
             } else {
               // User doesn't exist or is not verified - clear stored username and show input
               console.log(
@@ -148,11 +166,14 @@ export default function LoginPage() {
         <div className={styles["profile-section"]}>
           <div className={styles["avatar-container"]}>
             <img
-              src="/Avatar.png"
+              src={confirmedUser?.profileImage || user?.profileImage || "/Avatar.png"}
               alt="Profile avatar"
               className={styles.avatar}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/Avatar.png";
+              }}
             />
-            {user?.isVerified && (
+            {(confirmedUser?.isVerified || user?.isVerified) && (
               <div className={styles["verified-badge"]}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path
@@ -168,10 +189,14 @@ export default function LoginPage() {
           </div>
 
           <h1 className={styles["welcome-title"]}>
-            {user ? `Welcome Back, ${user.username}!` : "Welcome Back!"}
+            {confirmedUser?.username || user?.username 
+              ? `Welcome Back, ${confirmedUser?.username || user?.username}!` 
+              : "Welcome Back!"}
           </h1>
-          {user && (
-            <div className={styles["username-display"]}>{user.username}</div>
+          {(confirmedUser?.username || user?.username) && (
+            <div className={styles["username-display"]}>
+              {confirmedUser?.username || user?.username}
+            </div>
           )}
         </div>
 

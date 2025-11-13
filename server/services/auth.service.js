@@ -11,7 +11,7 @@ class AuthenticationService {
     confirmUser = async (username) => {
         console.log(username)
         const user = await User.findOne({
-            attributes: ['id', 'is_verified', 'username'],
+            attributes: ['id', 'is_verified', 'username', 'profileImage'],
             where: { username }
         });
         console.log(user ? user : 'User does not exist')

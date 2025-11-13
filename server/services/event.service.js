@@ -10,7 +10,7 @@ class EventService {
      * @param {string} organizerId 
      * @returns {Object} created event
      */
-    createEvent = async (eventData, organizerId, filename) => {
+    createEvent = async (eventData, organizerId, fileBuffer, filename, mimetype) => {
         try {
             console.log('Creating event with data:', eventData);
 
@@ -69,11 +69,23 @@ class EventService {
 
             const event = await Event.create(dbEventData);
 
-            // Only update eventImage if filename is provided
-            if (filename) {
-                await event.update({
-                    eventImage: `${serverUrl}/uploads/events/${filename}`
-                });
+            // Upload event image to Filestack if provided
+            if (fileBuffer && filename && mimetype) {
+                const filestackService = require('./filestack.service');
+                
+                const uploadResult = await filestackService.uploadFile(
+                    fileBuffer,
+                    `event-${event.id}-${filename}`,
+                    mimetype
+                );
+
+                if (uploadResult.success) {
+                    await event.update({
+                        eventImage: uploadResult.url
+                    });
+                } else {
+                    console.error('Failed to upload event image to Filestack:', uploadResult.error);
+                }
             }
 
             return {

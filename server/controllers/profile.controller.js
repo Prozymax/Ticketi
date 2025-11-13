@@ -105,21 +105,22 @@ class ProfileController {
     async uploadProfileImage(req, res) {
         try {
             console.log('Upload profile image - Request received');
-            console.log('Uploaded file:', req.uploadedFile);
             console.log('File object:', req.file);
 
             if (!req.user || !req.user.id) {
                 return ApiResponse.error(res, 'User not authenticated', 401, 'Authentication required');
             }
 
-            if (!req.uploadedFile) {
+            if (!req.file) {
                 return ApiResponse.error(res, 'No image file provided', 400, 'Image file is required');
             }
 
             const userId = req.user.id;
-            const filename = req.uploadedFile;
+            const fileBuffer = req.file.buffer; // Get buffer from multer memory storage
+            const filename = req.file.originalname;
+            const mimetype = req.file.mimetype;
 
-            const result = await profileService.uploadProfileImage(userId, filename);
+            const result = await profileService.uploadProfileImage(userId, fileBuffer, filename, mimetype);
 
             if (result.error) {
                 return ApiResponse.error(res, result.message, 400, result.message);

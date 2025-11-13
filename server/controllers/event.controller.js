@@ -3,29 +3,34 @@ const { ApiResponse } = require('../utils/response.utils');
 
 class EventController {
   createEvent = async (req, res) => {
-    try {
-      console.log('Create Event - Request body:', JSON.stringify(req.body, null, 2));
-      console.log('Create Event - Uploaded file:', req.uploadedFile);
-      console.log('Create Event - File object:', req.file);
+  try {
+    console.log('Create Event - Request body:', JSON.stringify(req.body, null, 2));
+    console.log('Create Event - File object:', req.file);
 
-      const event = await eventService.createEvent(req.body, req.user.id, req.uploadedFile);
-      console.log(event)
-      if (!event) return ApiResponse.error(res, 'Error creating event', 500);
-      if (event.error) {
-        console.error(event.message);
-        return ApiResponse.error(res, 'Error creating event', 500);
-      }
-      if (!event.event) {
-        return ApiResponse.error(res, 'Error creating event', 500);
-      }
+    const fileBuffer = req.file?.buffer;
+    const filename = req.file?.originalname;
+    const mimetype = req.file?.mimetype;
 
-      return ApiResponse.success(res, event, 'Success', 201);
-    }
-    catch (error) {
-      console.error(error);
+    const event = await eventService.createEvent(req.body, req.user.id, fileBuffer, filename, mimetype);
+    
+    if (!event) return ApiResponse.error(res, 'Error creating event', 500);
+    if (event.error) {
+      console.error(event.message);
       return ApiResponse.error(res, 'Error creating event', 500);
     }
+    if (!event.event) {
+      return ApiResponse.error(res, 'Error creating event', 500);
+    }
+
+    return ApiResponse.success(res, event, 'Success', 201);
   }
+  catch (error) {
+    console.error(error);
+    return ApiResponse.error(res, 'Error creating event', 500);
+  }
+}
+
+
 
   getAllEvents = async (req, res) => {
     const { page, limit } = req.query;
