@@ -262,7 +262,7 @@ export default function EventDetailsPage() {
           <div className={styles["host-section"]}>
             <div className={styles["host-info"]}>
               <a
-                href={`profiles.pinet.com/profiles/${event.organizer.username}`}
+                href={`pi://profiles.pinet.com/profiles/${event.organizer.username}`}
               >
                 <div className={styles["host-avatar"]}>
                   <img
