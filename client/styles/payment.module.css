@@ -3,11 +3,21 @@
   padding: 0;
 }
 
+.create-event-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #0a0a0a;
+  color: #ffffff;
+  padding: 20px;
+}
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 0;
+  flex-shrink: 0;
 }
 
 .back-button {
@@ -41,16 +51,16 @@
   max-width: 600px;
   margin: 0 auto;
   width: 100%;
+  min-height: 0;
 }
 
 .payment-title {
   font-size: 18px;
   color: white;
-  margin: 0 0 12px 0;
+  margin: 0 0 16px 0;
   text-align: center;
   font-weight: 500;
-  animation: fade-in 1s linear .5s;
-
+  animation: fade-in 0.5s ease-out 0.1s both;
 }
 
 .payment-card {
@@ -59,26 +69,23 @@
   border-radius: 20px 20px 0 0;
   padding: 12px 24px;
   width: 100%;
-  /* height */
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
-  transform: translateY(30%);
-  gap: 14px;
+  gap: 24px;
   opacity: 0;
-  animation: translate-up .15s linear .5s both; 
+  animation: slide-up .3s ease-out .2s both; 
 } 
  
-@keyframes translate-up {
+@keyframes slide-up {
   from {
     opacity: 0;
-  transform: translateY(30%);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-  transform: translateY(0%);
-
+    transform: translateY(-10px);
   }
 }
 

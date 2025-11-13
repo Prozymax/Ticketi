@@ -139,7 +139,7 @@ const Ticket = ({ticketData}: TicketProps) => {
             </div>
 
             {/* Event Title */}
-            <h2 className="text-sm font-bold text-purple-900 w-[80%] text-center px-2" style={{lineHeight: '1.2', maxWidth: '100%', wordBreak: 'break-word'}}>
+            <h2 className="text-sm font-bold text-[#7d5b9c] w-[80%] text-center px-2" style={{lineHeight: '1.2', maxWidth: '100%', wordBreak: 'break-word'}}>
               {ticketData.eventTitle}
             </h2>
           </div>

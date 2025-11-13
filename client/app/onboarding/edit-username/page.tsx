@@ -136,7 +136,7 @@ export default function EditUsernamePage() {
               </span>
             </p>
             <div className={styles["mint-link"]}>
-              <a href="domains.pinet.com">
+              <a href="pi://domains.pinet.com">
               Mint with Pi Domain
               </a>
             </div>
