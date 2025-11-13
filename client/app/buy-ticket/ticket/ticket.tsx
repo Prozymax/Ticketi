@@ -183,8 +183,10 @@ export default function TicketModal({
 
     console.log("Confirming payment for ticket:", selectedTicket);
 
-    // For fallback tickets, skip API availability check
-    if (!selectedTicket.id.startsWith("fallback-")) {
+    // For fallback tickets, skip API availability check and purchase creation
+    const isFallback = selectedTicket.id.startsWith("fallback-");
+    
+    if (!isFallback) {
       try {
         const availabilityResponse = await apiService.checkTicketAvailability(
           selectedTicket.id,
@@ -197,21 +199,47 @@ export default function TicketModal({
           );
           return;
         }
+
+        // Create purchase record before navigating to payment
+        console.log("Creating purchase record...");
+        const purchaseResponse = await apiService.createPurchase({
+          eventId: event.id,
+          ticketId: selectedTicket.id,
+          quantity: quantity
+        });
+
+        console.log("Purchase response:", purchaseResponse);
+
+        if (!purchaseResponse.success || !purchaseResponse.data) {
+          setTicketError(purchaseResponse.message || "Failed to create purchase");
+          return;
+        }
+
+        const purchaseId = purchaseResponse.data.id;
+        console.log("✅ Purchase created:", purchaseId);
+
+        // Close modal before navigation
+        onClose();
+        
+        // Navigate to payment page with purchaseId
+        const paymentUrl = `/buy-ticket/payment?eventId=${event.id}&ticketId=${selectedTicket.id}&purchaseId=${purchaseId}&quantity=${quantity}&total=${total}&ticketType=${selectedTicket.ticketType}&eventTitle=${encodeURIComponent(event.title)}&eventImage=${encodeURIComponent(event.image)}&ticketPrice=${selectedTicket.price}`;
+        
+        console.log("Navigating to payment page:", paymentUrl);
+        router.push(paymentUrl);
       } catch (error) {
-        console.error("Availability check failed:", error);
-        setTicketError("Failed to check ticket availability");
+        console.error("Purchase creation failed:", error);
+        setTicketError("Failed to create purchase. Please try again.");
         return;
       }
+    } else {
+      // For fallback tickets, navigate without creating purchase
+      onClose();
+      
+      const paymentUrl = `/buy-ticket/payment?eventId=${event.id}&ticketId=${selectedTicket.id}&quantity=${quantity}&total=${total}&ticketType=${selectedTicket.ticketType}&eventTitle=${encodeURIComponent(event.title)}&eventImage=${encodeURIComponent(event.image)}&ticketPrice=${selectedTicket.price}&fallback=true`;
+      
+      console.log("Navigating to payment page (fallback):", paymentUrl);
+      router.push(paymentUrl);
     }
-
-    // Close modal immediately before navigation
-    onClose();
-    
-    // Navigate to payment page with ticket details including event data to avoid API call
-    const paymentUrl = `/buy-ticket/payment?eventId=${event.id}&ticketId=${selectedTicket.id}&quantity=${quantity}&total=${total}&ticketType=${selectedTicket.ticketType}&eventTitle=${encodeURIComponent(event.title)}&eventImage=${encodeURIComponent(event.image)}&ticketPrice=${selectedTicket.price}${selectedTicket.id.startsWith("fallback-") ? '&fallback=true' : ''}`;
-    
-    console.log("Navigating to payment page:", paymentUrl);
-    router.push(paymentUrl);
   };
 
   if (!isOpen) return null;

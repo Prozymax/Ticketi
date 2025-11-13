@@ -121,7 +121,13 @@ class PaymentController {
                     logger.info('Purchase status updated to completed:', { purchaseId: result.payment.purchaseId });
 
                     // Create NFT tickets for the purchase
-                    await PaymentController.createNFTTickets(result.payment.purchaseId, userId, result.payment.txid || transactionHash);
+                    try {
+                        await PaymentController.createNFTTickets(result.payment.purchaseId, userId, result.payment.txid || transactionHash);
+                        console.log('✅ NFT tickets created successfully');
+                    } catch (nftError) {
+                        console.error('❌ Failed to create NFT tickets:', nftError);
+                        logger.error('Failed to create NFT tickets:', { error: nftError, purchaseId: result.payment.purchaseId });
+                    }
 
                 } else if (paymentType === 'event_creation' && result.payment.eventId) {
                     console.log('=== Processing Event Creation Payment ===');
@@ -322,7 +328,13 @@ class PaymentController {
                     logger.info('Purchase status updated to completed:', { purchaseId: result.payment.purchaseId });
 
                     // Create NFT tickets for the purchase
-                    await PaymentController.createNFTTickets(result.payment.purchaseId, userId, transactionHash);
+                    try {
+                        await PaymentController.createNFTTickets(result.payment.purchaseId, userId, transactionHash);
+                        console.log('✅ NFT tickets created successfully');
+                    } catch (nftError) {
+                        console.error('❌ Failed to create NFT tickets:', nftError);
+                        logger.error('Failed to create NFT tickets:', { error: nftError, purchaseId: result.payment.purchaseId });
+                    }
                 } else if (result.payment.metadata && result.payment.metadata.paymentType === 'event_creation' && result.payment.eventId) {
                     console.log('=== Processing Event Creation Payment ===');
                     console.log('EventId:', result.payment.eventId);
@@ -434,6 +446,11 @@ class PaymentController {
      */
     static async createNFTTickets(purchaseId, userId, transactionHash) {
         try {
+            console.log('=== Creating NFT Tickets ===');
+            console.log('Purchase ID:', purchaseId);
+            console.log('User ID:', userId);
+            console.log('Transaction Hash:', transactionHash);
+
             const Purchase = require('../models/purchase/purchase.model');
             const NFTTicket = require('../models/nft_ticket/nft_ticket.model');
             const { User } = require('../models/index.model');
@@ -450,15 +467,37 @@ class PaymentController {
                 ]
             });
 
+            console.log('Purchase found:', !!purchase);
+            if (purchase) {
+                console.log('Purchase details:', {
+                    id: purchase.id,
+                    userId: purchase.userId,
+                    quantity: purchase.quantity,
+                    eventId: purchase.eventId,
+                    hasBuyer: !!purchase.buyer
+                });
+            }
+
             if (!purchase) {
                 logger.error('Purchase not found for NFT creation:', { purchaseId });
-                return;
+                throw new Error(`Purchase not found: ${purchaseId}`);
+            }
+
+            if (!purchase.buyer) {
+                logger.error('Buyer not found for purchase:', { purchaseId });
+                throw new Error(`Buyer not found for purchase: ${purchaseId}`);
             }
 
             const user = purchase.buyer;
             const displayName = user.firstName && user.lastName
                 ? `${user.firstName} ${user.lastName}`
                 : user.username;
+
+            console.log('Creating NFT tickets for user:', {
+                username: user.username,
+                displayName: displayName,
+                quantity: purchase.quantity
+            });
 
             // Create NFT tickets based on quantity purchased
             const nftTickets = [];
@@ -471,6 +510,8 @@ class PaymentController {
                     owner: user.username,
                     transactionHash: transactionHash
                 });
+
+                console.log(`Creating NFT ticket ${i + 1}/${purchase.quantity}...`);
 
                 const nftTicket = await NFTTicket.create({
                     purchaseId: purchaseId,
@@ -490,18 +531,24 @@ class PaymentController {
                     isTransferable: true
                 });
 
+                console.log(`NFT ticket ${i + 1} created with ID:`, nftTicket.id);
                 nftTickets.push(nftTicket);
             }
 
+            console.log(`=== Successfully created ${nftTickets.length} NFT tickets ===`);
             logger.info(`Created ${nftTickets.length} NFT tickets for purchase:`, {
                 purchaseId,
                 userId,
-                owner: user.username
+                owner: user.username,
+                ticketIds: nftTickets.map(t => t.id)
             });
 
             return nftTickets;
         } catch (error) {
+            console.error('=== ERROR Creating NFT Tickets ===');
+            console.error('Error details:', error);
             logger.error('Error creating NFT tickets:', error);
+            throw error; // Re-throw to ensure calling code knows it failed
         }
     }
 

@@ -114,16 +114,17 @@ function PaymentContent({eventData}: PaymentPageProps) {
     setPaymentError(null);
 
     try {
-      console.log("Creating payment with fallback:", isFallback);
+      console.log("Initiating payment with purchaseId:", purchaseId);
       console.log("Payment details:", {
         amount: calculatedTotal,
         eventId: event.id,
         ticketId,
-        purchaseId,
-        quantity
+        purchaseId: purchaseId,
+        quantity,
+        isFallback
       });
       
-      // Create Pi Network payment with completion callback
+      // Create Pi Network payment with the purchaseId in metadata
       const paymentId = await createPayment(
         calculatedTotal,
         `Ticket purchase for ${event.title}`,
@@ -147,7 +148,7 @@ function PaymentContent({eventData}: PaymentPageProps) {
           console.log("Payment ID:", completedPaymentId);
           console.log("Transaction ID:", txid);
           
-          // Backend has already created the ticket in the completion handler
+          // Backend has already created the NFT tickets in the completion handler
           // Now navigate to success page with payment and event details
           console.log("🎉 Ticket created! Navigating to success page...");
           router.push(`/buy-ticket/success?paymentId=${completedPaymentId}&eventId=${event.id}&purchaseId=${purchaseId || ''}&quantity=${quantity}&ticketType=${ticketType}`);
