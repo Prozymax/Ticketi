@@ -1,4 +1,5 @@
 const { Followers, User } = require('../models/index.model');
+const cacheService = require('./cache.service');
 
 class FollowService {
     /**
@@ -40,6 +41,23 @@ class FollowService {
                 followingId
             });
 
+            // Invalidate follower count cache for both users
+            const followerCacheKey = `user:followers:${followingId}`;
+            const followingCacheKey = `user:followers:${followerId}`;
+            await Promise.all([
+                cacheService.del(followerCacheKey),
+                cacheService.del(followingCacheKey)
+            ]);
+            console.log('Invalidated follower count cache for users:', followerId, followingId);
+
+            // Also invalidate profile cache for both users to update follower counts
+            const profileCacheKey1 = `user:profile:${followingId}`;
+            const profileCacheKey2 = `user:profile:${followerId}`;
+            await Promise.all([
+                cacheService.del(profileCacheKey1),
+                cacheService.del(profileCacheKey2)
+            ]);
+
             return {
                 error: false,
                 message: 'Successfully followed user',
@@ -79,6 +97,23 @@ class FollowService {
             }
 
             await follow.destroy();
+
+            // Invalidate follower count cache for both users
+            const followerCacheKey = `user:followers:${followingId}`;
+            const followingCacheKey = `user:followers:${followerId}`;
+            await Promise.all([
+                cacheService.del(followerCacheKey),
+                cacheService.del(followingCacheKey)
+            ]);
+            console.log('Invalidated follower count cache for users:', followerId, followingId);
+
+            // Also invalidate profile cache for both users to update follower counts
+            const profileCacheKey1 = `user:profile:${followingId}`;
+            const profileCacheKey2 = `user:profile:${followerId}`;
+            await Promise.all([
+                cacheService.del(profileCacheKey1),
+                cacheService.del(profileCacheKey2)
+            ]);
 
             return {
                 error: false,

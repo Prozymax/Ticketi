@@ -2,6 +2,7 @@ const { serverUrl } = require('../config/url.config');
 const Event = require('../models/event/event.model');
 const { User } = require('../models/index.model');
 const { Op } = require('sequelize');
+const cacheService = require('./cache.service');
 
 class EventService {
     /**
@@ -72,7 +73,7 @@ class EventService {
             // Upload event image to Filestack if provided
             if (fileBuffer && filename && mimetype) {
                 const filestackService = require('./filestack.service');
-                
+
                 const uploadResult = await filestackService.uploadFile(
                     fileBuffer,
                     `event-${event.id}-${filename}`,
@@ -87,6 +88,10 @@ class EventService {
                     console.error('Failed to upload event image to Filestack:', uploadResult.error);
                 }
             }
+
+            // Invalidate user event lists cache when user creates an event
+            await cacheService.deletePattern(`events:organizer:${organizerId}:*`);
+            console.log('Invalidated user event lists cache for organizer:', organizerId);
 
             return {
                 error: false,
@@ -143,6 +148,18 @@ class EventService {
      */
     getPublishedEvents = async (page = 1, limit = 10) => {
         try {
+            // Cache key pattern: events:published:page:{page}
+            const cacheKey = `events:published:page:${page}`;
+
+            // Check cache first
+            const cachedData = await cacheService.get(cacheKey);
+            if (cachedData) {
+                console.log(`Cache hit for published events page ${page}`);
+                return cachedData;
+            }
+
+            console.log(`Cache miss for published events page ${page}, fetching from database`);
+
             const offset = (page - 1) * limit;
 
             const { count, rows } = await Event.findAndCountAll({
@@ -160,7 +177,7 @@ class EventService {
                 offset: parseInt(offset)
             });
 
-            return {
+            const result = {
                 error: false,
                 message: 'Events retrieved successfully',
                 events: rows.map(event => event.toJSON()),
@@ -171,6 +188,11 @@ class EventService {
                     totalPages: Math.ceil(count / limit)
                 }
             };
+
+            // Store in cache with 300 second TTL (5 minutes)
+            await cacheService.set(cacheKey, result, 300);
+
+            return result;
         } catch (error) {
             console.error('Error fetching published events:', error);
             return {
@@ -189,6 +211,22 @@ class EventService {
      */
     getEventById = async (eventId) => {
         try {
+            // Cache key pattern: event:{eventId}
+            const cacheKey = `event:${eventId}`;
+
+            // Check cache first (cache-aside pattern)
+            const cachedEvent = await cacheService.get(cacheKey);
+            if (cachedEvent) {
+                console.log(`Cache hit for event ${eventId}`);
+                return {
+                    error: false,
+                    message: 'Event retrieved successfully',
+                    event: cachedEvent
+                };
+            }
+
+            console.log(`Cache miss for event ${eventId}, fetching from database`);
+
             const Ticket = require('../models/ticket/ticket.model');
 
             const event = await Event.findByPk(eventId, {
@@ -220,10 +258,15 @@ class EventService {
             console.log('currentView', currentView)
             await event.update({ views })
 
+            const eventData = event.toJSON();
+
+            // Store in cache with 1800 second TTL (30 minutes)
+            await cacheService.set(cacheKey, eventData, 1800);
+
             return {
                 error: false,
                 message: 'Event retrieved successfully',
-                event: event.toJSON()
+                event: eventData
             };
         } catch (error) {
             console.error('Error fetching event:', error);
@@ -352,6 +395,15 @@ class EventService {
 
             await event.update(processedUpdateData);
 
+            // Invalidate cache for specific event
+            const eventCacheKey = `event:${eventId}`;
+            await cacheService.del(eventCacheKey);
+            console.log(`Cache invalidated for event ${eventId}`);
+
+            // Invalidate user event lists cache when user updates an event
+            await cacheService.deletePattern(`events:organizer:${organizerId}:*`);
+            console.log('Invalidated user event lists cache for organizer:', organizerId);
+
             return {
                 error: false,
                 message: 'Event updated successfully',
@@ -411,6 +463,17 @@ class EventService {
             console.log('Event updated, creating tickets...');
             // Create ticket entries for the event
             await this.createEventTickets(event);
+
+            // Invalidate event cache and related list caches
+            const eventCacheKey = `event:${eventId}`;
+            await cacheService.del(eventCacheKey);
+
+            // Invalidate all event list caches (published, trending, location-based)
+            await cacheService.deletePattern('events:published:*');
+            await cacheService.deletePattern('events:trending:*');
+            await cacheService.deletePattern('events:location:*');
+
+            console.log(`Cache invalidated for event ${eventId} and related list caches`);
 
             console.log('=== Event published successfully ===');
             return {
@@ -477,6 +540,17 @@ class EventService {
 
             await event.destroy();
 
+            // Invalidate all related cache entries
+            const eventCacheKey = `event:${eventId}`;
+            await cacheService.del(eventCacheKey);
+
+            // Invalidate all event list caches
+            await cacheService.deletePattern('events:published:*');
+            await cacheService.deletePattern('events:trending:*');
+            await cacheService.deletePattern('events:location:*');
+
+            console.log(`Cache invalidated for deleted event ${eventId} and related list caches`);
+
             return {
                 error: false,
                 message: 'Event deleted successfully'
@@ -530,6 +604,18 @@ class EventService {
                 return await this.getPublishedEvents(page, limit);
             }
 
+            // Cache key pattern: events:location:{location}:page:{page}
+            const cacheKey = `events:location:${cleanLocation}:page:${page}`;
+
+            // Check cache first
+            const cachedData = await cacheService.get(cacheKey);
+            if (cachedData) {
+                console.log(`Cache hit for events near ${cleanLocation} page ${page}`);
+                return cachedData;
+            }
+
+            console.log(`Cache miss for events near ${cleanLocation} page ${page}, fetching from database`);
+
             const offset = (page - 1) * limit;
 
             const { count, rows } = await Event.findAndCountAll({
@@ -550,7 +636,7 @@ class EventService {
                 offset: parseInt(offset)
             });
 
-            return {
+            const result = {
                 error: false,
                 message: 'Events near location retrieved successfully',
                 events: rows.map(event => event.toJSON()),
@@ -561,6 +647,11 @@ class EventService {
                     totalPages: Math.ceil(count / limit)
                 }
             };
+
+            // Store in cache with 300 second TTL (5 minutes)
+            await cacheService.set(cacheKey, result, 300);
+
+            return result;
         } catch (error) {
             console.error('Error fetching events near location:', error);
 
@@ -614,6 +705,18 @@ class EventService {
      */
     getTrendingEvents = async (page = 1, limit = 10) => {
         try {
+            // Cache key pattern: events:trending:page:{page}
+            const cacheKey = `events:trending:page:${page}`;
+
+            // Check cache first
+            const cachedData = await cacheService.get(cacheKey);
+            if (cachedData) {
+                console.log(`Cache hit for trending events page ${page}`);
+                return cachedData;
+            }
+
+            console.log(`Cache miss for trending events page ${page}, fetching from database`);
+
             const offset = (page - 1) * limit;
 
             const { count, rows } = await Event.findAndCountAll({
@@ -631,7 +734,7 @@ class EventService {
                 offset: parseInt(offset)
             });
 
-            return {
+            const result = {
                 error: false,
                 message: 'Trending events retrieved successfully',
                 events: rows.map(event => event.toJSON()),
@@ -642,6 +745,11 @@ class EventService {
                     totalPages: Math.ceil(count / limit)
                 }
             };
+
+            // Store in cache with 600 second TTL (10 minutes)
+            await cacheService.set(cacheKey, result, 600);
+
+            return result;
         } catch (error) {
             console.error('Error fetching trending events:', error);
             return {

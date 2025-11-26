@@ -1,4 +1,5 @@
 const { User } = require("../models/index.model");
+const cacheService = require('./cache.service');
 
 class ProfileService {
     /**
@@ -8,6 +9,21 @@ class ProfileService {
      */
     getUserProfile = async (userId) => {
         try {
+            // Cache key for user profile
+            const profileCacheKey = `user:profile:${userId}`;
+
+            // Try to get from cache first (cache-aside pattern)
+            const cachedProfile = await cacheService.get(profileCacheKey);
+            if (cachedProfile) {
+                console.log('User profile retrieved from cache:', userId);
+                return {
+                    error: false,
+                    message: 'Profile retrieved successfully',
+                    user: cachedProfile
+                };
+            }
+
+            // Cache miss - fetch from database
             const user = await User.findByPk(userId, {
                 attributes: [
                     'id',
@@ -49,7 +65,17 @@ class ProfileService {
             delete userWithStats.followers;
             delete userWithStats.following;
 
-            console.log('User profile with stats:', userWithStats);
+            console.log('User profile fetched from database:', userWithStats);
+
+            // Store in cache with 1800 second TTL (30 minutes)
+            await cacheService.set(profileCacheKey, userWithStats, 1800);
+
+            // Also cache follower count separately with 300 second TTL (5 minutes)
+            const followersCacheKey = `user:followers:${userId}`;
+            await cacheService.set(followersCacheKey, {
+                followersCount,
+                followingCount
+            }, 300);
 
             return {
                 error: false,
@@ -68,7 +94,7 @@ class ProfileService {
 
     getProfileImage = async (userId) => {
         try {
-            if(!userId) return { error: true, message: 'User not found', user: [] }
+            if (!userId) return { error: true, message: 'User not found', user: [] }
             const user = await User.findByPk(userId, {
                 attributes: ['profileImage']
             });
@@ -138,6 +164,11 @@ class ProfileService {
                 ]
             });
 
+            // Invalidate user profile cache
+            const profileCacheKey = `user:profile:${userId}`;
+            await cacheService.del(profileCacheKey);
+            console.log('Invalidated profile cache for user:', userId);
+
             return {
                 error: false,
                 message: 'Profile updated successfully',
@@ -204,7 +235,7 @@ class ProfileService {
 
             // Get current user to check for existing profile image
             const user = await User.findByPk(userId);
-            
+
             if (!user) {
                 return { error: true, message: 'User not found', user: null };
             }
@@ -215,7 +246,7 @@ class ProfileService {
                     // Extract handle from Filestack URL
                     const urlParts = user.profileImage.split('/');
                     const oldHandle = urlParts[urlParts.length - 1];
-                    
+
                     await filestackService.deleteFile(oldHandle);
                     console.log('Deleted old profile image from Filestack');
                 } catch (deleteError) {
@@ -241,7 +272,7 @@ class ProfileService {
 
             // Update user with new profile image URL from Filestack
             const profileImageUrl = uploadResult.url;
-            
+
             await user.update({
                 profileImage: profileImageUrl
             });
@@ -285,6 +316,11 @@ class ProfileService {
 
             delete userWithStats.followers;
             delete userWithStats.following;
+
+            // Invalidate user profile cache
+            const profileCacheKey = `user:profile:${userId}`;
+            await cacheService.del(profileCacheKey);
+            console.log('Invalidated profile cache after image upload for user:', userId);
 
             return {
                 error: false,

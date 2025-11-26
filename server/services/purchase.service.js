@@ -2,6 +2,7 @@ const { Purchase, Event, Ticket, User, NFTTicket } = require('../models/index.mo
 const { logger } = require('../utils/logger');
 const { Op } = require('sequelize');
 const { sequelize } = require('../config/db.config');
+const cacheService = require('./cache.service');
 
 class PurchaseService {
     /**
@@ -72,6 +73,11 @@ class PurchaseService {
             }, { transaction });
 
             await transaction.commit();
+
+            // Invalidate event cache to reflect updated ticket availability
+            const eventCacheKey = `event:${eventId}`;
+            await cacheService.del(eventCacheKey);
+            logger.info(`Cache invalidated for event ${eventId} after ticket purchase`);
 
             logger.info(`Purchase created successfully: ${purchase.id}`);
             return { success: true, purchase };

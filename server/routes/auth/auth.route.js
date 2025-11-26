@@ -50,8 +50,8 @@ authRouter.post('/authenticate', async (request, response) => {
                 return ApiResponse.error(response, message, 403, message);
             }
 
-            // Login with newly created user
-            return await authController.login(response, user);
+            // Login with newly created user (pass request for session metadata)
+            return await authController.login(response, user, request);
         } else {
             // User exists, login with existing user
             await User.update({
@@ -60,7 +60,8 @@ authRouter.post('/authenticate', async (request, response) => {
             },
                 { where: { username } }
             );
-            return await authController.login(response, userVerified.user);
+            // Pass request for session metadata
+            return await authController.login(response, userVerified.user, request);
         }
     } catch (error) {
         console.error('Authentication error:', error);
@@ -68,13 +69,25 @@ authRouter.post('/authenticate', async (request, response) => {
     }
 })
 
-// Logout endpoint to clear cookies
-authRouter.post('/logout', (request, response) => {
+// Logout endpoint to destroy Redis session
+authRouter.post('/logout', authenticateToken, async (request, response) => {
+    return await authController.logout(request, response);
+})
+
+// Logout from all devices endpoint
+authRouter.post('/logout-all', authenticateToken, async (request, response) => {
     try {
-        return ApiResponse.success(response, null, 'Logged out successfully', 200);
+        const userId = request.user.id;
+        const result = await AuthService.logoutAllDevices(userId);
+        
+        if (!result.success) {
+            return ApiResponse.error(response, result.message, 500, 'Failed to logout from all devices');
+        }
+        
+        return ApiResponse.success(response, { count: result.count }, result.message, 200);
     } catch (error) {
-        console.error('Logout error:', error);
-        return ApiResponse.error(response, 'Logout failed', 500, 'Failed to logout');
+        console.error('Logout all devices error:', error);
+        return ApiResponse.error(response, 'Logout failed', 500, 'Failed to logout from all devices');
     }
 })
 

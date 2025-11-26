@@ -5,7 +5,7 @@ const config = require('./environment.config');
 const corsConfig = require('./cors.config');
 // const { securityHeaders, apiRateLimit } = require('../middleware/security.middleware');
 // const { sanitizeInput, validateFileUpload } = require('../middleware/sanitization.middleware');
-// const cacheService = require('../services/cache.service');
+const cacheService = require('../services/cache.service');
 
 class App {
     constructor() {
@@ -24,6 +24,7 @@ class App {
         this.path = require('path');
         this.initialized = false;
         this.status = [];
+        this.healthCheckInterval = null;
     }
 
     // use socket.io for real-time communication for notifications and all
@@ -44,6 +45,24 @@ class App {
                 logger.error(`Error stopping server: ${error}`);
                 return;
             }
+
+            // Clear health check interval
+            if (this.healthCheckInterval) {
+                clearInterval(this.healthCheckInterval);
+                this.healthCheckInterval = null;
+                logger.info('Health check interval cleared');
+            }
+
+            // Disconnect cache service
+            try {
+                await cacheService.disconnect();
+                this.status.push('Cache service disconnected');
+                logger.info('Cache service disconnected');
+            } catch (error) {
+                logger.error('Error disconnecting cache service:', error);
+            }
+
+            // Close database connection
             await dbManager.close();
             this.status.push('Server closed and DB connection closed');
             this.initialized = false;
@@ -65,8 +84,11 @@ class App {
             logger.info('Initializing database connection...');
 
             // Initialize cache service
-            // await this.initializeCache();
+            await this.initializeCache();
             logger.info('Initializing cache service...');
+
+            // Start health check for Redis connection
+            this.startHealthCheck();
 
             // Configure security middleware first
             // this.app.use(securityHeaders);
@@ -171,6 +193,27 @@ class App {
             logger.warn('Cache service initialization failed, running without cache:', error);
             // Don't throw error - app can run without cache
         }
+    }
+
+    startHealthCheck = () => {
+        // Validate Redis connection every 30 seconds
+        this.healthCheckInterval = setInterval(() => {
+            const health = cacheService.getHealthStatus();
+            
+            if (!health.connected && !health.fallbackMode) {
+                logger.warn('Redis health check: Connection lost, attempting reconnection...');
+            } else if (health.fallbackMode) {
+                logger.warn(`Redis health check: Running in fallback mode (reconnect attempts: ${health.reconnectAttempts})`);
+            } else {
+                logger.debug('Redis health check: Connection healthy');
+            }
+
+            // Log metrics periodically
+            const metrics = cacheService.getMetrics();
+            logger.debug('Cache metrics:', metrics);
+        }, 30000); // 30 seconds
+
+        logger.info('Redis health check started (interval: 30 seconds)');
     }
 
     getStatus = () => {
