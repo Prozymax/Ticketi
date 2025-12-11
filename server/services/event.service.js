@@ -70,14 +70,15 @@ class EventService {
 
             const event = await Event.create(dbEventData);
 
-            // Upload event image to Filestack if provided
+            // Upload event image to S3 if provided
             if (fileBuffer && filename && mimetype) {
-                const filestackService = require('./filestack.service');
+                const s3Service = require('./s3.service');
 
-                const uploadResult = await filestackService.uploadFile(
+                const uploadResult = await s3Service.uploadFile(
                     fileBuffer,
-                    `event-${event.id}-${filename}`,
-                    mimetype
+                    filename,
+                    mimetype,
+                    'events' // Store in events folder
                 );
 
                 if (uploadResult.success) {
@@ -85,7 +86,7 @@ class EventService {
                         eventImage: uploadResult.url
                     });
                 } else {
-                    console.error('Failed to upload event image to Filestack:', uploadResult.error);
+                    console.error('Failed to upload event image to S3:', uploadResult.error);
                 }
             }
 

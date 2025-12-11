@@ -231,7 +231,7 @@ class ProfileService {
      */
     uploadProfileImage = async (userId, fileBuffer, filename, mimetype) => {
         try {
-            const filestackService = require('./filestack.service');
+            const s3Service = require('./s3.service');
 
             // Get current user to check for existing profile image
             const user = await User.findByPk(userId);
@@ -240,37 +240,34 @@ class ProfileService {
                 return { error: true, message: 'User not found', user: null };
             }
 
-            // Delete old profile image from Filestack if it exists
-            if (user.profileImage && user.profileImage.includes('filestackcontent.com')) {
+            // Delete old profile image from S3 if it exists
+            if (user.profileImage && (user.profileImage.includes('s3') || user.profileImage.includes('railway'))) {
                 try {
-                    // Extract handle from Filestack URL
-                    const urlParts = user.profileImage.split('/');
-                    const oldHandle = urlParts[urlParts.length - 1];
-
-                    await filestackService.deleteFile(oldHandle);
-                    console.log('Deleted old profile image from Filestack');
+                    await s3Service.deleteFile(user.profileImage);
+                    console.log('Deleted old profile image from S3');
                 } catch (deleteError) {
                     console.error('Error deleting old profile image:', deleteError);
                     // Continue even if deletion fails
                 }
             }
 
-            // Upload to Filestack
-            const uploadResult = await filestackService.uploadFile(
+            // Upload to S3
+            const uploadResult = await s3Service.uploadFile(
                 fileBuffer,
-                `profile-${userId}-${filename}`,
-                mimetype
+                filename,
+                mimetype,
+                'profiles' // Store in profiles folder
             );
 
             if (!uploadResult.success) {
                 return {
                     error: true,
-                    message: 'Failed to upload image to Filestack',
+                    message: 'Failed to upload image to S3',
                     user: null
                 };
             }
 
-            // Update user with new profile image URL from Filestack
+            // Update user with new profile image URL from S3
             const profileImageUrl = uploadResult.url;
 
             await user.update({

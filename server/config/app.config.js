@@ -6,6 +6,7 @@ const corsConfig = require('./cors.config');
 // const { securityHeaders, apiRateLimit } = require('../middleware/security.middleware');
 // const { sanitizeInput, validateFileUpload } = require('../middleware/sanitization.middleware');
 const cacheService = require('../services/cache.service');
+const s3Service = require('../services/s3.service');
 
 class App {
     constructor() {
@@ -86,6 +87,10 @@ class App {
             // Initialize cache service
             await this.initializeCache();
             logger.info('Initializing cache service...');
+
+            // Initialize S3 service
+            await this.initializeS3();
+            logger.info('Initializing S3 storage service...');
 
             // Start health check for Redis connection
             this.startHealthCheck();
@@ -195,25 +200,77 @@ class App {
         }
     }
 
-    startHealthCheck = () => {
-        // Validate Redis connection every 30 seconds
-        this.healthCheckInterval = setInterval(() => {
-            const health = cacheService.getHealthStatus();
+    initializeS3 = async () => {
+        try {
+            logger.info('🔧 Initializing S3 storage service...');
             
-            if (!health.connected && !health.fallbackMode) {
+            const initialized = await s3Service.initialize();
+            
+            if (initialized) {
+                this.status.push('✅ S3 storage service initialized successfully.');
+                
+                // Start S3 health checks
+                s3Service.startHealthCheck(60000); // Check every 60 seconds
+                
+                const config = s3Service.getConfigInfo();
+                logger.info('✅ S3 storage service ready', {
+                    bucket: config.bucket,
+                    region: config.region,
+                    endpoint: config.endpoint,
+                    status: 'connected'
+                });
+            } else {
+                this.status.push('⚠️  S3 storage service not available - file uploads will fail.');
+                logger.warn('⚠️  S3 storage service not available');
+                logger.warn('   File uploads will fail until S3 is configured');
+                logger.warn('   Configure: S3_BUCKET_NAME, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_ENDPOINT');
+            }
+        } catch (error) {
+            this.status.push('❌ S3 storage service initialization failed: ' + error.message);
+            logger.error('❌ S3 storage service initialization failed:', {
+                error: error.message,
+                stack: error.stack
+            });
+            logger.warn('⚠️  Application will continue without S3 storage');
+            // Don't throw error - app can run without S3 (but uploads will fail)
+        }
+    }
+
+    startHealthCheck = () => {
+        // Validate Redis and S3 connections every 30 seconds
+        this.healthCheckInterval = setInterval(async () => {
+            // Redis health check
+            const redisHealth = cacheService.getHealthStatus();
+            
+            if (!redisHealth.connected && !redisHealth.fallbackMode) {
                 logger.warn('Redis health check: Connection lost, attempting reconnection...');
-            } else if (health.fallbackMode) {
-                logger.warn(`Redis health check: Running in fallback mode (reconnect attempts: ${health.reconnectAttempts})`);
+            } else if (redisHealth.fallbackMode) {
+                logger.warn(`Redis health check: Running in fallback mode (reconnect attempts: ${redisHealth.reconnectAttempts})`);
             } else {
                 logger.debug('Redis health check: Connection healthy');
             }
 
+            // S3 health check
+            const s3Health = s3Service.getHealthStatus();
+            
+            if (s3Health.initialized && !s3Health.connected) {
+                logger.warn('S3 health check: Connection lost', {
+                    bucket: s3Health.bucket,
+                    lastCheck: s3Health.lastHealthCheck?.timestamp
+                });
+            } else if (s3Health.connected) {
+                logger.debug('S3 health check: Connection healthy', {
+                    uploads: s3Health.metrics.uploads,
+                    errors: s3Health.metrics.errors
+                });
+            }
+
             // Log metrics periodically
-            const metrics = cacheService.getMetrics();
-            logger.debug('Cache metrics:', metrics);
+            const cacheMetrics = cacheService.getMetrics();
+            logger.debug('Cache metrics:', cacheMetrics);
         }, 30000); // 30 seconds
 
-        logger.info('Redis health check started (interval: 30 seconds)');
+        logger.info('🏥 Health check started for Redis and S3 (interval: 30 seconds)');
     }
 
     getStatus = () => {
