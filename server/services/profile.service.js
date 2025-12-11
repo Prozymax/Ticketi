@@ -1,5 +1,6 @@
 const { User } = require("../models/index.model");
 const cacheService = require('./cache.service');
+const { logger } = require('../utils/logger');
 
 class ProfileService {
     /**
@@ -15,7 +16,7 @@ class ProfileService {
             // Try to get from cache first (cache-aside pattern)
             const cachedProfile = await cacheService.get(profileCacheKey);
             if (cachedProfile) {
-                console.log('User profile retrieved from cache:', userId);
+                logger.debug('User profile retrieved from cache:', userId);
                 return {
                     error: false,
                     message: 'Profile retrieved successfully',
@@ -65,7 +66,7 @@ class ProfileService {
             delete userWithStats.followers;
             delete userWithStats.following;
 
-            console.log('User profile fetched from database:', userWithStats);
+            logger.debug('User profile fetched from database:', userId);
 
             // Store in cache with 1800 second TTL (30 minutes)
             await cacheService.set(profileCacheKey, userWithStats, 1800);
@@ -101,7 +102,7 @@ class ProfileService {
             if (!user) {
                 return { error: true, message: 'User not found', user: [] };
             }
-            console.log(user)
+            logger.debug('Profile image retrieved for user:', userId);
             return {
                 error: false,
                 message: 'Profile retrieved successfully',
@@ -167,7 +168,7 @@ class ProfileService {
             // Invalidate user profile cache
             const profileCacheKey = `user:profile:${userId}`;
             await cacheService.del(profileCacheKey);
-            console.log('Invalidated profile cache for user:', userId);
+            logger.info('✅ Profile cache invalidated after update', { userId });
 
             return {
                 error: false,
@@ -244,7 +245,7 @@ class ProfileService {
             if (user.profileImage && (user.profileImage.includes('s3') || user.profileImage.includes('railway'))) {
                 try {
                     await s3Service.deleteFile(user.profileImage);
-                    console.log('Deleted old profile image from S3');
+                    logger.info('✅ Deleted old profile image from S3', { userId });
                 } catch (deleteError) {
                     console.error('Error deleting old profile image:', deleteError);
                     // Continue even if deletion fails
@@ -317,7 +318,7 @@ class ProfileService {
             // Invalidate user profile cache
             const profileCacheKey = `user:profile:${userId}`;
             await cacheService.del(profileCacheKey);
-            console.log('Invalidated profile cache after image upload for user:', userId);
+            logger.info('✅ Profile image uploaded successfully - cache invalidated', { userId });
 
             return {
                 error: false,

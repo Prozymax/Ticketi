@@ -126,18 +126,24 @@ class S3Service {
             const key = `${folder}/${timestamp}-${randomString}-${sanitizedFilename}`;
 
             // Upload to S3
+            // Note: Railway S3 doesn't support ACL parameter, files are public by default
             const command = new PutObjectCommand({
                 Bucket: this.bucketName,
                 Key: key,
                 Body: fileBuffer,
                 ContentType: mimetype,
-                ACL: 'public-read', // Make file publicly accessible
-                CacheControl: 'max-age=31536000' // Cache for 1 year
+                CacheControl: 'max-age=31536000', // Cache for 1 year
+                // Metadata to help with debugging
+                Metadata: {
+                    'uploaded-at': new Date().toISOString(),
+                    'original-filename': filename
+                }
             });
 
             await this.client.send(command);
 
             // Generate public URL
+            // Railway S3 format: https://storage.railway.app/bucket-name/key
             const url = `${this.publicUrl}/${key}`;
 
             // Update metrics

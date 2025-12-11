@@ -45,6 +45,11 @@ const nextConfig: NextConfig = {
         hostname: "cdn.filestackcontent.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "storage.railway.app",
+        pathname: "/**",
+      },
     ],
   },
 };
