@@ -33,21 +33,16 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "backend.mainnet.ticketi.xyz",
-        pathname: "/uploads/**",
+        pathname: "/**", // Allow all paths including /api/media/**
       },
       {
         protocol: "https",
         hostname: "backend.testnet.ticketi.xyz",
-        pathname: "/uploads/**",
+        pathname: "/**", // Allow all paths including /api/media/**
       },
       {
         protocol: "https",
         hostname: "cdn.filestackcontent.com",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "storage.railway.app",
         pathname: "/**",
       },
     ],
