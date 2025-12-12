@@ -285,4 +285,45 @@ router.get('/system', async (req, res) => {
     }
 });
 
+// List S3 Files (Browse your uploads)
+router.get('/s3/files', async (req, res) => {
+    try {
+        const prefix = req.query.folder || ''; // Optional: filter by folder (e.g., ?folder=profiles)
+        const maxKeys = parseInt(req.query.limit) || 100; // Optional: limit results
+        
+        const result = await s3Service.listFiles(prefix, maxKeys);
+        
+        if (!result.success) {
+            return res.status(500).json({
+                status: 'error',
+                timestamp: new Date().toISOString(),
+                error: 'Failed to list files',
+                message: result.error
+            });
+        }
+        
+        res.status(200).json({
+            status: 'success',
+            timestamp: new Date().toISOString(),
+            folder: prefix || 'root',
+            count: result.count,
+            truncated: result.truncated,
+            files: result.files
+        });
+        
+    } catch (error) {
+        logger.error('S3 files listing endpoint error', {
+            error: error.message,
+            stack: error.stack
+        });
+        
+        res.status(500).json({
+            status: 'error',
+            timestamp: new Date().toISOString(),
+            error: 'Failed to list S3 files',
+            message: error.message
+        });
+    }
+});
+
 module.exports = { healthRouter: router };

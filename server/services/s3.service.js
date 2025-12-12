@@ -1,5 +1,6 @@
-const { S3Client, PutObjectCommand, DeleteObjectCommand, HeadBucketCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand, HeadBucketCommand, ListObjectsV2Command } = require('@aws-sdk/client-s3');
 const { logger } = require('../utils/logger');
+const { serverUrl } = require('../config/url.config')
 
 /**
  * S3 Service for Railway S3-compatible storage
@@ -142,9 +143,13 @@ class S3Service {
 
             await this.client.send(command);
 
-            // Generate public URL
-            // Railway S3 format: https://storage.railway.app/bucket-name/key
-            const url = `${this.publicUrl}/${key}`;
+            // Generate proxied URL through backend
+            // Instead of: https://storage.railway.app/bucket/key
+            // Return: https://your-backend.com/api/media/folder/filename
+            const url = `${serverUrl}/api/media/${key}`;
+            
+            // Also store direct S3 URL for reference
+            const directUrl = `${this.publicUrl}/${key}`;
 
             // Update metrics
             this.metrics.uploads++;
@@ -154,12 +159,14 @@ class S3Service {
                 key,
                 size: fileBuffer.length,
                 mimetype,
-                url
+                proxiedUrl: url,
+                directUrl
             });
 
             return {
                 success: true,
-                url,
+                url, // Proxied URL through backend
+                directUrl, // Direct S3 URL (for reference)
                 key,
                 size: fileBuffer.length,
                 mimetype
@@ -363,6 +370,60 @@ class S3Service {
      */
     isReady() {
         return this.initialized && this.connected;
+    }
+
+    /**
+     * List files in S3 bucket
+     * @param {string} prefix - Optional prefix/folder to filter (e.g., 'profiles/')
+     * @param {number} maxKeys - Maximum number of files to return (default: 100)
+     * @returns {Object} List of files with URLs
+     */
+    async listFiles(prefix = '', maxKeys = 100) {
+        try {
+            if (!this.initialized || !this.client) {
+                throw new Error('S3 client not initialized');
+            }
+
+            const command = new ListObjectsV2Command({
+                Bucket: this.bucketName,
+                Prefix: prefix,
+                MaxKeys: maxKeys
+            });
+
+            const response = await this.client.send(command);
+
+            const files = (response.Contents || []).map(file => ({
+                key: file.Key,
+                size: file.Size,
+                lastModified: file.LastModified,
+                url: `${this.publicUrl}/${file.Key}`
+            }));
+
+            logger.info('✅ Listed S3 files', {
+                prefix,
+                count: files.length,
+                truncated: response.IsTruncated
+            });
+
+            return {
+                success: true,
+                files,
+                count: files.length,
+                truncated: response.IsTruncated,
+                prefix
+            };
+        } catch (error) {
+            logger.error('❌ Failed to list S3 files:', {
+                prefix,
+                error: error.message
+            });
+
+            return {
+                success: false,
+                error: error.message,
+                files: []
+            };
+        }
     }
 }
 

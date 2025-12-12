@@ -11,6 +11,7 @@ const { followRouter } = require('./follow/follow.route');
 const { errorHandler } = require('../middleware/error.middleware');
 const { handleDatabaseOverflow } = require('../middleware/db.middleware');
 const { healthRouter } = require('./health.route');
+const { mediaRouter } = require('./media.route');
 
 // Import payment router
 const { paymentRouter } = require('./payment/payment.route');
@@ -31,7 +32,8 @@ const apiRoutes = [
     { routes: 'payment', handlers: paymentRouter, limiter: paymentLimiter },
     { routes: 'profile', handlers: profileRouter, limiter: apiLimiter },
     { routes: 'follow', handlers: followRouter, limiter: apiLimiter },
-    { routes: 'health', handlers: healthRouter, limiter: null } // No rate limiting for health checks
+    { routes: 'health', handlers: healthRouter, limiter: null }, // No rate limiting for health checks
+    { routes: 'media', handlers: mediaRouter, limiter: null } // No rate limiting for media proxy (cached)
 ]
 
 // Health check endpoint (no rate limiting - bypassed in rate limiter middleware)
