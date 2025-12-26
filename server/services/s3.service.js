@@ -1,432 +1,346 @@
-const { S3Client, PutObjectCommand, DeleteObjectCommand, HeadBucketCommand, ListObjectsV2Command } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { logger } = require('../utils/logger');
-const { serverUrl } = require('../config/url.config')
 
 /**
- * S3 Service for Railway S3-compatible storage
- * Handles file uploads, deletions, and health monitoring
+ * S3 Service for Railway S3 Storage
+ * Replaces Filestack with Railway's S3-compatible storage
  */
 class S3Service {
     constructor() {
-        this.client = null;
-        this.bucketName = null;
-        this.region = null;
-        this.endpoint = null;
-        this.publicUrl = null;
-        this.initialized = false;
-        this.connected = false;
-        this.healthCheckInterval = null;
-        this.lastHealthCheck = null;
-        this.metrics = {
-            uploads: 0,
-            deletions: 0,
-            errors: 0,
-            lastUpload: null,
-            lastError: null
+        // Railway S3 configuration
+        this.bucketName = process.env.S3_BUCKET_NAME || 'ticketi-uploads';
+        this.region = process.env.S3_REGION || 'us-east-1';
+        this.endpoint = process.env.S3_ENDPOINT; // Railway S3 endpoint
+        this.accessKeyId = process.env.S3_ACCESS_KEY_ID;
+        this.secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
+        this.publicUrl = process.env.S3_PUBLIC_URL; // Public URL for accessing files
+
+        // Validate configuration
+        if (!this.accessKeyId || !this.secretAccessKey) {
+            logger.warn('S3 credentials not found in environment variables');
+            this.client = null;
+            return;
+        }
+
+        // Initialize S3 client
+        try {
+            const config = {
+                region: this.region,
+                credentials: {
+                    accessKeyId: this.accessKeyId,
+                    secretAccessKey: this.secretAccessKey
+                }
+            };
+
+            // Add endpoint if provided (for Railway S3)
+            if (this.endpoint) {
+                config.endpoint = this.endpoint;
+          turn  credentials: {
+       
+    async initialize() {
+                }
+            logger.info('🔧 Initializing S3 service...', {
+                bucket: this.bucketName,
+            if (this.endpoint) {
+                config.endpoint = this.endpoint;
+            });
+            }
+
+            this.client = new S3Client(config);
+                logger.warn('⚠️  S3 credentials not found in environment variables');
+                logger.warn('   Application will continue without S3 storage');
+                this.isInitializeon,
+                endpoint: this.endpoint
+            }
+
+            if (!this.endpoint) {
+                .client = null;
+                logger.warn('   Set S3_ENDPOINT in .env for Railway S3');
+                this.isInitialized = true;
+                return false;
+      nerateFilename(originalFilename,
+
+            // Initialize S3 clientath.random() * 1E9);
+            const config = {
+                region: this.region,me
+            .replace(/\.[^/.]+$/, '')
+            .replace(/[^a-zA-Z0-9]/g, '-')
+            .toLowerCase();
+        
+            };
+
+            : `${timestamp}-${random}-${sanitizedName}.${extension}`;
+    }
+
+                config.forcePathStyle = true; // Required for custom S3 endpoints
+            }
+
+                throw new Error('S3 client not initialized. Check S3 credentials.');
+            }
+
+            const key = this.generateFilename(filename, folder);
+
+            this.isConnected = trutObjectCommand({
+            this.isIni: this.bucketName,
+                Key:
+                Body: fileBuffer,
+                ContentType: mimetype,
+                endpoint: this.endpoint,
+                status: ' {
+                    'original-filename': filename,
+                    'upload-times
+            return true;
+        } cat);
+
+            await this.client.send(command);
+
+            const url = this.bucketName
+            });
+            metrics.uploads++;
+            this.metrics.totalBytesUploaded += fileBuffer.length;
+
+            logger.info('File uploaded to S3', {
+                key,
+                url,
+                size: fileBuffer.length,
+                mimetype
+            });
+
+            return {
+                success: true,
+                url,
+                key,
+                filename,
+                size: fileBuffer.length,
+                mimetype
+            };
+        } catch (error) {
+            this.metrics.errors++;
+            logger.error('Error uploading to S3:', {
+                error: error.message,
+                filename,
+                folder
+            });
+            return {nfo('✅ S3 connection test successful');
+            return true;
+        } catch (error) {
+            logger.error('❌ S3 connection test failed:', {
+                error: error.message,
+                code: error.code
+            });
+    async deleteFile(key) {
+        }
+    }if (!this.client
+
+    /**
+     * Start periodic health checks
+            const objectKey = l - Check interval Url(illiseconds (default: 60000)
+     */
+    startHeak(intervaland 0000) DeleteObjectCommand({
+                Bucket: this.ntervtName,
+            clearInterval(this
+            });
+
+        this.healthCheckInteresend(command);
+            await this.checkHealth();
+        }, interval);;
+
+            logger.info('File deleted from S3', { key: objectKey });
+
+       Generate a unique filename with timestamp
+     success: true,
+         age: 'File deleted success
+    /**
+     * Stop health checks
+     * @param {string} originalFilename - Original filename
+     * @p   logger.error('Error deleting from S3:', {
+                error: error.message,
+                key
+            });
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    extractKeyFromUrl(urlOrKey) {
+        if (!urlOrKey.startsWith('http')) {
+            return urlOrKey;
+        }
+
+        try {
+            const url = new URL(urlOrKey);
+            return url.pathname.substring(1);
+        } catch (error) {
+            return urlOrKey;
+        }
+    }
+
+    getPublicUrl(key) {
+        if (this.publicUrl) {
+            return `${this.publicUrl}/${key}`;
+        }
+
+        if (this.endpoint) {
+            return `${this.endpoint}/${this.
+        ilable = true;
+            this.isConnected = true;
+//${this.bucket`;
+    }
+
+    async getPresignedUrl(key, expiresIn = 360
+        return presConnected = false;
+            this.metrics.errors++;
+        throw new Error('S3 client not initialized. Check S3 credentials.');
+            }
+
+                code: error.code
+          })    Bucket: this.bucketName,
+                Key: key
+            });
+
+            const url = await getSignedUrl(this.client, command, { expiresIn });
+    }
+} catch (error) {
+            logger.error('Error generating presigned URL:', {
+                error: error.message,
+                key
+            });
+            throw error;
+        }
+    }
+
+    isAvailable() {
+        return this.client !== null;
+    }
+
+    getConfigInfo() {
+        return {
+            available: this.isAvailable(),
+            bucket: this.bucketName,
+            region: this.region,
+            endpoint: this.endpoint || 'default',
+            hasCredentials: !!(this.accessKeyId && this.secretAccessKey)
         };
     }
 
+    getMetrics() {
+        const uptimeMinutes = (Date.now() - this.metrics.startTime) / 60000;
+        return {
+            uploads: this.metrics.uploads,
+            deletions: this.metrics.deletions,
+            errors: this.metrics.errors,
+            totalBytesUploaded: this.metrics.totalBytesUploaded,
+            totalMBUploaded: (this.metrics.totalBytesUploaded / 1024 / 1024).toFixed(2),
+            uptimeMinutes: uptimeMinutes.toFixed(2),
+            uploadsPerMinute: uptimeMinutes > 0 ? (this.metrics.uploads / uptimeMinutes).toFixed(2) : 0
+        };
+    }
+}
+
+module.exports = new S3Service();
+            });++;
+            logger.error('Error deleting from S3:'
+                success: false,
+                error: error.message
+            };
+        }
+    }
+                error: er
+
     /**
-     * Initialize S3 client with Railway credentials
+     * Extract S3 key from full URL
+     * @param {string} urlOrKey - Full URL or S3 key
+     * @returns {string} S3 key
      */
-    async initialize() {
+    extractKeyFromUrl(urlOrKey) {
+        // If it's already a key (no http/https), return as is
+        if (!urlOrKey.startsWith('http')) {
+            return urlOrKey;
+        }
+
         try {
-            // Get configuration from environment
-            this.bucketName = process.env.S3_BUCKET_NAME;
-            this.region = process.env.S3_REGION || 'us-east-1';
-            this.endpoint = process.env.S3_ENDPOINT;
-            this.publicUrl = process.env.S3_PUBLIC_URL;
-            const accessKeyId = process.env.S3_ACCESS_KEY_ID;
-            const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
-
-            // Validate required configuration
-            if (!this.bucketName || !accessKeyId || !secretAccessKey || !this.endpoint) {
-                logger.warn('⚠️  S3 configuration incomplete. Required: S3_BUCKET_NAME, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_ENDPOINT');
-                return false;
-            }
-
-            // Create S3 client
-            this.client = new S3Client({
-                region: this.region,
-                endpoint: this.endpoint,
-                credentials: {
-                    accessKeyId,
-                    secretAccessKey
-                },
-                forcePathStyle: true, // Required for Railway S3
-                maxAttempts: 3
-            });
-
-            // Test connection
-            await this.testConnection();
-
-            this.initialized = true;
-            this.connected = true;
-
-            logger.info('✅ S3 Service initialized successfully', {
-                bucket: this.bucketName,
-                region: this.region,
-                endpoint: this.endpoint
-            });
-
-            return true;
+            const url = new URL(urlOrKey);
+            // Remove leading slash
+            return url.pathname.substring(1);
         } catch (error) {
-            logger.error('❌ S3 Service initialization failed:', {
-                error: error.message,
-                stack: error.stack
-            });
-            this.initialized = false;
-            this.connected = false;
-            return false;
+            // If URL parsing fails, assume it's already a key
+            return urlOrKey;
         }
     }
 
     /**
-     * Test S3 connection by checking bucket access
+     * Get public URL for an S3 object
+     * @param {string} key - S3 object key
+     * @returns {string} Public URL
      */
-    async testConnection() {
+    getPublicUrl(key) {
+        // Use custom public URL if provided (Railway S3)
+        if (this.publicUrl) {
+            return `${this.publicUrl}/${key}`;
+        }
+
+        // Use endpoint if provided
+        if (this.endpoint) {
+            return `${this.endpoint}/${this.bucketName}/${key}`;
+        }
+
+        // Default AWS S3 URL format
+        return `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${key}`;
+    }
+
+    /**
+     * Generate a presigned URL for temporary access
+     * @param {string} key - S3 object key
+     * @param {number} expiresIn - Expiration time in seconds (default: 3600)
+     * @returns {Promise<string>} Presigned URL
+     */
+    async getPresignedUrl(key, expiresIn = 3600) {
         try {
-            const command = new HeadBucketCommand({
-                Bucket: this.bucketName
+            if (!this.client) {
+                throw new Error('S3 client not initialized. Check S3 credentials.');
+            }
+
+            const command = new GetObjectCommand({
+                Bucket: this.bucketName,
+                Key: key
             });
 
-            await this.client.send(command);
-
-            logger.info('✅ S3 bucket connection test successful', {
-                bucket: this.bucketName
-            });
-
-            return true;
+            const url = await getSignedUrl(this.client, command, { expiresIn });
+            return url;
         } catch (error) {
-            logger.error('❌ S3 bucket connection test failed:', {
-                bucket: this.bucketName,
-                error: error.message
+            logger.error('Error generating presigned URL:', {
+                error: error.message,
+                key
             });
             throw error;
         }
     }
 
     /**
-     * Upload file to S3
-     * @param {Buffer} fileBuffer - File buffer
-     * @param {string} filename - Original filename
-     * @param {string} mimetype - File MIME type
-     * @param {string} folder - Folder/prefix in bucket (e.g., 'profiles', 'events')
-     * @returns {Object} Upload result with URL and key
+     * Check if S3 service is available
+     * @returns {boolean} Availability status
      */
-    async uploadFile(fileBuffer, filename, mimetype, folder = 'uploads') {
-        try {
-            if (!this.initialized || !this.client) {
-                throw new Error('S3 client not initialized. Please configure S3 environment variables.');
-            }
-
-            // Generate unique filename
-            const timestamp = Date.now();
-            const randomString = Math.random().toString(36).substring(2, 8);
-            const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-            const key = `${folder}/${timestamp}-${randomString}-${sanitizedFilename}`;
-
-            // Upload to S3
-            // Note: Railway S3 doesn't support ACL parameter, files are public by default
-            const command = new PutObjectCommand({
-                Bucket: this.bucketName,
-                Key: key,
-                Body: fileBuffer,
-                ContentType: mimetype,
-                CacheControl: 'max-age=31536000', // Cache for 1 year
-                // Metadata to help with debugging
-                Metadata: {
-                    'uploaded-at': new Date().toISOString(),
-                    'original-filename': filename
-                }
-            });
-
-            await this.client.send(command);
-
-            // Generate proxied URL through backend
-            // Instead of: https://storage.railway.app/bucket/key
-            // Return: https://your-backend.com/api/media/folder/filename
-            const url = `${serverUrl}/api/media/${key}`;
-            
-            // Also store direct S3 URL for reference
-            const directUrl = `${this.publicUrl}/${key}`;
-
-            // Update metrics
-            this.metrics.uploads++;
-            this.metrics.lastUpload = new Date().toISOString();
-
-            logger.info('✅ File uploaded to S3', {
-                key,
-                size: fileBuffer.length,
-                mimetype,
-                proxiedUrl: url,
-                directUrl
-            });
-
-            return {
-                success: true,
-                url, // Proxied URL through backend
-                directUrl, // Direct S3 URL (for reference)
-                key,
-                size: fileBuffer.length,
-                mimetype
-            };
-        } catch (error) {
-            this.metrics.errors++;
-            this.metrics.lastError = {
-                timestamp: new Date().toISOString(),
-                message: error.message
-            };
-
-            logger.error('❌ S3 upload failed:', {
-                filename,
-                folder,
-                error: error.message,
-                stack: error.stack
-            });
-
-            return {
-                success: false,
-                error: error.message
-            };
-        }
+    isAvailable() {
+        return this.client !== null;
     }
 
     /**
-     * Delete file from S3
-     * @param {string} fileKey - S3 object key or full URL
-     * @returns {Object} Deletion result
-     */
-    async deleteFile(fileKey) {
-        try {
-            if (!this.initialized || !this.client) {
-                throw new Error('S3 client not initialized');
-            }
-
-            // Extract key from URL if full URL is provided
-            let key = fileKey;
-            if (fileKey.includes('http')) {
-                const url = new URL(fileKey);
-                key = url.pathname.substring(1); // Remove leading slash
-
-                // Remove bucket name if it's in the path
-                if (key.startsWith(this.bucketName + '/')) {
-                    key = key.substring(this.bucketName.length + 1);
-                }
-            }
-
-            const command = new DeleteObjectCommand({
-                Bucket: this.bucketName,
-                Key: key
-            });
-
-            await this.client.send(command);
-
-            // Update metrics
-            this.metrics.deletions++;
-
-            logger.info('✅ File deleted from S3', { key });
-
-            return {
-                success: true,
-                key
-            };
-        } catch (error) {
-            this.metrics.errors++;
-            this.metrics.lastError = {
-                timestamp: new Date().toISOString(),
-                message: error.message
-            };
-
-            logger.error('❌ S3 deletion failed:', {
-                fileKey,
-                error: error.message
-            });
-
-            return {
-                success: false,
-                error: error.message
-            };
-        }
-    }
-
-    /**
-     * Start periodic health checks
-     * @param {number} interval - Check interval in milliseconds
-     */
-    startHealthCheck(interval = 60000) {
-        if (this.healthCheckInterval) {
-            clearInterval(this.healthCheckInterval);
-        }
-
-        this.healthCheckInterval = setInterval(async () => {
-            await this.performHealthCheck();
-        }, interval);
-
-        logger.info('🏥 S3 health check started', {
-            interval: `${interval / 1000}s`
-        });
-    }
-
-    /**
-     * Perform health check
-     */
-    async performHealthCheck() {
-        try {
-            if (!this.initialized) {
-                return;
-            }
-
-            const startTime = Date.now();
-            await this.testConnection();
-            const responseTime = Date.now() - startTime;
-
-            this.connected = true;
-            this.lastHealthCheck = {
-                timestamp: new Date().toISOString(),
-                status: 'healthy',
-                responseTime
-            };
-
-            logger.debug('S3 health check passed', {
-                responseTime: `${responseTime}ms`
-            });
-        } catch (error) {
-            this.connected = false;
-            this.lastHealthCheck = {
-                timestamp: new Date().toISOString(),
-                status: 'unhealthy',
-                error: error.message
-            };
-
-            logger.warn('S3 health check failed', {
-                error: error.message
-            });
-        }
-    }
-
-    /**
-     * Stop health checks
-     */
-    stopHealthCheck() {
-        if (this.healthCheckInterval) {
-            clearInterval(this.healthCheckInterval);
-            this.healthCheckInterval = null;
-            logger.info('S3 health check stopped');
-        }
-    }
-
-    /**
-     * Get configuration info
-     * @returns {Object} Configuration details
+     * Get service configuration info (for debugging)
+     * @returns {Object} Configuration info
      */
     getConfigInfo() {
         return {
-            bucket: this.bucketName || 'not-configured',
-            region: this.region || 'not-configured',
-            endpoint: this.endpoint || 'not-configured',
-            publicUrl: this.publicUrl || 'not-configured',
-            hasCredentials: !!(process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY),
-            available: this.initialized && this.connected
-        };
-    }
-
-    /**
-     * Get health status
-     * @returns {Object} Health status details
-     */
-    getHealthStatus() {
-        return {
-            initialized: this.initialized,
-            connected: this.connected,
+            available: this.isAvailable(),
             bucket: this.bucketName,
-            endpoint: this.endpoint,
-            lastHealthCheck: this.lastHealthCheck,
-            metrics: {
-                uploads: this.metrics.uploads,
-                deletions: this.metrics.deletions,
-                errors: this.metrics.errors,
-                lastUpload: this.metrics.lastUpload,
-                lastError: this.metrics.lastError
-            }
+            region: this.region,
+            endpoint: this.endpoint || 'default',
+            hasCredentials: !!(this.accessKeyId && this.secretAccessKey)
         };
-    }
-
-    /**
-     * Get metrics
-     * @returns {Object} Service metrics
-     */
-    getMetrics() {
-        return {
-            ...this.metrics,
-            uptime: this.initialized ? 'active' : 'inactive',
-            status: this.connected ? 'connected' : 'disconnected'
-        };
-    }
-
-    /**
-     * Check if service is ready
-     * @returns {boolean} Ready status
-     */
-    isReady() {
-        return this.initialized && this.connected;
-    }
-
-    /**
-     * List files in S3 bucket
-     * @param {string} prefix - Optional prefix/folder to filter (e.g., 'profiles/')
-     * @param {number} maxKeys - Maximum number of files to return (default: 100)
-     * @returns {Object} List of files with URLs
-     */
-    async listFiles(prefix = '', maxKeys = 100) {
-        try {
-            if (!this.initialized || !this.client) {
-                throw new Error('S3 client not initialized');
-            }
-
-            const command = new ListObjectsV2Command({
-                Bucket: this.bucketName,
-                Prefix: prefix,
-                MaxKeys: maxKeys
-            });
-
-            const response = await this.client.send(command);
-
-            const files = (response.Contents || []).map(file => ({
-                key: file.Key,
-                size: file.Size,
-                lastModified: file.LastModified,
-                url: `${this.publicUrl}/${file.Key}`
-            }));
-
-            logger.info('✅ Listed S3 files', {
-                prefix,
-                count: files.length,
-                truncated: response.IsTruncated
-            });
-
-            return {
-                success: true,
-                files,
-                count: files.length,
-                truncated: response.IsTruncated,
-                prefix
-            };
-        } catch (error) {
-            logger.error('❌ Failed to list S3 files:', {
-                prefix,
-                error: error.message
-            });
-
-            return {
-                success: false,
-                error: error.message,
-                files: []
-            };
-        }
     }
 }
 
 // Export singleton instance
-const s3Service = new S3Service();
-module.exports = s3Service;
+module.exports = new S3Service();
